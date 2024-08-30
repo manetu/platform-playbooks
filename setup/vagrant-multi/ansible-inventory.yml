@@ -1,0 +1,38 @@
+all:
+  hosts:
+    node-1:
+      ansible_host: 192.168.34.11
+    node-2:
+      ansible_host: 192.168.34.12
+  vars:
+    k3s_primary_host: 192.168.34.11
+    k3s_cluster_iface: enp0s8
+    metallb_addresses: 192.168.34.20-192.168.34.30
+    mgmt_dns_suffix: 192-168-34-20.sslip.io # longhorn.{{mgmt_dns_suffix}}, loki.{{mgmt_dns_suffix}}, etc
+    manetu_dns: manetu.192-168-34-21.sslip.io
+    vault_dns: vault.192-168-34-22.sslip.io
+    k3s_token: JbctBldwC4mfRofAkvh5ffPEFdegTaupvOIyNBK2q6Mpx6mmoOgT1EXc2N3h2bv7
+    cassandra_password: GILTwTpisn7ZMmeWI6QnEEHuLQbgWXJtB1lR26I5bsnQn49pID79ZvL7Yz4CyaCR
+    cassandra_tls_store: crVmerm9YRzJ8PSiy9kBuozDKwR1yoz6A9652DqhLmXSydXD552M6d7OrRRmWnaI
+    yugabyte_password: ZcLqAS2Q6UsOMmYTmFQnmJ9MwVsprfiKWshrRW0bj3G0GOlH8oPe0FMu4jba3nYK
+    minio_password: pz8REGcGrTQBaLg9U8rqsulq500O0TSwvZ1GqgTaNluu3HL5I82hF65ylhAs5oJ7
+    longhorn_password: eQ5KJv9d29IEvT5g3se0yXcpLuHZdjzdQu6qnMCi5cxSUGKjtrZ9mAf5R0xDzJTR
+    mgmt_admin_password: 2lnm3XTkBA5qcjYU0NqBInsbAfYQgJR5NMNDghRJCYwVCeDVlLSpYvhuGb91abMM
+    vault_operator_password: ECejn1XamfqQBETL7oSwIvS4gL32O9zoiHYDVsUVx9vjCVYlzGlG0koqN8L7i7DH
+    prsk_password: JUxpvK7AlTpoNcYBoghBAutSUw8tZJGSvmmwKXWv4T8zdAnLxijxNLHftDz5X8TC
+    s3_endpoint: http://192.168.34.51:9000
+    s3_access_key_id: minioadmin
+    s3_secret_access_key: minioadmin
+    s3_insecure: true
+
+k3s_primary:
+  hosts:
+    node-1:
+
+config_host:
+  hosts:
+    node-1:
+
+k3s_secondary:
+  hosts:
+    node-2:

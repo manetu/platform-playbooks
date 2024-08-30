@@ -1,0 +1,29 @@
+groups:
+- name: yugabyte.rules
+  rules:
+    - alert: High Latency for YB SET RPC Requests
+      expr: handler_latency_yb_redisserver_RedisServerService_set_internal{quantile="mean"} > 0.5
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: 'High Latency for YB SET RPC Requests'
+        description: 'Set RPC Requests latency is above the threshold of 0.5 seconds. Investigate the performance of the cluster.'
+  
+    - alert: High Latency for YB GET RPC Requests
+      expr: handler_latency_yb_redisserver_RedisServerService_get_internal{quantile="mean"} > 0.5
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: 'High Latency for YB GET RPC Requests'
+        description: 'GET RPC Requests latency is above the threshold of 0.5 seconds. Investigate the performance of the cluster.'
+
+    - alert: High Latency for YB Increase Mutation RPC Requests
+      expr: handler_latency_yb_stateful_service_PgAutoAnalyzeService_IncreaseMutationCounters{quantile="mean"} > 0.5
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: High Latency for YB Increase Mutation RPC Requests
+        description: Increase Mutation RPC Requests latency is above the threshold of 0.5 seconds. Investigate the performance of the cluster.'

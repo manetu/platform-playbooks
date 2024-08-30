@@ -1,0 +1,46 @@
+- name: Add chart repo
+  kubernetes.core.helm_repository:
+    name: hashicorp
+    repo_url: "https://helm.releases.hashicorp.com"
+
+- name: Install chart
+  kubernetes.core.helm:
+    name: vault
+    chart_ref: hashicorp/vault
+    chart_version: "{{ vault_version }}"
+    release_namespace: "{{ vault_namespace }}"
+    wait: true
+    values: "{{ lookup('template', 'values.yml') | from_yaml }}"
+
+# see https://itnext.io/big-change-in-k8s-1-24-about-serviceaccounts-and-their-secrets-4b909a4af4e0
+- name: Create secret for ServiceAccount
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ vault_namespace }}"
+    definition:
+      apiVersion: v1
+      kind: Secret
+      type: kubernetes.io/service-account-token
+      metadata:
+        name: vault
+        annotations:
+          kubernetes.io/service-account.name: "vault"
+
+- name: Wait for Vault
+  shell: kubectl -n {{ vault_namespace }} wait --timeout 300s --for=jsonpath='{.status.phase}'=Running pod {{ 'vault-' + item|string }}
+  loop: "{{ range(0, vault_replicas) }}"
+
+- name: Get CA certificate
+  when: not vault_devmode
+  kubernetes.core.k8s_info:
+    kind: Secret
+    namespace: "{{ vault_namespace }}"
+    name: vault-certificate
+    wait: true
+  register: vault_cert
+
+- name: Create Vault configuration for Manetu
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ manetu_namespace }}"
+    definition:  "{{ lookup('template', 'manetu-configmap.yml') | from_yaml }}"

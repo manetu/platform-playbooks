@@ -1,0 +1,30 @@
+- name: Set global values
+  set_fact:
+    global_values: "{{ lookup('template', 'global-values.yml') | from_yaml }}"
+
+- name: Set manetu-platform values
+  set_fact:
+    manetu_platform_values: "{{ lookup('template', 'manetu-platform-values.yml') | from_yaml }}"
+
+- name: Set mp-test specific values
+  set_fact:
+    mp_test_values: "{{ lookup('template', 'mptest-values.yml') | from_yaml }}"
+
+- name: Combine values with formatting for mp-test
+  set_fact:
+    chart_values: >
+      {{
+        global_values | combine({'manetu-platform': manetu_platform_values}) | combine(mp_test_values)
+      }}
+
+- name: Install Manetu
+  tags:
+    - manetu-install
+  kubernetes.core.helm:
+    name: manetu
+    release_namespace: "{{ manetu_namespace }}"
+    chart_ref: "{{ manetu_platform_mptest_chart_ref }}"
+    chart_version: "{{ manetu_platform_version }}"
+    wait: true
+    timeout: "{{ manetu_chart_timeout }}"
+    values: "{{ chart_values | from_yaml | ansible.builtin.combine(manetu_chart_values, recursive=true) }}"

@@ -1,0 +1,159 @@
+- name: Create VPC
+  amazon.aws.ec2_vpc_net:
+    name: "{{ aws_instance_name }}"
+    cidr_block: "{{ aws_vpc_cidr_block }}"
+    region: "{{ aws_region }}"
+  register: vpc
+
+- name: Update vpc_id
+  set_fact:
+    vpc_id: "{{ vpc.vpc.id }}"
+
+- name: Create subnets
+  amazon.aws.ec2_vpc_subnet:
+    state: present
+    region: "{{ aws_region }}"
+    vpc_id: "{{ vpc_id }}"
+    az: "{{ item.az }}"
+    cidr: "{{ item.cidr }}"
+    map_public: true
+    tags:
+      Name: "{{ aws_instance_name }}-{{ item.az }}"
+      kubernetes.io/role/elb: 1
+  loop: "{{ aws_vpc_subnets }}"
+  register: subnets
+
+- name: Update subnet_id
+  set_fact:
+    subnet_ids: "{{ subnets.results | map(attribute='subnet') | map(attribute='id') }}"
+
+- name: Create Internet gateway
+  amazon.aws.ec2_vpc_igw:
+    region: "{{ aws_region }}"
+    vpc_id: "{{ vpc_id }}"
+    tags:
+      Name: "{{ aws_instance_name }}"
+    state: present
+  register: igw
+
+- name: Create Route Table
+  amazon.aws.ec2_vpc_route_table:
+    region: "{{ aws_region }}"
+    vpc_id: "{{ vpc_id }}"
+    tags:
+      Name: "{{ aws_instance_name }}"
+    subnets: "{{ subnet_ids }}"
+    routes:
+      - dest: 0.0.0.0/0
+        gateway_id: "{{ igw.gateway_id }}"
+  register: route_table
+
+- name: Create SecurityGroup
+  amazon.aws.ec2_security_group:
+    name: "{{ aws_instance_name }}"
+    description: "{{ aws_instance_name }}"
+    region: "{{ aws_region }}"
+    vpc_id: "{{ vpc_id }}"
+    rules:
+      - proto: all
+        cidr_ip:
+          - "{{ aws_vpc_cidr_block }}"
+  register: sg
+
+- name: Update security_group
+  set_fact:
+    security_group: "{{ sg.group_id }}"
+
+- name: Create IAM EKS Cluster Role
+  amazon.aws.iam_role:
+    name: "{{ aws_instance_name }}-cluster"
+    managed_policies:
+      - arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
+    assume_role_policy_document: |
+      {
+          "Version": "2012-10-17",
+          "Statement": {
+              "Effect": "Allow",
+              "Principal": { "Service": "eks.amazonaws.com" },
+              "Action": "sts:AssumeRole"
+          }
+      }
+  register: cluster_role
+
+- name: Create EKS cluster
+  community.aws.eks_cluster:
+    name: "{{ aws_instance_name }}"
+    version: 1.28
+    region: "{{ aws_region }}"
+    role_arn: "{{ cluster_role.iam_role.arn }}"
+    subnets: "{{ subnet_ids }}"
+    security_groups:
+      - "{{ security_group }}"
+    wait: true
+  register: eks
+
+- name: Create IAM EKS Node Role
+  amazon.aws.iam_role:
+    name: "{{ aws_instance_name }}-node"
+    managed_policies:  # see https://docs.aws.amazon.com/eks/latest/userguide/security-iam-awsmanpol.html
+      - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+      - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+      - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+      - arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy
+    assume_role_policy_document: |
+      {
+          "Version": "2012-10-17",
+          "Statement": {
+              "Effect": "Allow",
+              "Principal": { "Service": "ec2.amazonaws.com" },
+              "Action": "sts:AssumeRole"
+          }
+      }
+  register: node_role
+
+- name: Create EKS Node Group
+  community.aws.eks_nodegroup:
+    name: "{{ aws_instance_name }}"
+    state: present
+    region: "{{ aws_region }}"
+    cluster_name: "{{ aws_instance_name }}"
+    node_role: "{{ node_role.iam_role.arn }}"
+    subnets: "{{ subnet_ids }}"
+    scaling_config: "{{ aws_scaling_config }}"
+    disk_size: "{{ aws_disk_size }}"
+    ami_type: 'AL2_x86_64'
+    instance_types: "{{ aws_instance_types }}"
+    capacity_type: "{{ aws_capacity_type }}"
+    tags:
+      Name: "{{ aws_instance_name }}"
+    wait: true
+
+- name: Install KUBECONFIG
+  shell: eksctl utils write-kubeconfig --kubeconfig=$HOME/.kube/config  --name {{ aws_instance_name }} --region {{ aws_region }}
+
+- name: Add the EBS CSI Driver helm repo
+  kubernetes.core.helm_repository:
+    name: aws-ebs-csi-driver
+    repo_url: "https://kubernetes-sigs.github.io/aws-ebs-csi-driver"
+
+- name: Install EBS CSI Driver chart
+  kubernetes.core.helm:
+    name: aws-ebs-csi-driver
+    chart_ref: aws-ebs-csi-driver/aws-ebs-csi-driver
+    release_namespace: kube-system
+
+- name: Create 'gp3' StorageClass
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      kind: StorageClass
+      apiVersion: storage.k8s.io/v1
+      metadata:
+        name: gp3
+      provisioner: ebs.csi.aws.com
+      volumeBindingMode: WaitForFirstConsumer
+      parameters:
+        csi.storage.k8s.io/fstype: xfs
+        type: gp3
+        iops: "16000"
+        throughput: "1000"

@@ -1,0 +1,14 @@
+- name: Add MinIO Alert Rules
+  when: alerts_enabled
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: monitoring.coreos.com/v1
+      kind: PrometheusRule
+      metadata:
+        labels:
+          prometheus: minio
+          role: alert-rules
+        name: prometheus-minio-rules
+        namespace: "{{ minio_namespace }}"
+      spec: "{{ lookup('file', 'alert-rules.yaml') | from_yaml }}"

@@ -1,0 +1,114 @@
+- name: Add chart repo
+  kubernetes.core.helm_repository:
+    name: qdrant
+    repo_url: "https://qdrant.github.io/qdrant-helm"
+
+- name: Create namespace
+  kubernetes.core.k8s:
+    name: "{{ qdrant_namespace }}"
+    api_version: v1
+    kind: Namespace
+    state: present
+
+- name: Create CA certificate
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ qdrant_namespace }}"
+    definition:
+      apiVersion: cert-manager.io/v1
+      kind: Certificate
+      metadata:
+        name: qdrant-ca-cert
+      spec:
+        isCA: true
+        duration: "{{ qdrant_tls_duration }}"
+        commonName: qdrant-ca-cert
+        secretName: qdrant-ca-secret
+        usage:
+          - "cert sign"
+        issuerRef:
+          name: selfsigned-issuer
+          kind: ClusterIssuer
+
+- name: Create CA issuer
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ qdrant_namespace }}"
+    definition:
+      apiVersion: cert-manager.io/v1
+      kind: Issuer
+      metadata:
+        name: qdrant-ca-issuer
+      spec:
+        ca:
+          secretName: qdrant-ca-secret
+
+- name: Create TLS certificate
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ qdrant_namespace }}"
+    definition:
+      apiVersion: cert-manager.io/v1
+      kind: Certificate
+      metadata:
+        name: qdrant-certificate
+      spec:
+        isCA: false
+        duration: "{{ qdrant_tls_duration }}"
+        commonName: qdrant
+        dnsNames:
+          - 'qdrant-0.qdrant-headless'
+          - 'qdrant-1.qdrant-headless'
+          - 'qdrant-2.qdrant-headless'
+          - 'qdrant-3.qdrant-headless'
+          - 'qdrant-4.qdrant-headless'
+          - 'qdrant-5.qdrant-headless'
+          - "*.{{ qdrant_namespace }}.cluster.svc.local"
+          - "*.{{ qdrant_namespace }}"
+        secretName: qdrant-certificate
+        usage:
+          - "server auth"
+          - "client auth"
+        issuerRef:
+          name: qdrant-ca-issuer
+          kind: Issuer
+
+- name: Install QDrant
+  kubernetes.core.helm:
+    name: qdrant
+    chart_ref: qdrant/qdrant
+    chart_version: "{{ qdrant_version }}"
+    release_namespace: "{{ qdrant_namespace }}"
+    wait: true
+    values:  "{{ lookup('template', 'chart-values.yml') | from_yaml }}"
+
+- name: Get CA certificate
+  kubernetes.core.k8s_info:
+    kind: Secret
+    namespace: "{{ qdrant_namespace }}"
+    name: qdrant-ca-secret
+    wait: true
+  register: ca_cert
+
+- name: Get APIKey
+  kubernetes.core.k8s_info:
+    kind: Secret
+    namespace: "{{ qdrant_namespace }}"
+    name: qdrant-apikey
+    wait: true
+  register: apikey
+
+- name: Create secrets for Manetu
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ manetu_namespace | default('manetu-platform') }}"
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: qdrant-config
+      type: Opaque
+      data:
+        QDRANT_URL: "{{ ('https://qdrant.' + qdrant_namespace + ':6333') | b64encode }}"
+        QDRANT_TLS_CERT: "{{ ca_cert.resources[0].data['ca.crt'] | b64encode }}"
+        QDRANT_APIKEY: "{{ apikey.resources[0].data['api-key'] }}"

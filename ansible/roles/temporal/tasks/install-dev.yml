@@ -1,0 +1,76 @@
+- name: Create namespace
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ temporal_namespace }}"
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "{{ temporal_namespace }}"
+
+- name: Create Temporal dev-mode deployment
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ temporal_namespace }}"
+    definition:
+      apiVersion: apps/v1
+      kind: StatefulSet
+      metadata:
+        name: temporal
+      spec:
+        replicas: 1
+        selector:
+          matchLabels:
+            app: dev-temporal
+        template:
+          metadata:
+            labels:
+              app: dev-temporal
+          spec:
+            containers:
+              - name: temporal-server
+                image: temporalio/server:1.21
+                command: ['temporal', 'server', 'start-dev', '--ip', '0.0.0.0', '--db-filename', '/data/persist.dat']
+                volumeMounts:
+                  - name: temporal-dev-data
+                    mountPath: /data
+        volumeClaimTemplates:
+          - metadata:
+              name: temporal-dev-data
+            spec:
+              accessModes:
+                - ReadWriteOnce
+              storageClassName: "{{ temporal_dev_storage_class }}"
+              resources:
+                requests:
+                  storage:  "{{ temporal_dev_storage_size }}"
+
+- name: Create Temporal service mapping
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ temporal_namespace }}"
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: temporal-frontend
+      spec:
+        selector:
+          app: dev-temporal
+        ports:
+          - protocol: TCP
+            port: 7233
+            targetPort: 7233
+
+- name: Create Temporal configuration for Manetu
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ manetu_namespace }}"
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: temporal-config
+      data:
+        TEMPORAL_HOSTPORT: "temporal-frontend.{{ temporal_namespace }}:7233"
+        TEMPORAL_TLS_ENABLED: "false"

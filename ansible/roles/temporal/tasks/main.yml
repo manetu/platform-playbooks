@@ -1,0 +1,8 @@
+- include_tasks: install-prod.yml
+  when: not temporal_dev_mode
+
+- include_tasks: install-dev.yml
+  when: temporal_dev_mode
+
+- include_tasks: monitoring.yml
+  when: monitoring_enabled

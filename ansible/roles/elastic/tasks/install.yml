@@ -1,0 +1,116 @@
+- name: Apply ECK CRD manifest to the cluster.
+  kubernetes.core.k8s:
+    state: present
+    src:  https://download.elastic.co/downloads/eck/{{ elastic_cloud_version }}/crds.yaml
+
+- name: Create ECK operator.
+  kubernetes.core.k8s:
+    state: present
+    src:  https://download.elastic.co/downloads/eck/{{ elastic_cloud_version }}/operator.yaml
+
+- name: Create namespace
+  kubernetes.core.k8s:
+    name: "{{ elasticsearch_namespace }}"
+    api_version: v1
+    kind: Namespace
+    state: present
+
+- name: Create basicauth secret
+  kubernetes.core.k8s:
+    namespace: "{{ elasticsearch_namespace }}"
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: default-basicauth-creds
+      type: kubernetes.io/basic-auth
+      stringData:
+        username: elastic
+        password: "{{ mgmt_admin_password }}"
+        roles: kibana_admin,superuser
+
+- name: Deploy ElasticSearch
+  kubernetes.core.k8s:
+    namespace: "{{ elasticsearch_namespace }}"
+    state: present
+    definition:
+      apiVersion: elasticsearch.k8s.elastic.co/v1
+      kind: Elasticsearch
+      metadata:
+        name: "{{ elasticsearch_name }}"
+      spec:
+        version: "{{ elasticsearch_version }}"
+        auth:
+          fileRealm:
+          - secretName: default-basicauth-creds
+        nodeSets:
+        - name: default
+          count: "{{ elasticsearch_replicas }}"
+          config:
+            node.store.allow_mmap: false
+          volumeClaimTemplates:
+           - metadata:
+               name: elasticsearch-data # Do not change this name: see https://www.elastic.co/guide/en/cloud-on-k8s/master/k8s-volume-claim-templates.html
+             spec:
+               accessModes:
+               - ReadWriteOnce
+               resources:
+                 requests:
+                   storage: "{{ elasticsearch_storage_size }}"
+               storageClassName: "{{ elasticsearch_storage_class }}"
+
+- name: Configure ElasticSearch Ingress
+  kubernetes.core.k8s:
+    namespace: "{{ elasticsearch_namespace }}"
+    state: present
+    definition:
+      apiVersion: traefik.io/v1alpha1
+      kind: IngressRouteTCP
+      metadata:
+        name: elastic-ingress
+      spec:
+        entryPoints:
+          - websecure
+        routes:
+        - match: HostSNI("elastic.{{ mgmt_dns_suffix }}")
+          services:
+          - name: "{{ elasticsearch_name }}-es-http"
+            port: 9200
+        tls:
+          passthrough: true
+
+- name: Deploy Kibana
+  kubernetes.core.k8s:
+    namespace: "{{ elasticsearch_namespace }}"
+    state: present
+    definition:
+      apiVersion: kibana.k8s.elastic.co/v1
+      kind: Kibana
+      metadata:
+        name: "{{ elasticsearch_name }}"
+      spec:
+        version: "{{ elasticsearch_version }}"
+        count: "{{ kibana_replicas }}"
+        elasticsearchRef:
+          name: "{{ elasticsearch_name }}"
+
+- name: Configure Kibana Ingress
+  kubernetes.core.k8s:
+    namespace: "{{ elasticsearch_namespace }}"
+    state: present
+    definition:
+      apiVersion: traefik.io/v1alpha1
+      kind: IngressRouteTCP
+      metadata:
+        name: kibana-ingress
+      spec:
+        entryPoints:
+          - websecure
+        routes:
+        - match: HostSNI("kibana.{{ mgmt_dns_suffix }}")
+          services:
+          - name: "{{ elasticsearch_name }}-kb-http"
+            port: 5601
+        tls:
+          passthrough: true

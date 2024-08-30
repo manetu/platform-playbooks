@@ -1,0 +1,39 @@
+- name: Create configuration directory
+  become: true
+  ansible.builtin.file:
+    path: /etc/rancher/k3s
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Upload configuration
+  become: true
+  template:
+    src: config.yaml
+    dest: /etc/rancher/k3s/config.yaml
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Create audit directory
+  become: true
+  ansible.builtin.file:
+    path: /var/lib/rancher/k3s/server/logs
+    state: directory
+    owner: root
+    group: root
+    mode: '0700'
+
+- name: Upload audit configuration
+  become: true
+  template:
+    src: audit.yaml
+    dest: /var/lib/rancher/k3s/server/audit.yaml
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Install K3s
+  become: true
+  shell: "{{ lookup('template', 'install.sh') }}"

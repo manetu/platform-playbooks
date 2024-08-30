@@ -1,0 +1,29 @@
+temporal_namespace: manetu-temporal
+temporal_dns: temporal.{{ mgmt_dns_suffix | default('invalid') }}
+cassandra_namespace: manetu-cassandra
+temporal_server_replicas: 3
+temporal_frontend_replicas: 3
+temporal_history_replicas: 3
+temporal_matching_replicas: 3
+temporal_worker_replicas: 3
+temporal_history_shards: 512   # IMPORTANT: This value cannot be changed, once it's set.  Tune about 1000/replica
+temporal_tls_duration: 87600h
+temporal_dev_mode: false
+temporal_dev_storage_size: 10Gi
+temporal_dev_storage_class: "{{ default_storage_class | default('default') }}"
+
+temporal_cassandra_replication_factor: 3
+
+temporal_history_resources: {}
+
+temporal_dynamic_config: {}
+#  matching.numTaskqueueReadPartitions:
+#  - value: 5
+#    constraints: {}
+#  matching.numTaskqueueWritePartitions:
+#  - value: 5
+#    constraints: {}
+
+prometheus_monitor_labels: {}
+monitoring_enabled: true
+alerts_enabled: true

@@ -1,0 +1,101 @@
+groups:
+- name: kafka.rules
+  rules:
+    - alert: Offline_Partiton_Count
+      expr: sum(kafka_controller_kafkacontroller_offlinepartitionscount{executor_name="kafka"})by(service_name)  > 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: 'Kafka {{ $labels.service_name }}: {{ $value }} partitons offline'
+        description: 'After successful leader election, if the leader for partition dies, then the partition moves to the OfflinePartition state. Offline partitions are not available for reading and writing. Restart the brokers, if needed, and check the logs for errors.'
+
+    - alert: Under_Replicated_Partition_Count
+      expr: sum(kafka_server_replicamanager_underreplicatedpartitions{executor_name="kafka"})by(service_name) > 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: 'Kafka {{ $labels.service_name }}: {{ $value }} under replicated partitons'
+        description: 'Under-replicated partitions means that one or more replicas are not available. This is usually because a broker is down.  Restart the broker, and check for errors in the logs.'
+
+    - alert: Active_Controller
+      expr: sum(kafka_controller_kafkacontroller_activecontrollercount{executor_name="kafka"})by(service_name) != 1
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: 'Kafka {{ $labels.service_name }}: No active controller'
+        description: 'No broker in the cluster is reporting as the active controller in the last 1 minute interval. During steady state there should be only one active controller per cluster.'
+
+    - alert: Broker_Count
+      expr: count(kafka_server_kafkaserver_brokerstate{executor_name="kafka"})by(service_name) == 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: 'Kafka {{ $labels.service_name }}: No Brokers online!'
+        description: 'Broker count is 0'
+
+    - alert: Network_Processor_Idle_Percent
+      expr: avg(sum(kafka_network_processor_idle_percent{executor_name="kafka"})by(service_name, task_name))by(service_name) < 0.3
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: 'Kafka {{ $labels.service_name }}: Network Processor Idle Percent is {{ $value }}!'
+        description: 'The average fraction of time the network processors are idle. A lower value {{ $value }} indicates that the network workload of the broker is very high.'
+
+    - alert: Request_Handler_Idle_Percent
+      expr: avg(kafka_server_kafkarequesthandlerpool_requesthandleravgidlepercent_count)by(service_name) < 0.3
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: 'Kafka {{ $labels.service_name }}: Request Handler Idle Percent is {{ $value }}!'
+        description: 'The average fraction of time the request handler threads (IO) are idle. A lower value {{ $value }} indicates that the workload of a broker is very high.'
+
+    - alert: Replica_Fetcher_Manager_Max_Lag
+      expr: avg(kafka_server_replicafetchermanager_maxlag)by(service_name) > 50
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: 'Kafka {{ $labels.service_name }}: Replica Fetcher Manager Max Lag is {{ $value }}!'
+        description: 'The maximum lag between the time that messages are received by the leader replica and by the follower replicas.'
+
+    - alert: Topic_Count
+      expr: count(count by (topic,service_name) (kafka_server_brokertopicmetrics_messagesin_total{executor_name="kafka"}))by(service_name) > 1000
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: 'Kafka {{ $labels.service_name }}: 1000 topics reached'
+        description: 'The number of active topics in the cluster has reached 1000.'
+    
+    - alert: Request_Queue_Time_Max
+      expr: max(kafka_network_requestmetrics_requestqueuetimems{executor_name="kafka"})by(service_name) > 100
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: 'Kafka {{ $labels.service_name }}: {{ $value }}ms request queue time'
+        description: 'Max request queue time exceeded 100ms for a request. It is the time, in milliseconds, that a request currently spends in the request queue.'
+
+    - alert: Response_Queue_Time_Max
+      expr: max(kafka_network_requestmetrics_responsequeuetimems_count{executor_name="kafka"})by(service_name) > 100
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: 'Kafka {{ $labels.service_name }}: {{ $value }}ms response queue time'
+        description: 'Max response queue time exceeded 100ms for a request. It is the length of time, in milliseconds, that the request waits in the response queue.'
+
+    - alert: Zookeeper_Sync_Connect
+      expr: avg(kafka_server_sessionexpirelistener_zookeepersyncconnects_total{executor_name="kafka"})by(service_name) < 1
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: 'Kafka {{ $labels.service_name }}: Zookeeper Sync Disconected'
+        description: 'Zookeeper Sync Disconected'

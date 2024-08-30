@@ -1,0 +1,25 @@
+- include_tasks: tls.yml
+  when: manetu_gateway_tls_internal
+
+- name: Set Helm Credentials
+  when: manetu_registry_login
+  shell: helm registry login {{ manetu_registry_dns }} -u {{ manetu_registry_username }} -p {{ manetu_registry_password }}
+
+- name: Install PeerAuthentication
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ manetu_namespace }}"
+    definition:
+      apiVersion: security.istio.io/v1beta1
+      kind: PeerAuthentication
+      metadata:
+        name: manetu-peer-authentication
+      spec:
+        mtls:
+          mode: "{{ manetu_peer_mtls_mode }}"
+
+- include_tasks: platform.yml
+  when: mp_test_enabled == false
+
+- include_tasks: mptest.yml
+  when: mp_test_enabled

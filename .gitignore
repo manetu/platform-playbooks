@@ -1,0 +1,4 @@
+.vagrant
+.vault
+wget-log
+inventories

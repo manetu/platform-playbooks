@@ -1,0 +1,36 @@
+{% if alertmanager_global_config.slack_api_url is defined -%}
+global:
+  slack_api_url: "{{ alertmanager_global_config.slack_api_url }}"  
+route:
+  group_by:
+    - alertname
+    - cluster
+    - service
+  group_wait: 30s
+  group_interval: 10m
+  repeat_interval: 3h
+  receiver: "slack-default"
+  routes:
+    - receiver: "slack-warn-critical"
+      matchers:
+        - severity =~ "warning|critical"
+      continue: true
+receivers:
+  - name: "slack-default"
+    slack_configs:
+      - channel: "{{ alertmanager_slack_channel }}"
+        send_resolved: true
+        icon_url: https://avatars3.githubusercontent.com/u/3380462
+        title: '{{ '{{' }} template "slack.alert-templates.title" . {{ '}}' }}'
+        text: '{{ '{{' }} template "slack.alert-templates.text" . {{ '}}' }}'        
+  - name: "slack-warn-critical"
+    slack_configs:
+      - channel: "{{ alertmanager_slack_channel }}"
+        send_resolved: true
+        icon_url: https://avatars3.githubusercontent.com/u/3380462
+        title: '{{ '{{' }} template "slack.alert-templates.title" . {{ '}}' }}'
+        text: '{{ '{{' }} template "slack.alert-templates.text" . {{ '}}' }}'
+{% endif -%}
+templates:
+  - '/etc/alertmanager/config/*.tmpl'
+  - '/etc/alertmanager/config/alert-templates.tmpl'

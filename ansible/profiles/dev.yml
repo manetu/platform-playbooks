@@ -1,0 +1,70 @@
+logging_enabled: false
+longhorn_storage_replicas: 1
+loki_replication_factor: 1
+loki_pod_replicas: 1
+istio_proxy_resources:
+  requests:
+    cpu: 1m
+    memory: 1Mi
+
+grafana_replicas: 1
+prometheus_replicas: 1
+alertmanager_replicas: 1
+
+minio_replicas: 1
+minio_mode: standalone
+minio_resources:
+  requests:
+    memory: 1Mi
+
+vault_replicas: 1
+cassandra_replicas: 1
+yugabyte_master_replicas: 1
+yugabyte_tserver_replicas: 1
+yugabyte_resources:
+  master:
+    requests:
+      cpu: 1m
+      memory: 1Mi
+  tserver:
+    requests:
+      cpu: 1m
+      memory: 1Mi
+
+temporal_server_replicas: 1
+temporal_frontend_replicas: 1
+temporal_history_replicas: 1
+temporal_matching_replicas: 1
+temporal_worker_replicas: 1
+temporal_cassandra_replication_factor: 1
+temporal_history_shards: 500
+
+manetu_replicas_min: 1
+
+manetu_kafka_replicationfactor: 1
+manetu_kafka_partitions: 1
+kafka_replicas: 1
+kafka_resources:
+  requests:
+    cpu: 1m
+    memory: 1Mi
+kafka_config:
+  offsets.topic.replication.factor: 1
+  transaction.state.log.replication.factor: 1
+  transaction.state.log.min.isr: 1
+  default.replication.factor: 1
+  min.insync.replicas: 1
+
+zookeeper_replicas: 1
+zookeeper_resources:
+  requests:
+    cpu: 1m
+    memory: 1Mi
+
+elasticsearch_replicas: 1
+kibana_replicas: 1
+
+qdrant_replicas: 1
+qdrant_replication_factor: 1
+qdrant_write_consistency_factor: 1
+qdrant_shard_number_per_node: 1

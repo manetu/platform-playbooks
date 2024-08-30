@@ -1,0 +1,1172 @@
+{
+    "annotations": {
+        "list": [
+            {
+                "builtIn": 1,
+                "datasource": "-- Grafana --",
+                "enable": true,
+                "hide": true,
+                "iconColor": "rgba(0, 211, 255, 1)",
+                "name": "Annotations & Alerts",
+                "type": "dashboard"
+            }
+        ]
+    },
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 0,
+    "id": 27,
+    "links": [],
+    "liveNow": false,
+    "panels": [
+        {
+            "datasource": "Prometheus",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 22,
+                "w": 4,
+                "x": 0,
+                "y": 0
+            },
+            "id": 17,
+            "options": {
+                "orientation": "auto",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "showThresholdLabels": false,
+                "showThresholdMarkers": true,
+                "text": {}
+            },
+            "pluginVersion": "10.0.1",
+            "targets": [
+                {
+                    "datasource": "Prometheus",
+                    "exemplar": true,
+                    "expr": "sum(rate(manetu_attribute_service_metrics_commands_rx_total[5m]))",
+                    "instant": false,
+                    "interval": "",
+                    "legendFormat": "",
+                    "refId": "A"
+                }
+            ],
+            "title": "Current Command Rate",
+            "type": "gauge"
+        },
+        {
+            "aliasColors": {},
+            "bars": false,
+            "dashLength": 10,
+            "dashes": false,
+            "datasource": "Prometheus",
+            "fill": 1,
+            "fillGradient": 0,
+            "gridPos": {
+                "h": 4,
+                "w": 12,
+                "x": 4,
+                "y": 0
+            },
+            "hiddenSeries": false,
+            "id": 15,
+            "interval": "30s",
+            "legend": {
+                "avg": true,
+                "current": true,
+                "max": true,
+                "min": true,
+                "show": true,
+                "total": false,
+                "values": true
+            },
+            "lines": true,
+            "linewidth": 1,
+            "nullPointMode": "null",
+            "options": {
+                "alertThreshold": true
+            },
+            "percentage": false,
+            "pluginVersion": "10.0.1",
+            "pointradius": 2,
+            "points": false,
+            "renderer": "flot",
+            "seriesOverrides": [],
+            "spaceLength": 10,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [
+                {
+                    "datasource": "Prometheus",
+                    "exemplar": true,
+                    "expr": "sum(rate(manetu_attribute_service_metrics_commands_rx_total[5m]))",
+                    "interval": "",
+                    "legendFormat": "{{pod}}",
+                    "refId": "A"
+                }
+            ],
+            "thresholds": [],
+            "timeRegions": [],
+            "title": "Command Rate",
+            "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+            },
+            "type": "graph",
+            "xaxis": {
+                "mode": "time",
+                "show": true,
+                "values": []
+            },
+            "yaxes": [
+                {
+                    "format": "reqps",
+                    "logBase": 1,
+                    "show": true
+                },
+                {
+                    "format": "short",
+                    "logBase": 1,
+                    "show": true
+                }
+            ],
+            "yaxis": {
+                "align": false
+            }
+        },
+        {
+            "datasource": "Prometheus",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        }
+                    },
+                    "mappings": [],
+                    "unit": "iops"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 6,
+                "w": 4,
+                "x": 16,
+                "y": 0
+            },
+            "id": 7,
+            "options": {
+                "displayLabels": [
+                    "percent"
+                ],
+                "legend": {
+                    "displayMode": "list",
+                    "placement": "right",
+                    "showLegend": true,
+                    "values": [
+                        "percent"
+                    ]
+                },
+                "pieType": "pie",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "text": {},
+                "tooltip": {
+                    "mode": "single",
+                    "sort": "none"
+                }
+            },
+            "pluginVersion": "7.5.11",
+            "targets": [
+                {
+                    "datasource": "Prometheus",
+                    "exemplar": true,
+                    "expr": "sum(increase(manetu_attribute_service_db_metrics_request_latency_bucket[3h])) by (le)",
+                    "format": "heatmap",
+                    "hide": false,
+                    "instant": false,
+                    "interval": "",
+                    "legendFormat": "{{le}}",
+                    "refId": "A"
+                }
+            ],
+            "title": "Database latency distribution (3 hour)",
+            "type": "piechart"
+        },
+        {
+            "datasource": "Prometheus",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    },
+                    "unit": "iops"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 6,
+                "w": 4,
+                "x": 20,
+                "y": 0
+            },
+            "id": 4,
+            "options": {
+                "displayMode": "gradient",
+                "minVizHeight": 10,
+                "minVizWidth": 0,
+                "orientation": "auto",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "showUnfilled": true,
+                "text": {},
+                "valueMode": "color"
+            },
+            "pluginVersion": "10.0.1",
+            "targets": [
+                {
+                    "datasource": "Prometheus",
+                    "exemplar": true,
+                    "expr": "sum(increase(manetu_attribute_service_db_metrics_request_latency_bucket[3h])) by (le)",
+                    "format": "heatmap",
+                    "hide": false,
+                    "instant": false,
+                    "interval": "",
+                    "legendFormat": "{{le}}",
+                    "refId": "A"
+                }
+            ],
+            "title": "Database latency distribution (3 hour)",
+            "type": "bargauge"
+        },
+        {
+            "cards": {},
+            "color": {
+                "cardColor": "#b4ff00",
+                "colorScale": "sqrt",
+                "colorScheme": "interpolateSpectral",
+                "exponent": 0.5,
+                "mode": "spectrum"
+            },
+            "dataFormat": "tsbuckets",
+            "datasource": "Prometheus",
+            "fieldConfig": {
+                "defaults": {
+                    "custom": {
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "scaleDistribution": {
+                            "type": "linear"
+                        }
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 6,
+                "w": 12,
+                "x": 4,
+                "y": 4
+            },
+            "heatmap": {},
+            "hideZeroBuckets": true,
+            "highlightCards": true,
+            "id": 11,
+            "interval": "30s",
+            "legend": {
+                "show": true
+            },
+            "options": {
+                "calculate": false,
+                "calculation": {},
+                "cellGap": 2,
+                "cellValues": {},
+                "color": {
+                    "exponent": 0.5,
+                    "fill": "#b4ff00",
+                    "mode": "scheme",
+                    "reverse": false,
+                    "scale": "exponential",
+                    "scheme": "Spectral",
+                    "steps": 128
+                },
+                "exemplars": {
+                    "color": "rgba(255,0,255,0.7)"
+                },
+                "filterValues": {
+                    "le": 1e-9
+                },
+                "legend": {
+                    "show": true
+                },
+                "rowsFrame": {
+                    "layout": "auto"
+                },
+                "showValue": "never",
+                "tooltip": {
+                    "show": true,
+                    "yHistogram": true
+                },
+                "yAxis": {
+                    "axisPlacement": "left",
+                    "reverse": false,
+                    "unit": "s"
+                }
+            },
+            "pluginVersion": "10.0.1",
+            "reverseYBuckets": false,
+            "targets": [
+                {
+                    "datasource": "Prometheus",
+                    "exemplar": true,
+                    "expr": "sum(rate(fn_duration_seconds_bucket{fn=\"manetu.attribute-service.subservice.command.vaults/handler\"}[5m])) by (le)",
+                    "format": "heatmap",
+                    "interval": "",
+                    "legendFormat": "{{le}}",
+                    "refId": "A"
+                }
+            ],
+            "title": "Overall Latency",
+            "tooltip": {
+                "show": true,
+                "showHistogram": true
+            },
+            "type": "heatmap",
+            "xAxis": {
+                "show": true
+            },
+            "yAxis": {
+                "format": "s",
+                "logBase": 1,
+                "show": true
+            },
+            "yBucketBound": "auto"
+        },
+        {
+            "aliasColors": {},
+            "bars": false,
+            "dashLength": 10,
+            "dashes": false,
+            "datasource": "Prometheus",
+            "fill": 1,
+            "fillGradient": 0,
+            "gridPos": {
+                "h": 5,
+                "w": 8,
+                "x": 16,
+                "y": 6
+            },
+            "hiddenSeries": false,
+            "id": 19,
+            "legend": {
+                "avg": true,
+                "current": true,
+                "max": true,
+                "min": true,
+                "show": true,
+                "total": false,
+                "values": true
+            },
+            "lines": true,
+            "linewidth": 1,
+            "nullPointMode": "null",
+            "options": {
+                "alertThreshold": true
+            },
+            "percentage": false,
+            "pluginVersion": "10.0.1",
+            "pointradius": 2,
+            "points": false,
+            "renderer": "flot",
+            "seriesOverrides": [],
+            "spaceLength": 10,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [
+                {
+                    "datasource": "Prometheus",
+                    "exemplar": true,
+                    "expr": "sum(rate(manetu_attribute_service_db_metrics_request_latency_count[5m]))",
+                    "interval": "",
+                    "legendFormat": "{{pod}}",
+                    "refId": "A"
+                }
+            ],
+            "thresholds": [],
+            "timeRegions": [],
+            "title": "Database Requests/Sec",
+            "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+            },
+            "type": "graph",
+            "xaxis": {
+                "mode": "time",
+                "show": true,
+                "values": []
+            },
+            "yaxes": [
+                {
+                    "format": "reqps",
+                    "logBase": 1,
+                    "show": true
+                },
+                {
+                    "format": "short",
+                    "logBase": 1,
+                    "show": true
+                }
+            ],
+            "yaxis": {
+                "align": false
+            }
+        },
+        {
+            "cards": {},
+            "color": {
+                "cardColor": "#b4ff00",
+                "colorScale": "sqrt",
+                "colorScheme": "interpolateSpectral",
+                "exponent": 0.5,
+                "mode": "spectrum"
+            },
+            "dataFormat": "tsbuckets",
+            "datasource": "Prometheus",
+            "fieldConfig": {
+                "defaults": {
+                    "custom": {
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "scaleDistribution": {
+                            "type": "linear"
+                        }
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 6,
+                "w": 12,
+                "x": 4,
+                "y": 10
+            },
+            "heatmap": {},
+            "hideZeroBuckets": true,
+            "highlightCards": true,
+            "id": 21,
+            "interval": "30s",
+            "legend": {
+                "show": true
+            },
+            "options": {
+                "calculate": false,
+                "calculation": {},
+                "cellGap": 2,
+                "cellValues": {},
+                "color": {
+                    "exponent": 0.5,
+                    "fill": "#b4ff00",
+                    "mode": "scheme",
+                    "reverse": false,
+                    "scale": "exponential",
+                    "scheme": "Spectral",
+                    "steps": 128
+                },
+                "exemplars": {
+                    "color": "rgba(255,0,255,0.7)"
+                },
+                "filterValues": {
+                    "le": 1e-9
+                },
+                "legend": {
+                    "show": true
+                },
+                "rowsFrame": {
+                    "layout": "auto"
+                },
+                "showValue": "never",
+                "tooltip": {
+                    "show": true,
+                    "yHistogram": true
+                },
+                "yAxis": {
+                    "axisPlacement": "left",
+                    "reverse": false,
+                    "unit": "s"
+                }
+            },
+            "pluginVersion": "10.0.1",
+            "reverseYBuckets": false,
+            "targets": [
+                {
+                    "datasource": "Prometheus",
+                    "exemplar": true,
+                    "expr": "sum(rate(fn_duration_seconds_bucket{fn=\"manetu.attribute-service.graph.aristotle/update\"}[5m])) by (le)",
+                    "format": "heatmap",
+                    "interval": "",
+                    "legendFormat": "{{le}}",
+                    "refId": "A"
+                }
+            ],
+            "title": "Execution Latency",
+            "tooltip": {
+                "show": true,
+                "showHistogram": true
+            },
+            "type": "heatmap",
+            "xAxis": {
+                "show": true
+            },
+            "yAxis": {
+                "format": "s",
+                "logBase": 1,
+                "show": true
+            },
+            "yBucketBound": "auto"
+        },
+        {
+            "cards": {},
+            "color": {
+                "cardColor": "#b4ff00",
+                "colorScale": "sqrt",
+                "colorScheme": "interpolateSpectral",
+                "exponent": 0.5,
+                "mode": "spectrum"
+            },
+            "dataFormat": "tsbuckets",
+            "datasource": "Prometheus",
+            "fieldConfig": {
+                "defaults": {
+                    "custom": {
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "scaleDistribution": {
+                            "type": "linear"
+                        }
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 6,
+                "w": 8,
+                "x": 16,
+                "y": 11
+            },
+            "heatmap": {},
+            "hideZeroBuckets": true,
+            "highlightCards": true,
+            "id": 6,
+            "interval": "30s",
+            "legend": {
+                "show": true
+            },
+            "options": {
+                "calculate": false,
+                "calculation": {},
+                "cellGap": 2,
+                "cellValues": {},
+                "color": {
+                    "exponent": 0.5,
+                    "fill": "#b4ff00",
+                    "mode": "scheme",
+                    "reverse": false,
+                    "scale": "exponential",
+                    "scheme": "Spectral",
+                    "steps": 128
+                },
+                "exemplars": {
+                    "color": "rgba(255,0,255,0.7)"
+                },
+                "filterValues": {
+                    "le": 1e-9
+                },
+                "legend": {
+                    "show": true
+                },
+                "rowsFrame": {
+                    "layout": "auto"
+                },
+                "showValue": "never",
+                "tooltip": {
+                    "show": true,
+                    "yHistogram": true
+                },
+                "yAxis": {
+                    "axisPlacement": "left",
+                    "reverse": false,
+                    "unit": "s"
+                }
+            },
+            "pluginVersion": "10.0.1",
+            "reverseYBuckets": false,
+            "targets": [
+                {
+                    "datasource": "Prometheus",
+                    "exemplar": true,
+                    "expr": "sum(rate(manetu_attribute_service_db_metrics_request_latency_bucket[5m])) by (le)",
+                    "format": "heatmap",
+                    "instant": false,
+                    "interval": "",
+                    "intervalFactor": 1,
+                    "legendFormat": "{{le}}",
+                    "refId": "A"
+                }
+            ],
+            "title": "Database Latency",
+            "tooltip": {
+                "show": true,
+                "showHistogram": true
+            },
+            "type": "heatmap",
+            "xAxis": {
+                "show": true
+            },
+            "yAxis": {
+                "format": "s",
+                "logBase": 1,
+                "show": true
+            },
+            "yBucketBound": "auto"
+        },
+        {
+            "cards": {},
+            "color": {
+                "cardColor": "#b4ff00",
+                "colorScale": "sqrt",
+                "colorScheme": "interpolateSpectral",
+                "exponent": 0.5,
+                "mode": "spectrum"
+            },
+            "dataFormat": "tsbuckets",
+            "datasource": "Prometheus",
+            "fieldConfig": {
+                "defaults": {
+                    "custom": {
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "scaleDistribution": {
+                            "type": "linear"
+                        }
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 6,
+                "w": 12,
+                "x": 4,
+                "y": 16
+            },
+            "heatmap": {},
+            "hideZeroBuckets": true,
+            "highlightCards": true,
+            "id": 22,
+            "interval": "30s",
+            "legend": {
+                "show": true
+            },
+            "options": {
+                "calculate": false,
+                "calculation": {},
+                "cellGap": 2,
+                "cellValues": {},
+                "color": {
+                    "exponent": 0.5,
+                    "fill": "#b4ff00",
+                    "mode": "scheme",
+                    "reverse": false,
+                    "scale": "exponential",
+                    "scheme": "Spectral",
+                    "steps": 128
+                },
+                "exemplars": {
+                    "color": "rgba(255,0,255,0.7)"
+                },
+                "filterValues": {
+                    "le": 1e-9
+                },
+                "legend": {
+                    "show": true
+                },
+                "rowsFrame": {
+                    "layout": "auto"
+                },
+                "showValue": "never",
+                "tooltip": {
+                    "show": true,
+                    "yHistogram": true
+                },
+                "yAxis": {
+                    "axisPlacement": "left",
+                    "reverse": false,
+                    "unit": "s"
+                }
+            },
+            "pluginVersion": "10.0.1",
+            "reverseYBuckets": false,
+            "targets": [
+                {
+                    "datasource": "Prometheus",
+                    "exemplar": true,
+                    "expr": "sum(rate(fn_duration_seconds_bucket{fn=\"manetu.attribute-service.txn.manager/transact!\"}[5m])) by (le)",
+                    "format": "heatmap",
+                    "interval": "",
+                    "legendFormat": "{{le}}",
+                    "refId": "A"
+                }
+            ],
+            "title": "Commit Latency",
+            "tooltip": {
+                "show": true,
+                "showHistogram": true
+            },
+            "type": "heatmap",
+            "xAxis": {
+                "show": true
+            },
+            "yAxis": {
+                "format": "s",
+                "logBase": 1,
+                "show": true
+            },
+            "yBucketBound": "auto"
+        },
+        {
+            "cards": {},
+            "color": {
+                "cardColor": "#b4ff00",
+                "colorScale": "sqrt",
+                "colorScheme": "interpolateSpectral",
+                "exponent": 0.5,
+                "mode": "spectrum"
+            },
+            "dataFormat": "tsbuckets",
+            "datasource": "Prometheus",
+            "fieldConfig": {
+                "defaults": {
+                    "custom": {
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "scaleDistribution": {
+                            "type": "linear"
+                        }
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 6,
+                "w": 8,
+                "x": 16,
+                "y": 17
+            },
+            "heatmap": {},
+            "hideZeroBuckets": true,
+            "highlightCards": true,
+            "id": 23,
+            "interval": "30s",
+            "legend": {
+                "show": true
+            },
+            "options": {
+                "calculate": false,
+                "calculation": {},
+                "cellGap": 2,
+                "cellValues": {},
+                "color": {
+                    "exponent": 0.5,
+                    "fill": "#b4ff00",
+                    "mode": "scheme",
+                    "reverse": false,
+                    "scale": "exponential",
+                    "scheme": "Spectral",
+                    "steps": 128
+                },
+                "exemplars": {
+                    "color": "rgba(255,0,255,0.7)"
+                },
+                "filterValues": {
+                    "le": 1e-9
+                },
+                "legend": {
+                    "show": true
+                },
+                "rowsFrame": {
+                    "layout": "auto"
+                },
+                "showValue": "never",
+                "tooltip": {
+                    "show": true,
+                    "yHistogram": true
+                },
+                "yAxis": {
+                    "axisPlacement": "left",
+                    "reverse": false,
+                    "unit": "s"
+                }
+            },
+            "pluginVersion": "10.0.1",
+            "reverseYBuckets": false,
+            "targets": [
+                {
+                    "datasource": "Prometheus",
+                    "exemplar": true,
+                    "expr": "sum(rate(fn_duration_seconds_bucket{fn=\"manetu.attribute-service.compiler-cache/compile\"}[5m])) by (le)",
+                    "format": "heatmap",
+                    "interval": "",
+                    "legendFormat": "{{le}}",
+                    "refId": "A"
+                }
+            ],
+            "title": "QueryEngine Compile Latency",
+            "tooltip": {
+                "show": true,
+                "showHistogram": true
+            },
+            "type": "heatmap",
+            "xAxis": {
+                "show": true
+            },
+            "yAxis": {
+                "format": "s",
+                "logBase": 1,
+                "show": true
+            },
+            "yBucketBound": "auto"
+        },
+        {
+            "datasource": "Prometheus",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 10,
+                "w": 4,
+                "x": 0,
+                "y": 22
+            },
+            "id": 26,
+            "interval": "30s",
+            "options": {
+                "orientation": "auto",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "showThresholdLabels": false,
+                "showThresholdMarkers": true,
+                "text": {}
+            },
+            "pluginVersion": "10.0.1",
+            "targets": [
+                {
+                    "datasource": "Prometheus",
+                    "exemplar": true,
+                    "expr": "sum(rate(manetu_attribute_service_metrics_query_requests_total[5m]))\n",
+                    "interval": "",
+                    "legendFormat": "",
+                    "refId": "A"
+                }
+            ],
+            "title": "Current Query Rate",
+            "type": "gauge"
+        },
+        {
+            "aliasColors": {},
+            "bars": false,
+            "dashLength": 10,
+            "dashes": false,
+            "datasource": "Prometheus",
+            "fill": 1,
+            "fillGradient": 0,
+            "gridPos": {
+                "h": 4,
+                "w": 12,
+                "x": 4,
+                "y": 22
+            },
+            "hiddenSeries": false,
+            "id": 25,
+            "interval": "30s",
+            "legend": {
+                "avg": true,
+                "current": true,
+                "max": true,
+                "min": true,
+                "show": true,
+                "total": false,
+                "values": true
+            },
+            "lines": true,
+            "linewidth": 1,
+            "nullPointMode": "null",
+            "options": {
+                "alertThreshold": true
+            },
+            "percentage": false,
+            "pluginVersion": "10.0.1",
+            "pointradius": 2,
+            "points": false,
+            "renderer": "flot",
+            "seriesOverrides": [],
+            "spaceLength": 10,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [
+                {
+                    "datasource": "Prometheus",
+                    "exemplar": true,
+                    "expr": "sum(rate(manetu_attribute_service_metrics_query_requests_total[5m]))\n",
+                    "interval": "",
+                    "legendFormat": "{{pod}}",
+                    "refId": "A"
+                }
+            ],
+            "thresholds": [],
+            "timeRegions": [],
+            "title": "Query Rate",
+            "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+            },
+            "type": "graph",
+            "xaxis": {
+                "mode": "time",
+                "show": true,
+                "values": []
+            },
+            "yaxes": [
+                {
+                    "format": "reqps",
+                    "logBase": 1,
+                    "show": true
+                },
+                {
+                    "format": "short",
+                    "logBase": 1,
+                    "show": true
+                }
+            ],
+            "yaxis": {
+                "align": false
+            }
+        },
+        {
+            "cards": {},
+            "color": {
+                "cardColor": "#b4ff00",
+                "colorScale": "sqrt",
+                "colorScheme": "interpolateSpectral",
+                "exponent": 0.5,
+                "mode": "spectrum"
+            },
+            "dataFormat": "tsbuckets",
+            "datasource": "Prometheus",
+            "fieldConfig": {
+                "defaults": {
+                    "custom": {
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "scaleDistribution": {
+                            "type": "linear"
+                        }
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 6,
+                "w": 12,
+                "x": 4,
+                "y": 26
+            },
+            "heatmap": {},
+            "hideZeroBuckets": true,
+            "highlightCards": true,
+            "id": 27,
+            "interval": "30s",
+            "legend": {
+                "show": true
+            },
+            "options": {
+                "calculate": false,
+                "calculation": {},
+                "cellGap": 2,
+                "cellValues": {},
+                "color": {
+                    "exponent": 0.5,
+                    "fill": "#b4ff00",
+                    "mode": "scheme",
+                    "reverse": false,
+                    "scale": "exponential",
+                    "scheme": "Spectral",
+                    "steps": 128
+                },
+                "exemplars": {
+                    "color": "rgba(255,0,255,0.7)"
+                },
+                "filterValues": {
+                    "le": 1e-9
+                },
+                "legend": {
+                    "show": true
+                },
+                "rowsFrame": {
+                    "layout": "auto"
+                },
+                "showValue": "never",
+                "tooltip": {
+                    "show": true,
+                    "yHistogram": true
+                },
+                "yAxis": {
+                    "axisPlacement": "left",
+                    "reverse": false,
+                    "unit": "s"
+                }
+            },
+            "pluginVersion": "10.0.1",
+            "reverseYBuckets": false,
+            "targets": [
+                {
+                    "datasource": "Prometheus",
+                    "exemplar": true,
+                    "expr": "sum(rate(fn_duration_seconds_bucket{fn=\"manetu.attribute-service.graph.aristotle/query\"}[5m])) by (le)",
+                    "format": "heatmap",
+                    "interval": "",
+                    "legendFormat": "{{le}}",
+                    "refId": "A"
+                }
+            ],
+            "title": "Execution Latency",
+            "tooltip": {
+                "show": true,
+                "showHistogram": true
+            },
+            "type": "heatmap",
+            "xAxis": {
+                "show": true
+            },
+            "yAxis": {
+                "format": "s",
+                "logBase": 1,
+                "show": true
+            },
+            "yBucketBound": "auto"
+        }
+    ],
+    "refresh": "",
+    "schemaVersion": 38,
+    "style": "dark",
+    "tags": [],
+    "templating": {
+        "list": []
+    },
+    "time": {
+        "from": "now-30m",
+        "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "",
+    "title": "Attribute Service",
+    "uid": "Js5pAWzVa",
+    "version": 3,
+    "weekStart": ""
+}

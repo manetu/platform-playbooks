@@ -1,0 +1,23 @@
+grafana_version: 7.3.7
+loki_datasource_url: http://loki-gateway.logging.svc.cluster.local
+grafana_replicas: 1
+grafana_storage_class: "{{ default_storage_class | default('default') }}"
+grafana_storage_size: 10Gi
+grafana_dns: grafana.{{ mgmt_dns_suffix }}
+
+prometheus_version: 58.0.0
+prometheus_datasource_url: http://prometheus-kube-prometheus-prometheus:9090
+prometheus_replicas: 3
+prometheus_storage_class: "{{ default_storage_class | default('default') }}"
+prometheus_storage_size: 10Gi
+prometheus_retention: 1d
+prometheus_dns: prometheus.{{ mgmt_dns_suffix }}
+
+alertmanager_replicas: 3
+alertmanager_storage_class: "{{ default_storage_class | default('default') }}"
+alertmanager_storage_size: 10Gi
+alertmanager_dns: alertmanager.{{ mgmt_dns_suffix }}
+alertmanager_slack_channel: prometheusalerts
+alertmanager_global_config: {}
+
+chaos_mesh_datasource_url: http://chaos-dashboard.chaos-mesh:2333

@@ -1,0 +1,21 @@
+- name: Uninstall Manetu to prepare for Data Migration
+  hosts: config_host
+  gather_facts: false
+  tasks:
+    - name: Confirm
+      pause:
+        prompt: Data migration requires taking the platform offline; thus, service will be unavailable during the upgrade window.  Press return to continue, or press Ctrl+c and then "a" to abort
+
+    - name: Uninstall Manetu Platform
+      kubernetes.core.helm:
+        name: manetu
+        release_namespace: "{{ manetu_namespace | default('manetu-platform') }}"
+        state: absent
+        wait: true
+        timeout: "{{ manetu_chart_timeout | default(600) }}"
+
+- name: Redeploy Manetu Platform
+  hosts: config_host
+  gather_facts: false
+  roles:
+    - manetu

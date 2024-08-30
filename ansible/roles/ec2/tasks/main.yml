@@ -1,0 +1,122 @@
+- name: Create VPC
+  amazon.aws.ec2_vpc_net:
+    name: "{{ aws_instance_name }}"
+    cidr_block: "{{ aws_vpc_cidr_block }}"
+    region: "{{ aws_region }}"
+  register: vpc
+
+- name: Update vpc_id
+  set_fact:
+    vpc_id: "{{ vpc.vpc.id }}"
+
+- name: Create subnets
+  amazon.aws.ec2_vpc_subnet:
+    state: present
+    region: "{{ aws_region }}"
+    vpc_id: "{{ vpc_id }}"
+    az: "{{ item.az }}"
+    cidr: "{{ item.cidr }}"
+    map_public: true
+    tags:
+      Name: "{{ aws_instance_name }}-{{ item.az }}"
+  loop: "{{ aws_vpc_subnets }}"
+  register: subnets
+
+- name: Update subnet_id
+  set_fact:
+    subnet_ids: "{{ subnets.results | map(attribute='subnet') | map(attribute='id') }}"
+
+- name: Create Internet gateway
+  amazon.aws.ec2_vpc_igw:
+    region: "{{ aws_region }}"
+    vpc_id: "{{ vpc_id }}"
+    tags:
+      Name: "{{ aws_instance_name }}"
+    state: present
+  register: igw
+
+- name: Create Route Table
+  amazon.aws.ec2_vpc_route_table:
+    region: "{{ aws_region }}"
+    vpc_id: "{{ vpc_id }}"
+    tags:
+      Name: "{{ aws_instance_name }}"
+    subnets: "{{ subnet_ids }}"
+    routes:
+      - dest: 0.0.0.0/0
+        gateway_id: "{{ igw.gateway_id }}"
+  register: route_table
+
+- name: Create SecurityGroup
+  amazon.aws.ec2_security_group:
+    name: "{{ aws_instance_name }}"
+    description: "{{ aws_instance_name }}"
+    region: "{{ aws_region }}"
+    vpc_id: "{{ vpc_id }}"
+    rules:
+      - proto: all
+        cidr_ip:
+          - "{{ aws_vpc_cidr_block }}"
+      - proto: tcp
+        ports:
+          - 22
+          - 80
+          - 443
+          - 6443
+        cidr_ip: 0.0.0.0/0
+  register: sg
+
+- name: Update security_group
+  set_fact:
+    security_group: "{{ sg.group_id }}"
+
+- name: Launch a EC2 instance
+  delegate_to: localhost
+  amazon.aws.ec2_instance:
+    name: "{{ aws_instance_name }}"
+    region: "{{ aws_region }}"
+    vpc_subnet_id: "{{ subnet_ids[0] }}"
+    security_group: "{{ security_group }}"
+    key_name: "{{ aws_key_name }}"
+    instance_type: "{{ aws_instance_type }}"
+    image_id: "{{ aws_image_id }}"
+    iam_instance_profile: "{{ iam_instance_profile | default('') }}"
+    tags: "{{ aws_tags | from_yaml }}"
+    network:
+      assign_public_ip: true
+      delete_on_termination: true
+    volumes:
+      - device_name: /dev/sda1
+        ebs:
+          volume_size: "{{ aws_volume_size }}"
+          volume_type: "{{ aws_volume_type }}"
+          iops: "{{ aws_volume_iops }}"
+          throughput: "{{ aws_volume_throughput }}"
+          delete_on_termination: true
+    wait: yes
+  register: ec2
+
+- name: Register DNS with Route53
+  when: aws_route53_zone is defined
+  amazon.aws.route53:
+    state: present
+    zone: "{{ aws_route53_zone }}"
+    record: "{{ manetu_dns }}"
+    type: A
+    ttl: "{{ aws_route53_ttl }}"
+    value: "{{ ec2.instances[0].public_ip_address }}"
+
+- name: Update instance facts
+  set_fact:
+    ansible_host: "{{ ec2.instances[0].public_ip_address }}"
+    aws_instance_id:  "{{ ec2.instances[0].instance_id }}"
+
+- name: Add EC2 instance to groups
+  ansible.builtin.add_host:
+    hostname: "{{ ec2.instances[0].public_ip_address }}"
+    ansible_user: ubuntu
+    ansible_ssh_private_key_file: "{{ aws_key_file }}"
+    ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+    groups:
+      - k3s_primary
+      - config_host

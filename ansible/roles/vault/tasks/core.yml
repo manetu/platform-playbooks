@@ -1,0 +1,13 @@
+- include_tasks: namespace.yml
+
+- include_tasks: tls.yml
+  when: not vault_devmode
+
+- include_tasks: install.yml
+
+- include_tasks: monitoring.yml
+  when: monitoring_enabled
+
+- include_tasks: init.yml
+  tags:
+    - vault-init            # use '--skip-tags vault-init' if vault has already been initialized

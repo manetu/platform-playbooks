@@ -1,0 +1,79 @@
+global:
+  manetu:
+    replicaCountMinimum: {{ manetu_replicas_min }}
+    imagePullSecrets:
+      - name: manetu-regcred
+    authentication:
+      audience: manetu.io
+      enabled: true
+    yugabyte:
+      keyspacePrefix: manetu
+      replication:
+        strategy: SimpleStrategy
+        factor: 3
+      configName: yugabyte-config # contains CASSANDRA_HOSTS, CASSANDRA_PORT, CASSANDRA_TLS_ENABLED
+      secretName: yugabyte-secrets # contains CASSANDRA_TLS_CERT, CASSANDRA_USERNAME, and CASSANDRA_PASSWORD
+      tls:
+        enabled: true
+    credentialName: manetu-certificate
+    gateway:
+      dnsName: {{ manetu_dns }}
+      enabled: true
+      istio_ver: 1.5
+      kind: istio
+      tls:
+        enabled: {{ manetu_gateway_tls }}
+    kafka:
+      alterTopics: true
+      createTopics: true
+      deleteTopics: false
+      initialPartitions: {{  manetu_kafka_partitions }}
+      initialReplicationFactor: {{ manetu_kafka_replicationfactor }}
+      topicPrefix: manetu
+    recaptcha:
+      enabled: false
+    securitykernel:
+      CE:
+        EnclaveType: soft-enclave
+        KccType: grpc
+    s3:
+      driver: minio
+      objectNamePrefix: manetu
+    rollbar:
+      enabled: {{ manetu_rollbar_enabled }}
+      environmentOverride: "{{ manetu_rollbar_env }}"
+    temporal:
+      enabled: true
+      hostPort: temporal-frontend.{{ temporal_namespace | default('manetu-temporal') }}:7233
+      tls:
+        enabled: {{ temporal_tls_enabled | default('true') }}
+        mtls: false
+        secret: temporal-secrets
+    platformoperator:
+      existingSecret: platform-operator-secrets
+    otel:
+      enabled: {{ tracing_enabled }}
+    gw:
+      resources:
+        requests:
+          memory: 128Mi
+        limits:
+          memory: 2Gi
+    cp:
+      resources:
+        requests:
+          memory: 128Mi
+        limits:
+          memory: 2Gi
+    ep:
+      resources:
+        requests:
+          memory: 128Mi
+        limits:
+          memory: 2Gi
+    sp:
+      resources:
+        requests:
+          memory: 128Mi
+        limits:
+          memory: 2Gi

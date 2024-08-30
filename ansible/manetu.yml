@@ -1,0 +1,4 @@
+- name: "Deploy Manetu Platform"
+  hosts: config_host
+  roles:
+    - manetu

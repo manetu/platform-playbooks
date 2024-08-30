@@ -1,0 +1,43 @@
+persistence:
+  size: "{{ qdrant_storage_size }}"
+  storageClassName: "{{ qdrant_storage_class }}"
+
+apiKey: true
+
+replicaCount: "{{ qdrant_replicas }}"
+
+resource: "{{ qdrant_resources | from_yaml }}"
+
+additionalVolumes:
+  - name: cert
+    secret:
+      secretName: qdrant-certificate
+
+additionalVolumeMounts:
+  - name: cert
+    readOnly: true
+    mountPath: /etc/qdrant/tls
+
+config:
+  telemetry_disabled: true
+  service:
+    enable_tls: true
+  tls:
+    ca_cert: /etc/qdrant/tls/ca.crt
+    cert: /etc/qdrant/tls/tls.crt
+    key: /etc/qdrant/tls/tls.key
+  cluster:
+    consensus:
+      tick_period_ms: 100
+    enabled: true
+    p2p:
+      port: 6335
+      enable_tls: true
+  collection:
+    # Number of replicas of each shard that network tries to maintain
+    replication_factor: "{{ qdrant_replication_factor }}"
+
+    # How many replicas should apply the operation for us to consider it successful
+    write_consistency_factor:  "{{ qdrant_write_consistency_factor }}"
+
+    shard_number_per_node: "{{ qdrant_shard_number_per_node }}"

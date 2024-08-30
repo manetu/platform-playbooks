@@ -1,0 +1,46 @@
+- name: "Set defaults"
+  hosts: all
+  tasks:
+    - set_fact:
+        manetu_namespace: "{{ manetu_namespace | default('manetu-platform') }}"
+        monitoring_enabled: false
+        alerts_enabled: false
+        yugabyte_loadbalancer: true
+        yugabyte_master_storage_class: gp3
+        yugabyte_tserver_storage_class: gp3
+
+- name: Create EKS environment
+  gather_facts: false
+  hosts: config_host
+  roles:
+    - python
+    - eks
+
+- name: Deploy Services
+  hosts: config_host
+  roles:
+    - cert-manager
+    - manetu-namespace  # needed to satisfy yugabyte role since it installs secrets
+    - yugabyte
+  tasks:
+    - name: Wait for Yugabyte pods
+      kubernetes.core.k8s_info:
+        namespace: "{{ yugabyte_namespace }}"
+        kind: Pod
+        field_selectors:
+          - status.phase=Running
+        name: "{{ 'yugabyte-yb-tserver-' + item|string }}"
+        wait: yes
+        wait_sleep: 10
+        wait_timeout: 360
+      loop: "{{ range(0, yugabyte_tserver_replicas) }}"
+
+- name: Configure YB DNS
+  hosts: config_host
+  vars:
+    aws_route53_namespace: manetu-yugabyte
+    aws_route53_service: yb-tserver-service
+    aws_route53_record: "{{ aws_instance_name }}.{{ aws_route53_zone }}"
+  tasks:
+    - when: aws_route53_zone is defined
+      import_tasks: tasks/service-to-route53.yml

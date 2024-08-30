@@ -1,0 +1,19 @@
+- name: Teardown Manetu
+  gather_facts: false
+  hosts: config_host
+  roles:
+    - python
+  tasks:
+    - name: Delete Manetu related namespaces
+      kubernetes.core.k8s:
+        state: absent
+        kind: Namespace
+        name: "{{ item }}"
+      loop:
+        - manetu-platform
+        - manetu-temporal
+        - manetu-yugabyte
+        - manetu-kafka
+        - manetu-cassandra
+        - manetu-minio
+        - manetu-hashicorp

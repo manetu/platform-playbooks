@@ -1,0 +1,12 @@
+qdrant_version: 0.9.3
+qdrant_enabled: false
+qdrant_namespace: manetu-qdrant
+qdrant_storage_size: 10Gi
+qdrant_storage_class: "{{ default_storage_class | default('default') }}"
+qdrant_replicas: 3
+qdrant_replication_factor: 3
+qdrant_write_consistency_factor: 2
+qdrant_shard_number_per_node: 2
+qdrant_tls_duration: 87600h
+
+qdrant_resources: {}

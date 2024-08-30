@@ -1,0 +1,38 @@
+groups:
+- name: minio.rules
+  rules:
+    - alert: High S3 Request Errors 
+      expr: rate(minio_s3_requests_4xx_errors_total[5m]) > 10
+      for: 10m
+      labels:
+        severity: warning
+      annotations:
+        summary: 'High Number of S3 Requests with Errors in MinIO'
+        description: 'The rate of S3 requests with status code 4xx is above 10 per 5 minutes. Investigate possible issues with MinIO.'
+        
+    - alert: MinIO Instance is Down
+      expr: up{job="minio"} == 0
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: 'MinIO Instance is Down'
+        description: 'The MinIO server is down or unresponsive. Investigate and restore service as soon as possible.'
+
+    - alert: High Audit Message Failure Rate
+      expr: sum(minio_audit_failed_messages)/sum(minio_audit_total_messages) * 100 > 5
+      for: 10m
+      labels:
+        severity: warning
+      annotations:
+        summary: 'High Audit Message Failure Rate'
+        description: 'Minio audit message failure rate is higher than 5%. Investigate and resolve the issue.'
+
+    - alert: Minio Cluster nodes are down
+      expr: minio_cluster_nodes_offline_total > 1
+      for: 10m
+      labels:
+        severity: warning
+      annotations:
+        summary: 'Minio Cluster Nodes are down'
+        description: '1 or more Minio Cluster Nodes are down. Investigate and resolve the issue.'

@@ -1,0 +1,108 @@
+- name: Create Kafka PodMonitor for Cluster Operator Metrics
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: monitoring.coreos.com/v1
+      kind: PodMonitor
+      metadata:
+        name: cluster-operator-metrics
+        namespace: "{{ kafka_namespace }}"
+        labels: "{{ kafka_monitor_labels | ansible.builtin.combine(prometheus_monitor_labels, recursive=true) | from_yaml }}"
+      spec:
+        selector:
+          matchLabels:
+            strimzi.io/kind: cluster-operator
+        namespaceSelector:
+          matchNames:
+            - "{{ kafka_namespace }}"
+        podMetricsEndpoints:
+        - path: /metrics
+          port: http
+
+- name: Create Kafka PodMonitor for Entity Operator Metrics
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: monitoring.coreos.com/v1
+      kind: PodMonitor
+      metadata:
+        name: entity-operator-metrics
+        namespace: "{{ kafka_namespace }}"
+        labels: "{{ kafka_monitor_labels | ansible.builtin.combine(prometheus_monitor_labels, recursive=true) | from_yaml }}"
+      spec:
+        selector:
+          matchLabels:
+            app.kubernetes.io/name: entity-operator
+        namespaceSelector:
+          matchNames:
+            - "{{ kafka_namespace }}"
+        podMetricsEndpoints:
+        - path: /metrics
+          port: healthcheck
+
+- name: Create Kafka PodMonitor for Kafka Resources Metrics
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: monitoring.coreos.com/v1
+      kind: PodMonitor
+      metadata:
+        namespace: "{{ kafka_namespace }}"
+        name: kafka-resources-metrics
+        labels: "{{ kafka_monitor_labels | ansible.builtin.combine(prometheus_monitor_labels, recursive=true) | from_yaml }}"
+      spec:
+        selector:
+          matchExpressions:
+            - key: "strimzi.io/kind"
+              operator: In
+              values: ["Kafka", "KafkaConnect"]
+        namespaceSelector:
+          matchNames:
+            - "{{ kafka_namespace }}"
+        podMetricsEndpoints:
+        - path: /metrics
+          port: tcp-prometheus
+          relabelings:
+          - separator: ;
+            regex: __meta_kubernetes_pod_label_(strimzi_io_.+)
+            replacement: $1
+            action: labelmap
+          - sourceLabels: [__meta_kubernetes_namespace]
+            separator: ;
+            regex: (.*)
+            targetLabel: namespace
+            replacement: $1
+            action: replace
+          - sourceLabels: [__meta_kubernetes_pod_name]
+            separator: ;
+            regex: (.*)
+            targetLabel: kubernetes_pod_name
+            replacement: $1
+            action: replace
+          - sourceLabels: [__meta_kubernetes_pod_node_name]
+            separator: ;
+            regex: (.*)
+            targetLabel: node_name
+            replacement: $1
+            action: replace
+          - sourceLabels: [__meta_kubernetes_pod_host_ip]
+            separator: ;
+            regex: (.*)
+            targetLabel: node_ip
+            replacement: $1
+            action: replace
+
+- name: Add Kafka Alert Rules
+  when: alerts_enabled
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: monitoring.coreos.com/v1
+      kind: PrometheusRule
+      metadata:
+        labels:
+          prometheus: kafka
+          role: alert-rules
+        name: prometheus-kafka-rules
+        namespace: "{{ kafka_namespace }}"
+      spec: "{{ lookup('file', 'alert-rules.yaml') | from_yaml }}"

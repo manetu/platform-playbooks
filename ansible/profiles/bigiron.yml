@@ -1,0 +1,75 @@
+yugabyte_tserver_replicas: 6
+yugabyte_resources:
+  master:
+    requests:
+      cpu: 2
+      memory: 2Gi
+    limits:
+      cpu: 2
+      memory: 2Gi
+  tserver:
+    requests:
+      cpu: 8
+      memory: 24Gi
+    limits:
+      cpu: 12
+      memory: 24Gi
+
+kafka_replicas: 9
+kafka_resources:
+  requests:
+    memory: 8Gi
+    cpu: 2
+  limits:
+    memory: 24Gi
+    cpu: 4
+
+zookeeper_replicas: 3
+zookeeper_resources:
+  requests:
+    memory: 8Gi
+    cpu: 2
+  limits:
+    memory: 8Gi
+    cpu: 2
+
+cassandra_replicas: 6
+cassandra_resources:
+  requests:
+    memory: 24Gi
+    cpu: 10
+  limits:
+    memory: 24Gi
+    cpu: 12
+
+temporal_server_replicas: 5
+temporal_frontend_replicas: 18
+temporal_matching_replicas: 18
+temporal_worker_replicas: 5
+
+temporal_history_replicas: 18
+temporal_history_resources: {}
+temporal_history_shards: 3000
+
+temporal_dynamic_config:
+  matching.numTaskqueueReadPartitions:
+  - value: 20
+    constraints: {}
+  matching.numTaskqueueWritePartitions:
+  - value: 20
+    constraints: {}
+
+manetu_replicas_min: 6
+manetu_chart_values:
+  mcp-attribute-service:
+    cp:
+      replicaCount: 18
+  mcp-vault-service:
+    cp:
+      replicaCount: 18
+  mcp-keycustodian-service-v2:
+    cp:
+      replicaCount: 18
+  mcp-iam-service:
+    cp:
+      replicaCount: 18

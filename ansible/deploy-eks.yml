@@ -1,0 +1,58 @@
+- name: Set defaults
+  hosts: all
+  tasks:
+    - set_fact:
+        manetu_namespace: "{{ manetu_namespace | default('manetu-platform') }}"
+        default_storage_class: gp3
+        istio_gateway_annotations:
+          "service.beta.kubernetes.io/aws-load-balancer-type": "nlb"
+
+- name: Create EKS environment
+  gather_facts: false
+  hosts: config_host
+  roles:
+    - python
+    - eks
+
+- name: Configure Management Ingress
+  hosts: config_host
+  vars:
+    aws_route53_namespace: traefik-system
+    aws_route53_service: traefik
+    aws_route53_record: "*.{{ mgmt_dns_suffix }}"
+  roles:
+    - traefik
+  tasks:
+    - when: aws_route53_zone is defined
+      import_tasks: tasks/service-to-route53.yml
+
+- name: Deploy k8s infrastructure components
+  hosts: config_host
+  roles:
+    - manetu-namespace # needs to be early so components may install configmaps/secrets
+    - cert-manager
+    - monitoring
+    - istio
+    - kiali
+    - jaeger
+
+- name: Configure Istio Ingress DNS
+  hosts: config_host
+  vars:
+    aws_route53_namespace: istio-system
+    aws_route53_service: istio-ingress-gw
+    aws_route53_record: "{{ manetu_dns }}"
+  tasks:
+    - when: aws_route53_zone is defined
+      import_tasks: tasks/service-to-route53.yml
+
+- name: Deploy Third-party
+  import_playbook: third-party.yml
+
+- name: Deploy Manetu
+  import_playbook: manetu.yml
+
+- name: "Deploy Chaos Mesh"
+  hosts: config_host
+  roles:
+    - chaos-mesh

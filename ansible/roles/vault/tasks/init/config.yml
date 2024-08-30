@@ -1,0 +1,30 @@
+- name: Create temporary directory for scripts
+  ansible.builtin.tempfile:
+    state: directory
+    suffix: vault-init
+  register: tmpdir
+
+- name: Copy scripts and policy to worker-node
+  copy:
+    src: vault-init/
+    dest: "{{ tmpdir.path }}"
+
+- name: Copy scripts and policy into vault cluster
+  kubernetes.core.k8s_cp:
+    namespace: "{{ vault_namespace }}"
+    pod: vault-0
+    local_path: "{{ tmpdir.path }}/"
+    remote_path: /tmp/manetu
+
+- name: Retrieve ServiceAccount secret
+  shell: kubectl -n {{ vault_namespace }} get secret vault -o yaml
+  register: sa_secret
+
+- set_fact:
+    sa_secret: "{{ sa_secret.stdout | from_yaml }}"
+
+- name: Configure secrets engines
+  kubernetes.core.k8s_exec:
+    namespace: "{{ vault_namespace }}"
+    pod: vault-0
+    command: sh /tmp/manetu/configure.sh {{ vault_keys.root_token }} {{ vault_devmode | string  | lower }} "{{ sa_secret.data['ca.crt'] | b64decode }}" "{{ vault_operator_password }}"

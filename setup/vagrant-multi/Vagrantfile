@@ -1,0 +1,36 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/jammy64"
+  config.ssh.insert_key = false
+
+  config.vm.provider "virtualbox" do |v|
+    v.memory = 24576
+    v.cpus = 12
+  end
+  config.disksize.size = '200GB'                         # requires 'vagrant plugin install vagrant-disksize'
+  
+  # infra node
+  config.vm.define "infra" do |node|
+    node.vm.hostname = "infra"
+    node.vm.network "private_network", ip: "192.168.34.51"
+  
+    # provisioner
+    node.vm.provision :shell, path: "setup/vagrant/infra-provision.sh"
+  
+    # Delay and check MinIO container status
+    node.vm.provision :shell, inline: <<-SHELL
+      sleep 10
+      docker ps -f "name=minio"
+    SHELL
+  end
+  
+  N = 2
+  (1..N).each do |i|
+    config.vm.define "node-#{i}" do |node|
+      node.vm.hostname = "node-#{i}"
+      node.vm.network "private_network", ip: "192.168.34.1#{i}"
+    end
+  end
+end

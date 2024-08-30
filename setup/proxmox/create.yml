@@ -1,0 +1,44 @@
+- name: Create Proxmox VM
+  hosts: proxmox
+  gather_facts: false
+
+  tasks:
+    - name: Create new VM
+      delegate_to: 127.0.0.1
+      community.general.proxmox_kvm:
+        api_host: "{{inventory_hostname}}"
+        api_user: "{{pve_api_user}}"
+        api_token_id: "{{pve_token_id}}"
+        api_token_secret: "{{pve_token_secret}}"
+        clone: "{{pve_clone_id}}"
+        node: "{{item.node}}"
+        name: "{{item.name}}"
+        full: false
+      loop: "{{vms}}"
+      register: instances
+
+    - name: Configure VMs
+      delegate_to: 127.0.0.1
+      community.general.proxmox_kvm:
+        api_host: "{{inventory_hostname}}"
+        api_user: "{{pve_api_user}}"
+        api_token_id: "{{pve_token_id}}"
+        api_token_secret: "{{pve_token_secret}}"
+        vmid: "{{item.vmid}}"
+        node: "{{item.item.node}}"
+        cores: 8
+        memory: 24576
+        update: true
+      loop: "{{ instances.results }}"
+
+    - name: Start VMs
+      delegate_to: 127.0.0.1
+      community.general.proxmox_kvm:
+        api_host: "{{inventory_hostname}}"
+        api_user: "{{pve_api_user}}"
+        api_token_id: "{{pve_token_id}}"
+        api_token_secret: "{{pve_token_secret}}"
+        vmid: "{{item.vmid}}"
+        node: "{{item.item.node}}"
+        state: started
+      loop: "{{ instances.results }}"

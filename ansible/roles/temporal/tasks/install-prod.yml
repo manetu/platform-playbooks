@@ -1,0 +1,192 @@
+- name: Create namespace
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ temporal_namespace }}"
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "{{ temporal_namespace }}"
+        labels:
+          access.manetu.io/temporal: "true"                     # grants access to itself
+          access.manetu.io/cassandra: "true"                    # grants access to the cassandra cluster
+
+- name: Install Network Policy
+  when: notyet is defined
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ temporal_namespace }}"
+    definition:
+      apiVersion: networking.k8s.io/v1
+      kind: NetworkPolicy
+      metadata:
+        name: temporal-network-policy
+      spec:
+        podSelector: {}
+        policyTypes:
+          - Ingress
+        ingress:
+          - from:
+              - namespaceSelector:
+                  matchLabels:
+                    access.manetu.io/temporal: "true"
+
+- name: Get Cassandra certificate
+  kubernetes.core.k8s_info:
+    kind: Secret
+    namespace: "{{ cassandra_namespace }}"
+    name: cassandra-client-certificate
+    wait: true
+  register: client_cert
+
+- set_fact:
+    cassandra_ca_crt: "{{ client_cert.resources[0].data['ca.crt'] | b64decode }}"
+
+- name: Create Cassandra credentials
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ temporal_namespace }}"
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: temporal-cassandra-secret
+      type: Opaque
+      data:
+        password: "{{ cassandra_password | b64encode }}"
+        ca.crt: "{{ cassandra_ca_crt | b64encode }}"
+
+- name: Create CA certificate
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ temporal_namespace }}"
+    definition:
+      apiVersion: cert-manager.io/v1
+      kind: Certificate
+      metadata:
+        name: temporal-ca-cert
+      spec:
+        isCA: true
+        duration: "{{ temporal_tls_duration }}"
+        commonName: temporal-ca-cert
+        secretName: temporal-ca-secret
+        usage:
+          - "cert sign"
+        issuerRef:
+          name: selfsigned-issuer
+          kind: ClusterIssuer
+
+- name: Create CA issuer
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ temporal_namespace }}"
+    definition:
+      apiVersion: cert-manager.io/v1
+      kind: Issuer
+      metadata:
+        name: temporal-ca-issuer
+      spec:
+        ca:
+          secretName: temporal-ca-secret
+
+- name: Create Internode TLS certificate
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ temporal_namespace }}"
+    definition:
+      apiVersion: cert-manager.io/v1
+      kind: Certificate
+      metadata:
+        name: temporal-internode-certificate
+      spec:
+        isCA: false
+        duration: "{{ temporal_tls_duration }}"
+        commonName: temporal-internode
+        dnsNames:
+          - "*.{{ temporal_namespace }}.cluster.svc.local"
+          - "*.{{ temporal_namespace }}"
+        secretName: temporal-internode-certificate
+        usage:
+          - "server auth"
+          - "client auth"
+        issuerRef:
+          name: temporal-ca-issuer
+          kind: Issuer
+
+- name: Create Frontend TLS certificate
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ temporal_namespace }}"
+    definition:
+      apiVersion: cert-manager.io/v1
+      kind: Certificate
+      metadata:
+        name: temporal-frontend-certificate
+      spec:
+        isCA: false
+        duration: "{{ temporal_tls_duration }}"
+        commonName: temporal-frontend
+        dnsNames:
+          - "temporal-frontend.{{ temporal_namespace }}.cluster.svc.local"
+          - "temporal-frontend.{{ temporal_namespace }}"
+        secretName: temporal-frontend-certificate
+        usage:
+          - "server auth"
+        issuerRef:
+          name: temporal-ca-issuer
+          kind: Issuer
+
+- name: Create temporary directory for Temporal Chart
+  ansible.builtin.tempfile:
+    state: directory
+    suffix: temporal-chart
+  register: tmpdir
+
+- name: Upload Temporal chart
+  copy:
+    src: chart/
+    dest: "{{ tmpdir.path }}"
+
+- name: Install Temporal
+  kubernetes.core.helm:
+    namespace: "{{ temporal_namespace }}"
+    name: temporal
+    chart_ref: "{{ tmpdir.path }}"
+    dependency_update: true
+    wait: true
+    values: "{{ lookup('template', 'chart-values.yml') | from_yaml }}"
+
+- name: Get CA certificate
+  kubernetes.core.k8s_info:
+    kind: Secret
+    namespace: "{{ temporal_namespace }}"
+    name: temporal-frontend-certificate
+    wait: true
+  register: client_cert
+
+- name: Create Temporal configuration for Manetu
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ manetu_namespace }}"
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: temporal-config
+      data:
+        TEMPORAL_HOSTPORT: "temporal-frontend.{{ temporal_namespace }}:7233"
+        TEMPORAL_TLS_ENABLED: "true"
+        TEMPORAL_TLS_MUTUAL: "false"
+
+- name: Create Temporal secrets for Manetu
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ manetu_namespace }}"
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: temporal-secrets
+      type: Opaque
+      data:
+        ca.crt: "{{ client_cert.resources[0].data['ca.crt']  }}"

@@ -1,0 +1,36 @@
+gateway:
+  gateway: ingress-gw
+  tls:
+    credentialName: manetu-certificate
+
+internal:
+  ingress:
+    enabled: true
+    cnamePrefix: {{ manetu_internal_dns }}
+    destination: istio-ingress-gw.istio-system.svc.cluster.local # This is the CNAME destination
+
+kafka-metrics:
+  enabled: false
+
+mcp-attribute-service:
+  qdrant:
+    enabled: {{ qdrant_enabled | default('false') }}
+    secretName: qdrant-config
+
+mcp-keycustodian-service-v2:
+  vault:
+    enabled: {{ vault_enabled | default('false') }}
+  prsk:
+    existingSecret: prsk-secrets
+mcp-provider-ui-v2:
+  features:
+    notarization: false
+mcp-notary-service:
+  enabled: false
+
+mcp-artifact-service:
+  enabled: true
+
+prometheus:
+  enabled: {{ monitoring_enabled }}
+  extraLabels: {{ prometheus_monitor_labels | from_yaml }}

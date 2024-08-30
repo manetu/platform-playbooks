@@ -1,0 +1,30 @@
+- name: Generate Proxmox Snapshot
+  hosts: proxmox
+  gather_facts: false
+
+  tasks:
+    - name: Inventory VMs
+      delegate_to: 127.0.0.1
+      community.general.proxmox_kvm:
+        api_host: "{{inventory_hostname}}"
+        api_user: "{{pve_api_user}}"
+        api_token_id: "{{pve_token_id}}"
+        api_token_secret: "{{pve_token_secret}}"
+        node: "{{item.node}}"
+        name: "{{item.name}}"
+        state: started
+      loop: "{{vms}}"
+      register: instances
+
+    - name: Snapshot VMs
+      delegate_to: 127.0.0.1
+      community.general.proxmox_snap:
+        api_host: "{{inventory_hostname}}"
+        api_user: "{{pve_api_user}}"
+        api_token_id: "{{pve_token_id}}"
+        api_token_secret: "{{pve_token_secret}}"
+        vmid: "{{item.vmid}}"
+        state: absent
+        force: true
+        snapname: pre-install
+      loop:  "{{ instances.results }}"

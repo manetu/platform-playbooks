@@ -1,0 +1,11 @@
+groups:
+- name: vault.rules
+  rules:
+    - alert: Vault sealed
+      expr: max(1 + vault_core_unsealed{}) by (pod) == 1
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: 'Vault pod: {{ $labels.pod }} is sealed. Vault admin required to unseal.'
+        description: 'Vault pod: {{ $labels.pod }} is sealed. Vault admin is required to unseal.'

@@ -1,0 +1,196 @@
+- name: Upgrade Certificates
+  hosts: config_host
+  tasks:
+    - set_fact:
+        manetu_namespace: "{{ manetu_namespace | default('manetu-platform') }}"
+        cassandra_namespace: "{{ cassandra_namespace | default('manetu-cassandra') }}"
+        minio_namespace: "{{ minio_namespace | default('manetu-minio') }}"
+        temporal_namespace: "{{ temporal_namespace | default('manetu-temporal') }}"
+        yugabyte_namespace: "{{ yugabyte_namespace | default('manetu-yugabyte') }}"
+
+    - name: Update Certficate Expiration
+      kubernetes.core.k8s:
+        state: patched
+        kind: Certificate
+        namespace: "{{ item.namespace }}"
+        name: "{{ item.name }}"
+        definition:
+          spec:
+            duration: 87600h
+            renewBefore: 1440h
+      loop:
+        - {namespace: "{{ cassandra_namespace }}", name: "cassandra-ca-cert"}
+        - {namespace: "{{ cassandra_namespace }}", name: "cassandra-certificate"}
+        - {namespace: "{{ cassandra_namespace }}", name: "cassandra-client-certificate"}
+        - {namespace: "{{ minio_namespace }}",     name: "minio-ca-cert"}
+        - {namespace: "{{ minio_namespace }}",     name: "minio-certificate"}
+        - {namespace: "{{ temporal_namespace }}",  name: "temporal-ca-cert"}
+        - {namespace: "{{ temporal_namespace }}",  name: "temporal-frontend-certificate"}
+        - {namespace: "{{ temporal_namespace }}",  name: "temporal-internode-certificate"}
+        - {namespace: "{{ yugabyte_namespace }}",  name: "yugabyte-ca"}
+        - {namespace: "{{ yugabyte_namespace }}",  name: "yb-master-yugabyte-tls-cert"}
+        - {namespace: "{{ yugabyte_namespace }}",  name: "yb-tserver-yugabyte-tls-cert"}
+        - {namespace: "{{ yugabyte_namespace }}",  name: "yugabyte-tls-client-cert"}
+
+    - name: Update YB DNS
+      kubernetes.core.k8s_json_patch:
+        kind: Certificate
+        namespace: "{{ yugabyte_namespace }}"
+        name: yb-tserver-yugabyte-tls-cert
+        patch:
+          - op: add
+            path: /spec/dnsNames/-
+            value: "yb-tservers.{{ yugabyte_namespace }}.svc.cluster.local"
+          - op: add
+            path: /spec/dnsNames/-
+            value: "yb-tservers.{{ yugabyte_namespace }}"
+
+    - name: Gather YB pod list
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: Pod
+        namespace: "{{ yugabyte_namespace }}"
+      register: ybpods
+
+    - set_fact:
+        ybpods: "{{ ybpods.resources | map(attribute='metadata') | map(attribute='name') }}"
+
+    - name: Remove stale YB ca.crt
+      kubernetes.core.k8s_exec:
+        namespace: "{{ yugabyte_namespace }}"
+        pod: "{{ item }}"
+        command: rm /mnt/disk0/certs/ca.crt
+      loop: "{{ ybpods }}"
+
+    - name: Trigger CA Renewal
+      kubernetes.core.k8s_json_patch:
+        kind: Secret
+        namespace: "{{ item.namespace }}"
+        name: "{{ item.name }}"
+        patch:
+          - op: replace
+            path: /data/tls.crt
+            value: UPDATEME
+      loop:
+        - {namespace: "{{ cassandra_namespace }}", name: "cassandra-ca-secret"}
+        - {namespace: "{{ minio_namespace }}",     name: "minio-ca-secret"}
+        - {namespace: "{{ temporal_namespace }}",  name: "temporal-ca-secret"}
+        - {namespace: "{{ yugabyte_namespace }}",  name: "yugabyte-ca"}
+
+    - name: Trigger Downstream Cert Renewal
+      kubernetes.core.k8s_json_patch:
+        kind: Secret
+        namespace: "{{ item.namespace }}"
+        name: "{{ item.name }}"
+        patch:
+          - op: replace
+            path: /data/tls.crt
+            value: UPDATEME
+      loop:
+        - {namespace: "{{ cassandra_namespace }}", name: "cassandra-certificate"}
+        - {namespace: "{{ cassandra_namespace }}", name: "cassandra-client-certificate"}
+        - {namespace: "{{ minio_namespace }}",     name: "minio-certificate"}
+        - {namespace: "{{ temporal_namespace }}",  name: "temporal-frontend-certificate"}
+        - {namespace: "{{ temporal_namespace }}",  name: "temporal-internode-certificate"}
+        - {namespace: "{{ yugabyte_namespace }}",  name: "yb-master-yugabyte-tls-cert"}
+        - {namespace: "{{ yugabyte_namespace }}",  name: "yb-tserver-yugabyte-tls-cert"}
+        - {namespace: "{{ yugabyte_namespace }}",  name: "yugabyte-tls-client-cert"}
+
+    - name: Wait for certificates to settle
+      pause:
+        seconds: 30
+
+    - name: Get YB certificate
+      kubernetes.core.k8s_info:
+        kind: Secret
+        namespace: "{{ yugabyte_namespace }}"
+        name: yugabyte-tls-client-cert
+        wait: true
+      register: yb_cert
+
+    - name: Update YB secrets for Manetu
+      kubernetes.core.k8s_json_patch:
+        kind: Secret
+        namespace: "{{ manetu_namespace }}"
+        name: yugabyte-secrets
+        patch:
+          - op: replace
+            path: /data/YUGABYTE_TLS_CERT
+            value: "{{ yb_cert.resources[0].data['ca.crt']  }}"
+
+    - name: Get Cassandra certificate
+      kubernetes.core.k8s_info:
+        kind: Secret
+        namespace: "{{ cassandra_namespace }}"
+        name: cassandra-client-certificate
+        wait: true
+      register: cassandra_cert
+
+    - name: Update Cassandra secrets for Temporal
+      kubernetes.core.k8s_json_patch:
+        kind: Secret
+        namespace: "{{ temporal_namespace }}"
+        name: temporal-cassandra-secret
+        patch:
+          - op: replace
+            path: /data/ca.crt
+            value: "{{ cassandra_cert.resources[0].data['ca.crt']  }}"
+
+    - name: Get Temporal certificate
+      kubernetes.core.k8s_info:
+        kind: Secret
+        namespace: "{{ temporal_namespace }}"
+        name: temporal-frontend-certificate
+        wait: true
+      register: temporal_cert
+
+    - name: Update Temporal secrets for Manetu
+      kubernetes.core.k8s_json_patch:
+        kind: Secret
+        namespace: "{{ manetu_namespace }}"
+        name: temporal-secrets
+        patch:
+          - op: replace
+            path: /data/ca.crt
+            value: "{{ temporal_cert.resources[0].data['ca.crt']  }}"
+
+    - name: Get Minio certificate
+      kubernetes.core.k8s_info:
+        kind: Secret
+        namespace: "{{ minio_namespace }}"
+        name: minio-certificate
+        wait: true
+      register: minio_cert
+
+    - name: Update Minio secrets for Manetu
+      kubernetes.core.k8s_json_patch:
+        kind: Secret
+        namespace: "{{ manetu_namespace }}"
+        name: s3-secrets
+        patch:
+          - op: replace
+            path: /data/S3_CERTBUNDLE
+            value: "{{ minio_cert.resources[0].data['ca.crt']  }}"
+
+    - name: Gather pod restart list
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: Pod
+        namespace: "{{ item }}"
+      loop:
+        - "{{ cassandra_namespace }}"
+        - "{{ minio_namespace }}"
+        - "{{ temporal_namespace }}"
+        - "{{ yugabyte_namespace }}"
+      register: restartable
+
+    - set_fact:
+        restartable: "{{ restartable.results | map(attribute='resources') | flatten | map(attribute='metadata') }}"
+
+    - name: Restart pods
+      kubernetes.core.k8s:
+        state: absent
+        kind: Pod
+        namespace: "{{ item.namespace }}"
+        name: "{{ item.name }}"
+      loop: "{{ restartable }}"

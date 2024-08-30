@@ -1,0 +1,4 @@
+- name: "Update Ubuntu"
+  hosts: all
+  roles:
+    - ubuntu

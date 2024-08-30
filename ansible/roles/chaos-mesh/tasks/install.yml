@@ -1,0 +1,103 @@
+- name: Add Chaos Mesh Helm repository
+  kubernetes.core.helm_repository:
+    name: chaos-mesh
+    repo_url: "https://charts.chaos-mesh.org"
+
+- name: Install Chaos Mesh using Helm
+  kubernetes.core.helm:
+    name: chaos-mesh
+    chart_ref: chaos-mesh/chaos-mesh
+    chart_version: "{{ chaos_mesh_version }}"
+    release_namespace: chaos-mesh
+    create_namespace: true
+    values:
+      dashboard:
+        service:
+          type: ClusterIP      
+        securityMode: false
+        ingress:
+          enabled: true
+          annotations:
+            traefik.ingress.kubernetes.io/router.entrypoints: "websecure" 
+            traefik.ingress.kubernetes.io/router.tls: "true"
+            traefik.ingress.kubernetes.io/router.middlewares: traefik-system-basic-auth@kubernetescrd
+          hosts:
+            - name: "{{ chaos_mesh_dns }}"
+          ingressClassName: "traefik"
+      controllerManager:
+        leaderElection:
+          enabled: false          
+
+- name: Wait for Chaos Controller Manager pods
+  kubernetes.core.k8s_info:
+    namespace: chaos-mesh
+    kind: Pod
+    label_selectors:
+      - "app.kubernetes.io/component=controller-manager"
+    field_selectors:
+      - "status.phase=Running"
+    wait: yes
+    wait_sleep: 10
+    wait_timeout: 480
+
+- name: Inject Pod kill Chaos Test
+  kubernetes.core.k8s:
+    state: present
+    definition:  "{{ lookup('template', 'pod-kill.yaml') | from_yaml }}"
+
+- name: Create Chaos Mesh ServiceMonitor for chaos-dashboard
+  when: monitoring_enabled
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: monitoring.coreos.com/v1
+      kind: ServiceMonitor
+      metadata:
+        name: chaos-controller-manager
+        namespace: chaos-mesh        
+      spec:
+        endpoints:
+          - interval: 30s
+            port: http
+        selector:
+          matchLabels:
+            app.kubernetes.io/name: chaos-mesh
+            app.kubernetes.io/component: controller-manager
+
+- name: Create Chaos Mesh ServiceMonitor for chaos-daemon
+  when: monitoring_enabled
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: monitoring.coreos.com/v1
+      kind: ServiceMonitor
+      metadata:
+        name: chaos-daemon
+        namespace: chaos-mesh        
+      spec:
+        endpoints:
+          - interval: 30s
+            port: http
+        selector:
+          matchLabels:
+            app.kubernetes.io/name: chaos-mesh
+            app.kubernetes.io/component: chaos-daemon
+
+- name: Create Chaos Mesh ServiceMonitor for chaos-dashboard
+  when: monitoring_enabled
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: monitoring.coreos.com/v1
+      kind: ServiceMonitor
+      metadata:
+        name: chaos-dashboard
+        namespace: chaos-mesh
+      spec:
+        endpoints:
+          - interval: 30s
+            port: metric
+        selector:
+          matchLabels:
+            app.kubernetes.io/name: chaos-mesh
+            app.kubernetes.io/component: chaos-dashboard

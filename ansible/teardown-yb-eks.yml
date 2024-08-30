@@ -1,0 +1,15 @@
+- name: Delete EKS environment
+  gather_facts: false
+  hosts: config_host
+  roles:
+    - python
+  tasks:
+    - name: Delete DNS
+      when: aws_route53_zone
+      amazon.aws.route53:
+        state: absent
+        zone: "{{ aws_route53_zone }}"
+        record: "{{ aws_instance_name }}.{{ aws_route53_zone }}"
+        type: CNAME
+
+- import_playbook: teardown-eks.yml

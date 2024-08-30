@@ -1,0 +1,34 @@
+- name: Create Longhorn service monitor
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: monitoring.coreos.com/v1
+      kind: ServiceMonitor
+      metadata:
+        name: longhorn-prometheus-servicemonitor
+        namespace: longhorn-system
+        labels: "{{ longhorn_monitor_labels | ansible.builtin.combine(prometheus_monitor_labels, recursive=true) | from_yaml }}"
+      spec:
+        selector:
+          matchLabels:
+            app: longhorn-manager
+        namespaceSelector:
+          matchNames:
+            - longhorn-system
+        endpoints:
+          - port: manager
+
+- name: Add Longhorn Alert Rules
+  when: alerts_enabled
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: monitoring.coreos.com/v1
+      kind: PrometheusRule
+      metadata:
+        labels:
+          prometheus: longhorn
+          role: alert-rules
+        name: prometheus-longhorn-rules
+        namespace: longhorn-system
+      spec: "{{ lookup('file', 'alert-rules.yaml') | from_yaml }}"

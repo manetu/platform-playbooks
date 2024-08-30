@@ -1,0 +1,7 @@
+- include_tasks: install.yml
+  when: tracing_enabled
+
+- include_tasks: monitoring.yml
+  when:
+    - monitoring_enabled
+    - tracing_enabled

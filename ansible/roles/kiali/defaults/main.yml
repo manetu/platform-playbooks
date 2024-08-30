@@ -1,0 +1,5 @@
+kiali_operator_version: 1.78.0
+kiali_dns: kiali.{{ mgmt_dns_suffix }}
+prometheus_datasource_url: http://prometheus-kube-prometheus-prometheus.monitoring:9090
+jaeger_internal_url: http://jaeger-query.istio-system.svc.cluster.local:16685/jaeger
+jaeger_external_url: https://jaeger.{{ mgmt_dns_suffix }}/jaeger

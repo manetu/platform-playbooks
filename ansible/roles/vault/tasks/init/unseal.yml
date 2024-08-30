@@ -1,0 +1,79 @@
+- name: Check Vault status
+  kubernetes.core.k8s_exec:
+    namespace: "{{ vault_namespace }}"
+    pod: vault-0
+    command: vault operator init --status
+  register: vault_status                   # 0 = already initialized, 1 = error, 2 = not initialized
+  failed_when: vault_status.rc != 0 and vault_status.rc != 2
+
+- name: Initialize vault
+  kubernetes.core.k8s_exec:
+    namespace: "{{ vault_namespace }}"
+    pod: vault-0
+    command: vault operator init -key-shares {{ vault_key_shares }} -key-threshold {{ vault_key_threshold }} -format yaml
+  register: vault_keys
+  when: vault_status.rc == 2
+
+- set_fact:
+    vault_keys: "{{ vault_keys.stdout | from_yaml }}"
+  when: vault_status.rc == 2
+
+- debug:
+    msg: |
+      Your root token is: {{ vault_keys.root_token }}
+
+      Your unseal keys are:
+
+      {{ vault_keys.unseal_keys_b64 }}
+
+      Keep them safe, and do not lose them. They may be needed to unseal
+      the Vault in the future.  This is the last time they will be displayed.
+  when: vault_status.rc == 2
+
+- name: Get Vault node status
+  kubernetes.core.k8s_exec:
+    namespace: "{{ vault_namespace }}"
+    pod: "{{ 'vault-' + item|string }}"
+    command: vault status --format yaml
+  loop: "{{ range(0, vault_replicas) }}"
+  register: vault_node_status
+  failed_when: vault_node_status.rc != 0 and vault_node_status.rc != 2
+
+- set_fact:
+    vault_state: "{{vault_state|default([]) + [ item.stdout | from_yaml ]}}"
+  loop: "{{ vault_node_status.results }}"
+
+- name: Unseal Vault-0
+  kubernetes.core.k8s_exec:
+    namespace: "{{ vault_namespace }}"
+    pod: vault-0
+    command: vault operator unseal {{ item }}
+  no_log: true
+  loop: "{{ vault_keys.unseal_keys_b64 }}"
+  when: vault_state[0].sealed == True
+
+- name: Copy join.sh script to cluster
+  kubernetes.core.k8s_cp:
+    namespace: "{{ vault_namespace }}"
+    pod: "{{ 'vault-' + item|string }}"
+    content: "{{ lookup('template', 'join.sh') }}"
+    remote_path: /tmp/join.sh
+  loop: "{{ range(1, vault_replicas) }}"
+  when: vault_replicas > 1 and vault_state[item].initialized == False
+
+- name: Join Remaining Members
+  kubernetes.core.k8s_exec:
+    namespace: "{{ vault_namespace }}"
+    pod: "{{ 'vault-' + item|string }}"
+    command: sh /tmp/join.sh {{ item | string }}
+  loop: "{{ range(1, vault_replicas) }}"
+  when: vault_replicas > 1 and vault_state[item].initialized == False
+
+- name: Unseal Remaining Vaults
+  kubernetes.core.k8s_exec:
+    namespace: "{{ vault_namespace }}"
+    pod: "{{ 'vault-' + item[0]|string }}"
+    command: vault operator unseal {{ item[1] }}
+  no_log: true
+  loop: "{{ range(1, vault_replicas) | product(vault_keys.unseal_keys_b64) | list }}"
+  when: vault_replicas > 1 and vault_state[item[0]].sealed

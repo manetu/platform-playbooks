@@ -1,0 +1,56 @@
+- name: Create CA certificate
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ manetu_gateway_tls_namespace }}"
+    definition:
+      apiVersion: cert-manager.io/v1
+      kind: Certificate
+      metadata:
+        name: manetu-ca-cert
+      spec:
+        isCA: true
+        duration: "{{ manetu_gateway_tls_ca_duration }}"
+        commonName: manetu-ca-cert
+        secretName: manetu-ca-secret
+        usage:
+          - "cert sign"
+        issuerRef:
+          name: selfsigned-issuer
+          kind: ClusterIssuer
+
+- name: Create CA issuer
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ manetu_gateway_tls_namespace }}"
+    definition:
+      apiVersion: cert-manager.io/v1
+      kind: Issuer
+      metadata:
+        name: manetu-ca-issuer
+      spec:
+        ca:
+          secretName: manetu-ca-secret
+
+- name: Create TLS certificate
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ manetu_gateway_tls_namespace }}"
+    definition:
+      apiVersion: cert-manager.io/v1
+      kind: Certificate
+      metadata:
+        name: manetu-platform
+      spec:
+        isCA: false
+        commonName: "{{ manetu_dns }}"
+        dnsNames:
+          - "{{ manetu_dns }}"
+          - "{{ manetu_internal_dns }}.{{ manetu_namespace }}"
+          - "{{ manetu_internal_dns }}.{{ manetu_namespace }}.svc.cluster.local"
+        secretName: "{{ manetu_gateway_tls_name }}"
+        privateKey:
+          algorithm: ECDSA
+          size: 256
+        issuerRef:
+          name: manetu-ca-issuer
+          kind: Issuer

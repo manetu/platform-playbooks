@@ -1,0 +1,20 @@
+kind: Schedule
+apiVersion: chaos-mesh.org/v1alpha1
+metadata:
+  namespace: "{{ manetu_namespace }}"
+  name: pod-kill
+  annotations:
+    experiment.chaos-mesh.org/pause: "{{ pod_kill_pause }}"
+spec:
+  schedule: "{{ pod_kill_schedule }}"
+  startingDeadlineSeconds: null
+  concurrencyPolicy: Forbid
+  historyLimit: 1
+  type: PodChaos
+  podChaos:
+    selector:
+      namespaces:
+        - "{{ manetu_namespace }}"
+    mode: fixed
+    value: "{{ pod_kill_amount }}" 
+    action: pod-kill

@@ -1,0 +1,13 @@
+istio_version: 1.21.1
+istio_gateway_annotations: {}
+istio_gateway_service_type: LoadBalancer
+istio_tracing_sampling: 1.0  # % range of 0.0 to 100.0 with a precision of 0.01
+istio_proxy_resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 2000m
+    memory: 1024Mi
+
+prometheus_monitor_labels: {}

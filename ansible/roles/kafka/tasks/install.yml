@@ -1,0 +1,74 @@
+- name: Add Strimzi chart repo
+  kubernetes.core.helm_repository:
+    name: strimzi
+    repo_url: "https://strimzi.io/charts/"
+
+- name: Create namespace
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ kafka_namespace }}"
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "{{ kafka_namespace }}"
+        labels:
+          access.manetu.io/kafka: "true"                     # grants access to itself
+
+- name: Install Network Policy
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ kafka_namespace }}"
+    definition:
+      apiVersion: networking.k8s.io/v1
+      kind: NetworkPolicy
+      metadata:
+        name: kafka-network-policy
+      spec:
+        podSelector: {}
+        policyTypes:
+          - Ingress
+        ingress:
+          - from:
+              - namespaceSelector:
+                  matchLabels:
+                    access.manetu.io/kafka: "true"
+
+- name: Install Strimzi CRDs
+  kubernetes.core.helm:
+    name: strimzi-crds
+    chart_ref: strimzi/strimzi-kafka-operator
+    chart_version: "{{ strimzi_version }}"
+    release_namespace: "{{ kafka_namespace }}"
+    wait: true
+    timeout: 5m
+
+- name: Install Kafka via Strimzi
+  kubernetes.core.k8s:
+    namespace: "{{ kafka_namespace }}"
+    state: present
+    template: "crd.j2"
+
+- name: Get Cluster CA certificate
+  kubernetes.core.k8s_info:
+    kind: Secret
+    namespace: "{{ kafka_namespace }}"
+    name: kafka-cluster-ca-cert
+    wait: true
+  register: cluster_ca_cert
+
+- name: Create Kafka secrets
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ manetu_namespace }}"
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: kafka-secrets
+      type: Opaque
+      data:
+        kafka-cluster-ca.crt: "{{ cluster_ca_cert.resources[0].data['ca.crt'] }}"
+        kafka.java.config: "{{ lookup('template', 'kafka.java.config.j2') | b64encode }}"
+        librdkafka.properties: "{{ lookup('template', 'librdkafka.properties.j2') | b64encode }}"
+        kafka.yaml: "{{ lookup('template', 'kafka.yaml.j2') | b64encode }}"

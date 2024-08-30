@@ -1,0 +1,24 @@
+- name: "Set defaults"
+  hosts: all
+  tasks:
+    - set_fact:
+        manetu_namespace: "{{ manetu_namespace | default('manetu-platform') }}"
+        s3_enabled: false
+        monitoring_enabled: false
+        alerts_enabled: false
+        tracing_enabled: false
+        storage_enabled: false
+        vault_devmode: true
+
+- name: "Deploy k8s infrastructure"
+  hosts: config_host
+  roles:
+    - python
+    - manetu-namespace # needs to be early so components may install configmaps/secrets
+    - cert-manager
+    - istio
+
+- name: "Deploy Third-party"
+  import_playbook: third-party.yml
+
+# Manetu explicitly omitted: Managed by CI pipeline

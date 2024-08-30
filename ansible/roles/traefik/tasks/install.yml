@@ -1,0 +1,61 @@
+- name: Add chart repo
+  kubernetes.core.helm_repository:
+    name: traefik
+    repo_url: "https://traefik.github.io/charts"
+
+- name: Install
+  kubernetes.core.helm:
+    name: traefik
+    chart_ref: traefik/traefik
+    chart_version: "{{ traefik_version }}"
+    release_namespace: traefik-system
+    create_namespace: true
+    wait: true
+
+- name: Create temporary directory for password file
+  ansible.builtin.tempfile:
+    state: directory
+    suffix: traefik
+  register: tmpdir
+
+- name: Create password file
+  community.general.htpasswd:
+    path: "{{ tmpdir.path }}/passwdfile"
+    name: admin
+    password: "{{ mgmt_admin_password }}"
+
+- name: Download the passwd file
+  ansible.builtin.slurp:
+    src: "{{ tmpdir.path }}/passwdfile"
+  register: passwd
+
+- name: Delete temporary file
+  ansible.builtin.file:
+    state: absent
+    path:  "{{ tmpdir.path }}"
+
+- name: Create passwd secret
+  kubernetes.core.k8s:
+    state: present
+    namespace: traefik-system
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: basicauth-secrets
+      type: Opaque
+      data:
+        users: "{{ passwd.content }}"
+
+- name: Enable basic-auth
+  kubernetes.core.k8s:
+    state: present
+    namespace: traefik-system
+    definition:
+      apiVersion: traefik.io/v1alpha1
+      kind: Middleware
+      metadata:
+        name: basic-auth
+      spec:
+        basicAuth:
+          secret: basicauth-secrets

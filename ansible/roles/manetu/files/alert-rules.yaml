@@ -1,0 +1,118 @@
+groups:
+- name: manetu.attribute.service.rules
+  rules:
+    - alert: High Attribute Service Database Request Latency
+      expr: sum(rate(manetu_attribute_service_db_metrics_request_latency_bucket[5m])) > 75
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: 'High Attribute Service Database Requests Latency'
+        description: 'Attribute Service Database Requests latency is above the threshold of 75ms. Investigate the performance of the cluster.'
+
+    - alert: High Attribute Service Overall Command Latency
+      expr: sum(rate(fn_duration_seconds_bucket{fn="manetu.attribute-service.subservice.command.vaults/handler"}[5m]))  > 75
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: 'High Attribute Service Overall Command Latency'
+        description: ' Attribute Service Overall Command latency is above the threshold of 75ms. Investigate the performance of the cluster.'
+
+    - alert: High Attribute Service Command Execution Latency
+      expr: sum(rate(fn_duration_seconds_bucket{fn="manetu.attribute-service.graph.aristotle/update"}[5m])) > 75
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: 'High Attribute Service Execution Latency'
+        description: 'Attribute Service Command Execution latency is above the threshold of 75ms. Investigate the performance of the cluster.'
+
+    - alert: High Attribute Service Command Commit Latency
+      expr: sum(rate(fn_duration_seconds_bucket{fn="manetu.attribute-service.txn.manager/transact!"}[5m])) > 75
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: 'High Attribute Service Command Commit Latency'
+        description: 'Attribute Service Command Commit latency is above the threshold of 75ms. Investigate the performance of the cluster.'
+
+    - alert: High Attribute Service QueryEngine Compile Latency
+      expr: sum(rate(fn_duration_seconds_bucket{fn="manetu.attribute-service.compiler-cache/compile"}[5m])) > 75
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: 'High Attribute Service QueryEngine Compile Latency'
+        description: 'Attribute Service QueryEngineCompile latency is above the threshold of 75ms. Investigate the performance of the cluster.'
+
+- name: manetu.vault.service.rules
+  rules:
+    - alert: High Vault Service Database Request Latency
+      expr: sum(rate(manetu_vault_service_metrics_db_latency_bucket[5m])) > 75
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: 'High Vault Service Database Requests Latency'
+        description: 'Vault Service Database Requests latency is above the threshold of 75ms. Investigate the performance of the cluster.'
+
+    - alert: High Vault Service GRPC Request Latency
+      expr: sum(rate(manetu_vault_service_metrics_grpc_request_latency_bucket[5m])) > 75
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: 'High Vault Service GRPC Requests Latency'
+        description: 'Vault Service GRPC Requests latency is above the threshold of 75ms. Investigate the performance of the cluster.'
+
+    - alert: High Vault Service Temporal Latency
+      expr: sum(rate(manetu_vault_service_metrics_temporal_activity_latency_bucket[5m])) > 75
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: 'High Vault Service Temporal Latency'
+        description: 'Vault Service Temporal latency is above the threshold of 75ms. Investigate the performance of the cluster.'
+
+- name: manetu.analytics.service.rules
+  rules:
+    - alert: High Analytics Service Yugabyte Request Latency
+      expr: sum(rate(manetu_analytics_service_timeseries_db_drivers_yugabyte_metrics_exec_latency_bucket[5m])) > 75
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: 'High Analytics Service Yugabyte Requests Latency'
+        description: 'Analytics Service Yugabyte Requests latency is above the threshold of 75ms. Investigate the performance of the cluster.'
+
+- name: manetu.graphql.service.rules
+  rules:
+    - alert: High GraphQL Service GRPC Latency
+      expr: sum(rate(manetu_graphql_service_metrics_grpc_latency_bucket[5m])) > 75
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: 'High GraphQL Service GRPC Latency'
+        description: 'GraphQL Service GRPC latency is above the threshold of 75ms. Investigate the performance of the cluster.'        
+
+- name: manetu.utils.service.rules
+  rules:
+    - alert: High Utils Service Pedestal Request Latency
+      expr: sum(rate(manetu_utils_metrics_pedestal_request_latency_bucket[5m])) > 75
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: 'High Utils Service Pedestal Requests Latency'
+        description: 'Utils Service Pedestal Requests latency is above the threshold of 75ms. Investigate the performance of the cluster.'
+
+    - alert: High Utils Service Kafka Latency
+      expr: sum(rate(manetu_utils_kafka_metrics_latency_bucket[5m])) > 75
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: 'High Utils Service Kafka Latency'
+        description: 'Utils Service Kafka latency is above the threshold of 75ms. Investigate the performance of the cluster.'    

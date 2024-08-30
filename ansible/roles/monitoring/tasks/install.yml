@@ -1,0 +1,377 @@
+- name: Add Grafana Helm repository
+  kubernetes.core.helm_repository:
+    name: grafana
+    repo_url: "https://grafana.github.io/helm-charts"
+
+- name: Add Prometheus Helm repository
+  kubernetes.core.helm_repository:
+    name: prometheus-community
+    repo_url: "https://prometheus-community.github.io/helm-charts"
+
+- name: Create monitoring namespace
+  kubernetes.core.k8s:
+    state: present
+    namespace: monitoring
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: monitoring
+        labels:
+          access.manetu.io/kafka: "true"
+          access.manetu.io/yugabyte: "true"
+          access.manetu.io/temporal: "true"
+          access.manetu.io/vault: "true"
+          access.manetu.io/minio: "true"
+          access.manetu.io/manetu: "true"
+
+- name: Install Grafana using Helm
+  kubernetes.core.helm:
+    name: grafana
+    chart_ref: grafana/grafana
+    chart_version: "{{ grafana_version }}"
+    release_namespace: monitoring
+    values:
+      plugins:
+        - chaosmeshorg-datasource
+      datasources:
+        datasources.yaml:
+          apiVersion: 1
+          datasources:
+            - name: Loki
+              type: loki
+              access: proxy
+              url: "{{ loki_datasource_url }}"
+            - name: Prometheus
+              type: prometheus
+              access: proxy
+              url: "{{ prometheus_datasource_url }}"
+            - name: Chaos Mesh
+              type: chaosmeshorg-datasource
+              access: proxy
+              url: "{{ chaos_mesh_datasource_url }}"
+      grafana.ini:
+        auth.anonymous:
+          enabled: true
+          org_role: Admin
+        auth.basic:
+          enabled: false
+        auth:
+          disable_login_form: true
+      dashboardProviders:
+        dashboardproviders.yaml:
+          apiVersion: 1
+          providers:
+          - name: 'dashboards'
+            orgId: 1
+            type: file
+            disableDeletion: false
+            allowUiUpdates: true
+            editable: true
+            options:
+              path: /var/lib/grafana/dashboards
+              foldersFromFilesStructure: true
+          - name: 'manetu'
+            orgId: 1
+            allowUiUpdates: true
+            type: file
+            disableDeletion: false
+            editable: true
+            folder: 'manetu'
+            options:
+              path: /var/lib/grafana/dashboards/manetu
+          - name: 'logging'
+            orgId: 1
+            allowUiUpdates: true
+            type: file
+            disableDeletion: false
+            editable: true
+            folder: 'logging'
+            options:
+              path: /var/lib/grafana/dashboards/logging
+          - name: 'temporal'
+            orgId: 1
+            type: file
+            disableDeletion: false
+            folder: 'temporal'
+            allowUiUpdates: true
+            editable: true
+            options:
+              path: /var/lib/grafana/dashboards/temporal
+          - name: 'yugabyte'
+            orgId: 1
+            type: file
+            disableDeletion: false
+            folder: 'yugabyte'
+            allowUiUpdates: true
+            editable: true
+            options:
+              path: /var/lib/grafana/dashboards/yugabyte
+          - name: 'longhorn'
+            orgId: 1
+            type: file
+            disableDeletion: false
+            folder: 'longhorn'
+            allowUiUpdates: true
+            editable: true
+            options:
+              path: /var/lib/grafana/dashboards/longhorn
+          - name: 'hashivault'
+            orgId: 1
+            type: file
+            disableDeletion: false
+            folder: 'hashivault'
+            allowUiUpdates: true
+            editable: true
+            options:
+              path: /var/lib/grafana/dashboards/hashivault
+          - name: 'minio'
+            orgId: 1
+            type: file
+            disableDeletion: false
+            folder: 'minio'
+            allowUiUpdates: true
+            editable: true
+            options:
+              path: /var/lib/grafana/dashboards/minio
+          - name: 'kafka'
+            orgId: 1
+            type: file
+            disableDeletion: false
+            folder: 'kafka'
+            allowUiUpdates: true
+            editable: true
+            options:
+              path: /var/lib/grafana/dashboards/kafka
+          - name: 'istio'
+            orgId: 1
+            type: file
+            disableDeletion: false
+            folder: 'istio'
+            allowUiUpdates: true
+            editable: true
+            options:
+              path: /var/lib/grafana/dashboards/istio
+          - name: 'chaos-mesh'
+            orgId: 1
+            type: file
+            disableDeletion: false
+            folder: 'chaos-mesh'
+            allowUiUpdates: true
+            editable: true
+            options:
+              path: /var/lib/grafana/dashboards/chaos-mesh
+          - name: 'overview'
+            orgId: 1
+            type: file
+            disableDeletion: false
+            folder: 'overview'
+            allowUiUpdates: true
+            editable: true
+            options:
+              path: /var/lib/grafana/dashboards/overview
+      dashboards:
+        overview:
+          k8s-views-global:
+            gnetId: 15757
+            revision: 31
+            datasource: Prometheus
+          k8s-views-namespaces:
+            gnetId: 15758
+            revision: 27
+            datasource: Prometheus
+          k8s-views-nodes:
+            gnetId: 15759
+            revision: 19
+            datasource: Prometheus
+          k8s-views-pods:
+            gnetId: 15760
+            revision: 22
+            datasource: Prometheus
+          status_page:
+            json: |
+              {{ lookup('file', 'status-page.json') | string }}
+        manetu:
+          red_dashboard:
+            json: |
+              {{ lookup('file', 'red.json') | string }}
+          attribute_service:
+            json: |
+              {{ lookup('file', 'attribute-service.json') | string }}
+          manetu_overview:
+            json: |
+              {{ lookup('file', 'manetu-overview.json') | string }}
+        chaos-mesh:
+          chaos-mesh-overview:
+            gnetId: 15918
+            datasource: Prometheus
+          chaos-daemon-performance:
+            gnetId: 15919
+            datasource: Prometheus
+          chaos-controller-runtime:
+            gnetId: 15920
+            datasource: Prometheus
+          chaos-controller-runtime-webhooks:
+            gnetId: 15921
+            datasource: Prometheus
+        logging:
+          loki:
+            gnetId: 15141
+            datasource: Loki
+          loki-monitoring:
+            gnetId: 14055
+            datasource: Loki
+        yugabyte:
+          yugabte-db:
+            gnetId: 12620
+            revision: 2
+            datasource: Prometheus
+        longhorn:
+          longhorn-db:
+            gnetId: 13032
+            revision: 6
+            datasource: Prometheus
+        hashivault:
+          hashicorp-vault:
+            gnetId: 12904
+            revision: 2
+            datasource: Prometheus
+        minio:
+          minio-cluster-replication:
+            gnetId: 15305
+            revision: 4
+            datasource: Prometheus
+          minio-overview:
+            gnetId: 10946
+            datasource: Prometheus
+        istio:
+          istio-control-plane-db:
+            gnetId: 7645
+            revision: 183
+            datasource: Prometheus
+          istio-mesh-db:
+            gnetId: 7639
+            revision: 183
+            datasource: Prometheus
+          istio-performance-db:
+            gnetId: 11829
+            revision: 183
+            datasource: Prometheus
+          istio-service-db:
+            gnetId: 7636
+            revision: 183
+            datasource: Prometheus
+          istio-workload-db:
+            gnetId: 7630
+            revision: 183
+            datasource: Prometheus
+        temporal:
+          server:
+            url: https://raw.githubusercontent.com/temporalio/dashboards/helm/server/server-general.json
+            datasource: Prometheus
+          sdk:
+            url: https://raw.githubusercontent.com/temporalio/dashboards/helm/sdk/sdk-general.json
+            datasource: Prometheus
+          misc-frontend-service-specific:
+            url: https://raw.githubusercontent.com/temporalio/dashboards/helm/misc/frontend-service-specific.json
+            datasource: Prometheus
+          misc-history-service-specific:
+            url: https://raw.githubusercontent.com/temporalio/dashboards/helm/misc/history-service-specific.json
+            datasource: Prometheus
+          misc-matching-service-specific:
+            url: https://raw.githubusercontent.com/temporalio/dashboards/helm/misc/matching-service-specific.json
+            datasource: Prometheus
+        kafka:
+          strimzi-operators-db:
+            url: https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/main/examples/metrics/grafana-dashboards/strimzi-operators.json
+            datasource: Prometheus
+          strimzi-zookeeper-db:
+            url: https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/main/examples/metrics/grafana-dashboards/strimzi-zookeeper.json
+            datasource: Prometheus
+          strimzi-kafka-exporter-db:
+            url: https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/main/examples/metrics/grafana-dashboards/strimzi-kafka-exporter.json
+            datasource: Prometheus
+          strimzi-kafka-db:
+            url: https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/main/examples/metrics/grafana-dashboards/strimzi-kafka.json
+            datasource: Prometheus
+      replicas: "{{ grafana_replicas }}"
+      persistence:
+        enabled: true
+        storageClassName: "{{ grafana_storage_class }}"
+        size: "{{ grafana_storage_size }}"
+      useStatefulSet: true
+      ingress:
+        enabled: true
+        annotations: {
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure ,
+          traefik.ingress.kubernetes.io/router.tls: "true",
+          traefik.ingress.kubernetes.io/router.middlewares: traefik-system-basic-auth@kubernetescrd
+        }
+        hosts:
+          - "{{ grafana_dns }}"
+        path: /
+
+- name: Install Prometheus using Helm
+  kubernetes.core.helm:
+    name: prometheus
+    chart_ref: prometheus-community/kube-prometheus-stack
+    chart_version: "{{ prometheus_version }}"
+    release_namespace: monitoring
+    values:
+      defaultRules:
+        create: true
+        rules:
+          alertmanager: true
+      prometheus:
+        ingress:
+          enabled: true
+          annotations: {
+            traefik.ingress.kubernetes.io/router.entrypoints: websecure ,
+            traefik.ingress.kubernetes.io/router.tls: "true",
+            traefik.ingress.kubernetes.io/router.middlewares: traefik-system-basic-auth@kubernetescrd
+          }
+          hosts:
+            - "{{ prometheus_dns }}"
+          paths:
+            - /
+        prometheusSpec:
+          replicas: "{{ prometheus_replicas }}"
+          podMonitorSelectorNilUsesHelmValues: false
+          serviceMonitorSelectorNilUsesHelmValues: false
+          ruleSelectorNilUsesHelmValues: false
+          retention: "{{ prometheus_retention }}"
+          storageSpec:
+            volumeClaimTemplate:
+              spec:
+                storageClassName: "{{ prometheus_storage_class }}"
+                accessModes: ["ReadWriteOnce"]
+                resources:
+                  requests:
+                    storage: "{{ prometheus_storage_size }}"
+      alertmanager:
+        enabled: true
+        config: "{{ lookup('template', 'alertmanager-config.yaml') | from_yaml }}"
+        alertmanagerSpec:
+          replicas: "{{ alertmanager_replicas }}"
+          storage:
+            volumeClaimTemplate:
+              spec:
+                storageClassName: "{{ alertmanager_storage_class }}"
+                accessModes: ["ReadWriteOnce"]
+                resources:
+                  requests:
+                    storage: "{{ alertmanager_storage_size }}"
+        templateFiles:
+          alert-templates.tmpl: |-
+            {{ lookup('file', 'alert-templates.yaml') | string }}
+        ingress:
+          enabled: true
+          annotations: {
+            traefik.ingress.kubernetes.io/router.entrypoints: websecure ,
+            traefik.ingress.kubernetes.io/router.tls: "true",
+            traefik.ingress.kubernetes.io/router.middlewares: traefik-system-basic-auth@kubernetescrd
+          }
+          hosts:
+            - "{{ alertmanager_dns }}"
+          paths:
+            - /

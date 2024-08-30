@@ -1,0 +1,4 @@
+- name: "Deploy QDrant"
+  hosts: config_host
+  roles:
+    - qdrant

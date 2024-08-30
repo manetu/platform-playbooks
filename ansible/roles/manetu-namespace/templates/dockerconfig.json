@@ -1,0 +1,9 @@
+{
+    "auths": {
+        "{{ manetu_registry_dns }}": {
+            "username": "{{ manetu_registry_username }}",
+            "password": "{{ manetu_registry_password }}",
+            "auth": "{{ [manetu_registry_username, ':', manetu_registry_password] | join | b64encode }}"
+        }
+    }
+}

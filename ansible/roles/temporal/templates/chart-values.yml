@@ -1,0 +1,134 @@
+fullnameOverride: "temporal"
+serviceAccount:
+  create: false
+  name: "temporal"
+server:
+{% if monitoring_enabled %}
+  metrics:
+    serviceMonitor:
+      enabled: true
+      interval: 10s
+      additionalLabels: {{ prometheus_monitor_labels | from_yaml }}
+{% endif %}
+  replicaCount: {{ temporal_server_replicas }}
+  config:
+    numHistoryShards: {{ temporal_history_shards }}
+    tls:
+      enabled: true
+      internode:
+        secret: temporal-internode-certificate
+        serverName: "temporal.{{ temporal_namespace }}.cluster.svc.local"
+      frontend:
+        requireClientAuth: false
+        secret: temporal-frontend-certificate
+        serverName: "temporal-frontend.{{ temporal_namespace }}.cluster.svc.local"
+
+    persistence:
+      default:
+        cassandra:
+          hosts: ["cassandra.{{ cassandra_namespace }}"]
+          port: 9042
+          user: "cassandra"
+          existingSecret: temporal-cassandra-secret
+          replicationFactor: {{ temporal_cassandra_replication_factor }}
+          tls:
+            enabled: true
+            caData: {{ cassandra_ca_crt | b64encode }}
+      visibility:
+        cassandra:
+          hosts: ["cassandra.{{ cassandra_namespace }}"]
+          port: 9042
+          user: "cassandra"
+          existingSecret: temporal-cassandra-secret
+          replicationFactor: {{ temporal_cassandra_replication_factor }}
+          tls:
+            enabled: true
+            caData: {{ cassandra_ca_crt | b64encode }}
+  dynamicConfig: {{ temporal_dynamic_config }}
+  frontend:
+    replicaCount: {{ temporal_frontend_replicas }}
+  history:
+    replicaCount: {{ temporal_history_replicas }}
+    resources: {{ temporal_history_resources }}
+  matching:
+    replicaCount: {{ temporal_matching_replicas }}
+  worker:
+    replicaCount: {{ temporal_worker_replicas }}
+
+  additionalVolumes:
+    - name: internode-cert
+      secret:
+        secretName: temporal-internode-certificate
+    - name: frontend-cert
+      secret:
+        secretName: temporal-frontend-certificate
+
+  additionalVolumeMounts:
+    - name: internode-cert
+      readOnly: true
+      mountPath: /etc/temporal/certs/internode
+    - name: frontend-cert
+      readOnly: true
+      mountPath: /etc/temporal/certs/frontend
+
+admintools:
+  additionalVolumes:
+    - name: frontend-cert
+      secret:
+        secretName: temporal-frontend-certificate
+
+  additionalVolumeMounts:
+    - name: frontend-cert
+      readOnly: true
+      mountPath: /etc/temporal/certs/frontend
+
+schema:
+  setup:
+    enabled: true
+    backoffLimit: 100
+  update:
+    enabled: true
+    backoffLimit: 100
+
+web:
+  enabled: true
+
+{% if mgmt_dns_suffix is defined %}
+  ingress:
+    enabled: true
+    annotations:
+      traefik.ingress.kubernetes.io/router.entrypoints: "websecure"
+      traefik.ingress.kubernetes.io/router.tls: "true"
+      traefik.ingress.kubernetes.io/router.middlewares: "traefik-system-basic-auth@kubernetescrd"
+    hosts:
+      - "{{ temporal_dns }}"
+{% endif %}
+
+  additionalVolumes:
+    - name: frontend-cert
+      secret:
+        secretName: temporal-frontend-certificate
+
+  additionalVolumeMounts:
+    - name: frontend-cert
+      readOnly: true
+      mountPath: /etc/temporal/certs/frontend
+
+  additionalEnv:
+    - name: TEMPORAL_TLS_CA
+      value: /etc/temporal/certs/frontend/ca.crt
+    - name: TEMPORAL_TLS_CERT
+      value: /etc/temporal/certs/frontend/tls.crt
+    - name: TEMPORAL_TLS_KEY
+      value: /etc/temporal/certs/frontend/tls.key
+
+elasticsearch:
+  enabled: false
+prometheus:
+  enabled: false
+grafana:
+  enabled: false
+cassandra:
+  enabled: false
+mysql:
+  enabled: false

@@ -1,0 +1,21 @@
+all:
+  hosts:
+    node-1:
+      ansible_host: 3.138.178.177
+  vars:
+    k3s_cluster_enabled: false
+    lb_type: servicelb
+    manetu_dns: manetu.3.138.178.177.sslip.io
+    s3_enabled: false
+    logging_enabled: false
+    monitoring_enabled: false
+    alerts_enabled: false
+    traefik_enabled: false
+
+k3s_primary:
+  hosts:
+    node-1:
+
+config_host:
+  hosts:
+    node-1:

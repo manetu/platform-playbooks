@@ -1,0 +1,45 @@
+- name: Add Kiali Helm repository
+  kubernetes.core.helm_repository:
+    name: kiali
+    repo_url: "https://kiali.org/helm-charts"
+
+- name: Install Kiali using Helm
+  kubernetes.core.helm:
+    name: kiali
+    chart_ref: kiali/kiali-operator
+    chart_version: "{{ kiali_operator_version }}"
+    release_namespace: istio-system
+    values:
+      metrics:
+        enabled: true
+      cr:
+        create: true
+        name: kiali 
+        spec:
+          auth:
+            strategy: anonymous
+          deployment:
+            ingress:
+              class_name: "traefik"  
+              enabled: true
+              override_yaml:
+                metadata:
+                  annotations:
+                    traefik.ingress.kubernetes.io/router.entrypoints: "websecure" 
+                    traefik.ingress.kubernetes.io/router.tls: "true"
+                    traefik.ingress.kubernetes.io/router.middlewares: "traefik-system-basic-auth@kubernetescrd"
+          server:
+            web_fqdn: "{{ kiali_dns }}"
+            web_schema: https
+            web_root: /
+          namespace: "istio-system"
+          external_services:
+            prometheus:
+              url: "{{ prometheus_datasource_url }}"
+            tracing:
+              auth:
+                type: none
+              enabled: true 
+              in_cluster_url: '{{ jaeger_internal_url }}'
+              use_grpc: true
+              url: '{{ jaeger_external_url }}'

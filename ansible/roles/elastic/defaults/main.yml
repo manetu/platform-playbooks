@@ -1,0 +1,9 @@
+elastic_cloud_version: 2.13.0
+elasticsearch_version: 8.14.1
+elasticsearch_enabled: false
+elasticsearch_namespace: manetu-elastic
+elasticsearch_name: elastic
+elasticsearch_storage_size: 10Gi
+elasticsearch_storage_class: "{{ default_storage_class | default('default') }}"
+elasticsearch_replicas: 3
+kibana_replicas: 2

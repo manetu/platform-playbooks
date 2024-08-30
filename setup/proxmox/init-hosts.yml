@@ -1,0 +1,8 @@
+- name: Initialize Hosts
+  hosts: workers
+
+  tasks:
+    - name: Set hostname
+      become: true
+      ansible.builtin.shell: |
+        hostnamectl set-hostname {{ inventory_hostname }}

@@ -1,0 +1,105 @@
+- name: Create Manetu namespace
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ manetu_namespace }}"
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "{{ manetu_namespace }}"
+        labels:
+          access.manetu.io/kafka: "true"
+          access.manetu.io/yugabyte: "true"
+          access.manetu.io/temporal: "true"
+          access.manetu.io/minio: "true"
+          access.manetu.io/vaultpods: "true"
+          access.manetu.io/manetu: "true"
+
+- name: Install Network Policy
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ manetu_namespace }}"
+    definition:
+      apiVersion: networking.k8s.io/v1
+      kind: NetworkPolicy
+      metadata:
+        name: manetu-network-policy
+      spec:
+        podSelector: {}
+        policyTypes:
+          - Ingress
+        ingress:
+          - from:
+              - namespaceSelector:
+                  matchLabels:
+                    access.manetu.io/manetu: "true"
+
+- name: Create Platform Operator x509 secrets
+  when: manetu_platform_operator_cert is defined
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ manetu_namespace }}"
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: platform-operator-secrets
+      type: Opaque
+      data:
+        SERVICE_PLATFORMOPERATOR_CREDENTIALS_TYPE: "{{ 'x509' | b64encode }}"
+        SERVICE_PLATFORMOPERATOR_CREDENTIALS_DATA: "{{ manetu_platform_operator_cert }}"
+
+- name: Create Platform Operator userpass secrets
+  when: manetu_platform_operator_cert is not defined
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ manetu_namespace }}"
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: platform-operator-secrets
+      type: Opaque
+      data:
+        SERVICE_PLATFORMOPERATOR_CREDENTIALS_TYPE: "{{ 'user' | b64encode }}"
+        SERVICE_PLATFORMOPERATOR_CREDENTIALS_DATA: "{{ (manetu_platform_operator_email + ':' + manetu_platform_operator_password) | b64encode }}"
+
+- name: Create SMTP secrets
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ manetu_namespace }}"
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: smtp-secrets
+      type: Opaque
+      data:
+        SMTP_AUTH_TOKEN: "{{ '!! SMTP UNSET !!' | b64encode }}"
+
+- name: Create registry secrets
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ manetu_namespace }}"
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: manetu-regcred
+      type: kubernetes.io/dockerconfigjson
+      data:
+        .dockerconfigjson:  "{{ lookup('template', 'dockerconfig.json') | to_json | b64encode }}"
+
+- name: Create PRSK Secret
+  when: prsk_password is defined
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ manetu_namespace }}"
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: prsk-secrets
+      type: Opaque
+      data:
+        PRSK_PASSWORD: "{{ prsk_password | b64encode }}"

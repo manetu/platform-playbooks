@@ -1,0 +1,9 @@
+bootstrap.servers=kafka-kafka-brokers.{{ kafka_namespace }}:9093
+request.timeout.ms=20000
+retry.backoff.ms=500
+reconnect.backoff.ms=500
+reconnect.backoff.max.ms=20000
+socket.connection.setup.timeout.ms=50000
+security.protocol=SSL
+ssl.ca.location=/etc/mcp/kafka/kafka-cluster-ca.crt
+#debug=broker

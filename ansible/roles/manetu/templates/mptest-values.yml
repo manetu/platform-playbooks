@@ -1,0 +1,15 @@
+test:
+  iam: true
+  attribute: true
+  cliDataLoaderPrep: true
+  cypress: true
+  dataLoader: true
+  dataLoaderPrequery: true
+  dataLoaderInstall: false
+  happypath: true
+  staticAssets: true
+  idp: false
+  auth: true
+  artifact: true
+  loadRecoveryQuestions: true
+  policy: true

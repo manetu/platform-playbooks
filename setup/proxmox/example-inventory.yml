@@ -1,0 +1,29 @@
+proxmox:
+  hosts:
+    pve.haskins.net:
+      pve_api_user: root@pam
+      pve_token_id: ansible
+      pve_token_secret: --TOKEN--
+      pve_clone_id: base-worker
+      vms:
+        - {name: node-1, node: pve}
+        - {name: node-2, node: pve}
+    pve2.haskins.net:
+      pve_api_user: root@pam
+      pve_token_id: ansible
+      pve_token_secret: --TOKEN--
+      pve_clone_id: base-worker
+      vms:
+        - {name: node-3, node: pve2}
+        - {name: node-4, node: pve2}
+
+workers:
+  hosts:
+    node-1:
+      ansible_host: 10.20.32.40
+    node-2:
+      ansible_host: 10.20.32.42
+    node-3:
+      ansible_host: 10.20.32.41
+    node-4:
+      ansible_host: 10.20.32.43

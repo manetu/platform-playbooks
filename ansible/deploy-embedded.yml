@@ -1,0 +1,35 @@
+- name: "Set defaults"
+  hosts: all
+  tasks:
+    - set_fact:
+        manetu_namespace: "{{ manetu_namespace | default('manetu-platform') }}"
+        s3_enabled: "{{ s3_enabled | default(false) }}"
+        s3_insecure: "{{ s3_insecure | default(false) }}"
+
+- name: "Deploy k3s"
+  import_playbook: k3s.yml
+
+- name: "Deploy k8s infrastructure"
+  hosts: config_host
+  roles:
+    - python
+    - manetu-namespace # needs to be early so components may install configmaps/secrets
+    - cert-manager
+    - metallb
+    - traefik
+    - monitoring
+    - istio
+    - longhorn
+    - logging
+    - kiali
+    - jaeger
+
+- name: "Deploy Third-party"
+  import_playbook: third-party.yml
+
+- import_playbook: manetu.yml
+
+- name: "Deploy Chaos Mesh"
+  hosts: config_host
+  roles:
+    - chaos-mesh

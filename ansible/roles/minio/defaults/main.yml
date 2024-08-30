@@ -1,0 +1,17 @@
+minio_enabled: true
+minio_version: 5.1.0
+minio_namespace: manetu-minio
+minio_replicas: 3
+minio_mode: distributed
+minio_root_user: rootuser
+minio_manetu_internal_bucket: "manetu-internal"
+minio_persistence_storage_class: "{{ default_storage_class | default('default') }}"
+minio_persistence_size: 4Gi
+minio_resources:
+  requests:
+    memory: 1Gi
+minio_tls_duration: 87600h
+
+prometheus_monitor_labels: {}
+monitoring_enabled: true
+alerts_enabled: true

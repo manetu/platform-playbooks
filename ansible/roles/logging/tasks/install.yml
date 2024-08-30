@@ -1,0 +1,140 @@
+- name: Add Helm repository
+  kubernetes.core.helm_repository:
+    name: grafana
+    repo_url: "https://grafana.github.io/helm-charts"
+
+- name: Install Loki using Helm
+  kubernetes.core.helm:
+    name: loki
+    chart_ref: grafana/loki
+    chart_version: "{{ loki_version }}"
+    release_namespace: logging
+    create_namespace: true
+    values:
+      loki:
+        commonConfig:
+          replication_factor: "{{ loki_replication_factor }}"
+        auth_enabled: "{{ loki_auth_enabled }}"
+        server:
+          http_listen_port: "{{ loki_http_listen_port }}"
+          log_level: "{{ log_level }}"          
+        compactor:
+          working_directory: /var/loki/compactor
+          shared_store: s3
+          retention_enabled: true
+          retention_delete_delay: 2h
+          retention_delete_worker_count: 150    
+        storage:
+          bucketNames:
+            chunks: "{{ loki_bucket }}"
+            ruler: "{{ loki_bucket }}"
+            admin: "{{ loki_bucket }}"         
+          type: s3
+          s3:
+            endpoint: "{{ s3_endpoint }}"
+            region: ""
+            accessKeyId: "{{ s3_access_key_id }}"
+            secretAccessKey: "{{ s3_secret_access_key }}"
+            s3ForcePathStyle: true
+            insecure: "{{ s3_insecure }}"
+        schema_config:
+          configs:
+            - from: 2022-01-11
+              store: boltdb-shipper
+              object_store: s3
+              schema: v12
+              index:
+                prefix: loki_index_
+                period: 24h
+        storage_config:
+          boltdb_shipper:
+            active_index_directory: /var/loki/index
+            shared_store: s3
+            cache_location: /var/loki/cache
+            cache_ttl: 24h
+          filesystem:
+            directory: /var/loki/manetu
+      monitoring:
+        selfMonitoring:
+          grafanaAgent:
+            enabled: false
+      ingress:
+        enabled: true
+        annotations: { 
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure ,
+          traefik.ingress.kubernetes.io/router.tls: "true"           
+        }
+        paths:
+          write:
+            - /api/prom/push
+            - /loki/api/v1/push
+          read:
+            - /api/prom/tail
+            - /loki/api/v1/tail
+            - /loki/api
+            - /api/prom/rules
+            - /loki/api/v1/rules
+            - /prometheus/api/v1/rules
+            - /prometheus/api/v1/alerts
+          singleBinary:
+            - /api/prom/push
+            - /loki/api/v1/push
+            - /api/prom/tail
+            - /loki/api/v1/tail
+            - /loki/api
+            - /api/prom/rules
+            - /loki/api/v1/rules
+            - /prometheus/api/v1/rules
+            - /prometheus/api/v1/alerts
+        hosts:
+          - "{{ loki_dns }}"
+      write:
+        replicas: "{{ loki_pod_replicas }}"
+      backend:
+        replicas: "{{ loki_pod_replicas }}"
+      read:
+        replicas: "{{ loki_pod_replicas }}"
+
+- name: Wait for Loki pods
+  kubernetes.core.k8s_info:
+    namespace: logging
+    kind: Pod
+    field_selectors:
+      - status.phase=Running
+    name: "{{ item[1] }}-{{ item[0]}}"
+    wait: yes
+    wait_sleep: 10
+    wait_timeout: 480
+  loop: "{{ range(0, loki_pod_replicas) | product(('loki-backend', 'loki-write')) }}" 
+
+- name: Install Promtail using Helm
+  kubernetes.core.helm:
+    name: promtail
+    chart_ref: grafana/promtail
+    chart_version: "{{ promtail_version }}"
+    release_namespace: logging
+    create_namespace: false
+    values:
+      promtail:
+        config:
+          server:
+            http_listen_port: "{{ promtail_http_listen_port }}"
+            grpc_listen_port: "{{ promtail_grpc_listen_port }}"
+            log_level: "{{ log_level }}"
+          positions:
+            filename: /run/promtail/positions.yaml
+          clients:
+            - url: "{{ promtail_client_url }}"
+              tenant_id: "{{ promtail_tenant_id }}"
+            - backoff_config:
+                min_period: 1500ms
+                max_retries: 60
+          scrape_configs: 
+            - job_name: system
+              static_configs:
+                - targets:
+                    - loki
+                  labels:
+                    job: varlogs
+                    __path__: /var/log/*.log
+              

@@ -1,0 +1,17 @@
+logging_enabled: true
+
+promtail_version: 6.14.1
+loki_version: 5.14.1
+
+loki_replication_factor: 3
+loki_pod_replicas: 3
+loki_http_listen_port: 3100
+log_level: debug
+loki_auth_enabled: false # currently needed for grafana and promtail to communicate with loki
+loki_storage_class: "{{ default_storage_class | default('default') }}"
+loki_bucket: manetu
+loki_dns: loki.{{ mgmt_dns_suffix }}
+promtail_http_listen_port: 9080
+promtail_grpc_listen_port: 0
+promtail_client_url: http://loki-gateway.logging.svc.cluster.local:80/loki/api/v1/push
+promtail_tenant_id: tenant1

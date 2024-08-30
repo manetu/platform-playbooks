@@ -1,0 +1,25 @@
+- name: "Update Ubuntu"
+  hosts: all
+  roles:
+    - ubuntu
+
+- name: "Install K3s Primary Node"
+  hosts: k3s_primary
+  roles:
+    - k3s
+    - kubectl                # we will use k3s_primary as the config_host, so make sure it has all the tools
+
+- name: "Install K3s Secondary Nodes"
+  hosts: k3s_secondary
+  serial: 1                  # deploy one at a time to avoid errors with concurrent etdc "learner"
+  vars:
+    k3s_primary: false
+  roles:
+    - k3s
+
+- name: "Install K3s Agent Nodes"
+  hosts: k3s_agents
+  vars:
+    k3s_role: agent
+  roles:
+    - k3s

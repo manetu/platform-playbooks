@@ -1,0 +1,4 @@
+- name: "Deploy Elasticsearch"
+  hosts: config_host
+  roles:
+    - elastic

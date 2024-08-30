@@ -1,0 +1,13 @@
+ubuntu_disable_ufw: true
+instance_timezone: 'America/New_York'
+sysctl_config:
+  fs.file-max: '2097152'
+  fs.inotify.max_user_watches: '524288'
+  fs.inotify.max_user_instances: '32768'
+  vm.panic_on_oom: '0'
+  vm.overcommit_memory: '1'
+  kernel.panic: '10'
+  kernel.panic_on_oops: '1'
+  kernel.keys.root_maxbytes: '25000000'
+security_limits_hard_nofile: '524288'
+security_limits_soft_nofile: '524288'

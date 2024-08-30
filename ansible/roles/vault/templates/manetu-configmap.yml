@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vault-config
+data:
+{% if vault_devmode is sameas true %}
+  VAULT_ADDR: http://vault.{{ vault_namespace }}:8200
+  VAULT_TLS_ENABLED: "false"
+{% else %}
+  VAULT_ADDR: https://vault.{{ vault_namespace }}:8200
+  VAULT_TLS_ENABLED: "true"
+  VAULT_CACERT: "{{ vault_cert.resources[0].data['ca.crt']  }}"
+{% endif %}

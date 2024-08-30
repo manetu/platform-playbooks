@@ -1,0 +1,29 @@
+yugabyte_version: 2.20.3
+yugabyte_namespace: manetu-yugabyte
+yugabyte_master_replicas: 3
+yugabyte_master_storage_size: 10Gi
+yugabyte_master_storage_class: "{{ default_storage_class | default('default') }}"
+yugabyte_tserver_replicas: 3
+yugabyte_tserver_storage_size: 10Gi
+yugabyte_tserver_storage_class: "{{ default_storage_class | default('default') }}"
+yugabyte_loadbalancer: false
+yugabyte_tls_duration: 87600h
+yugabyte_resources: {}
+#  master:
+#    requests:
+#      cpu: 2
+#      memory: 2Gi
+#    limits:
+#      cpu: 2
+#      memory: 2Gi
+#  tserver:
+#    requests:
+#      cpu: 8
+#      memory: 24Gi
+#    limits:
+#      cpu: 12
+#      memory: 24Gi
+
+monitoring_enabled: true
+alerts_enabled: true
+prometheus_monitor_labels: {}

@@ -1,0 +1,66 @@
+- name: "Set defaults"
+  hosts: all
+  tasks:
+    - set_fact:
+        k3s_cluster_enabled: false
+        s3_enabled: false
+        logging_enabled: false
+        vault_enabled: false
+        monitoring_enabled: false
+        tracing_enabled: false
+        local_storage_enabled: true
+        temporal_dev_mode: true
+        temporal_tls_enabled: false
+        manetu_rollbar_enabled: false
+        manetu_gateway_tls: true
+        lb_type: servicelb
+        default_storage_class: local-path
+        manetu_chart_values:
+          gw:
+            resources: {}
+          cp:
+            resources: {}
+          ep:
+            resources: {}
+          sp:
+            resources: {}
+
+- name: "Deploy infrastructure"
+  hosts: all
+  roles:
+    - ubuntu
+    - k3s
+    - kubectl
+    - python
+    - manetu-namespace # needs to be early so components may install configmaps/secrets
+    - cert-manager
+    - istio
+    - temporal
+    - kafka
+    - yugabyte
+    - minio
+  tasks:
+    - name: "Wait for Kafka pods"
+      kubernetes.core.k8s_info:
+        namespace: "{{ kafka_namespace }}"
+        kind: Pod
+        field_selectors:
+          - status.phase=Running
+        name: "{{ 'kafka-kafka-' + item|string }}"
+        wait: yes
+        wait_sleep: 10
+        wait_timeout: 360
+      loop: "{{ range(0, kafka_replicas) }}"
+    - name: "Wait for Yugabyte pods"
+      kubernetes.core.k8s_info:
+        namespace: "{{ yugabyte_namespace }}"
+        kind: Pod
+        field_selectors:
+          - status.phase=Running
+        name: "{{ 'yugabyte-yb-tserver-' + item|string }}"
+        wait: yes
+        wait_sleep: 10
+        wait_timeout: 360
+      loop: "{{ range(0, yugabyte_tserver_replicas) }}"
+
+- import_playbook: manetu.yml

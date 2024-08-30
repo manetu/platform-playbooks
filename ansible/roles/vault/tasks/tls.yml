@@ -1,0 +1,60 @@
+- name: Create CA certificate
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ vault_namespace }}"
+    definition:
+      apiVersion: cert-manager.io/v1
+      kind: Certificate
+      metadata:
+        name: vault-ca-cert
+      spec:
+        isCA: true
+        duration: "{{ vault_tls_duration }}"
+        commonName: vault-ca-cert
+        secretName: vault-ca-secret
+        usage:
+          - "cert sign"
+        issuerRef:
+          name: selfsigned-issuer
+          kind: ClusterIssuer
+
+- name: Create CA issuer
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ vault_namespace }}"
+    definition:
+      apiVersion: cert-manager.io/v1
+      kind: Issuer
+      metadata:
+        name: vault-ca-issuer
+      spec:
+        ca:
+          secretName: vault-ca-secret
+
+- name: Create TLS certificate
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ vault_namespace }}"
+    definition:
+      apiVersion: cert-manager.io/v1
+      kind: Certificate
+      metadata:
+        name: vault-certificate
+      spec:
+        isCA: false
+        duration: "{{ vault_tls_duration }}"
+        commonName: vault-internal
+        dnsNames:
+          - "*.{{ vault_namespace }}.cluster.svc.local"
+          - "*.{{ vault_namespace }}"
+          - "*.vault-internal"
+          - "localhost"
+        ipAddresses:
+          - "127.0.0.1"
+        secretName: vault-certificate
+        usage:
+          - "server auth"
+          - "client auth"
+        issuerRef:
+          name: vault-ca-issuer
+          kind: Issuer

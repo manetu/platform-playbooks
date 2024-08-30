@@ -1,0 +1,60 @@
+- name: Update apt-get repo and cache
+  become: true
+  apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
+
+- name: Upgrade all apt packages
+  become: true
+  apt: upgrade=dist force_apt_get=yes
+  tags:
+    - upgrade
+  register: upgrade_result
+
+- name: Gather the package facts
+  ansible.builtin.package_facts:
+    manager: auto
+
+- name: Disable UFW firewall
+  when: "ubuntu_disable_ufw and 'ufw' in ansible_facts.packages"
+  become: true
+  community.general.ufw:
+    state: disabled
+
+- name: Install iscsid for longhorn
+  become: true
+  apt:
+    name: open-iscsi
+    state: present
+
+- name: Update sysctl
+  become: true
+  ansible.posix.sysctl:
+    name: '{{ item.key }}'
+    value: '{{ item.value }}'
+    sysctl_set: true
+    reload: true
+  with_dict: '{{ sysctl_config }}'
+
+- name: Update hard and soft file limits
+  become: true
+  lineinfile:
+    dest: /etc/security/limits.conf
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    insertbefore: "^# End of file"
+    state: present
+    backup: yes
+  loop:
+    - { regexp: '^\\*\ +hard\ +nofile\ +[0-9]+$', line: "*  hard  nofile    {{ security_limits_hard_nofile }}" }
+    - { regexp: '^\\*\ +soft\ +nofile\ +[0-9]+$', line: "*  soft  nofile    {{ security_limits_soft_nofile }}" }
+
+- name: Set timezone to  {{ instance_timezone }} --  needed by opa/rego
+  become: true
+  timezone:
+    name:  "{{ instance_timezone }}"
+
+- name: Reboot machine
+  become: true
+  ansible.builtin.reboot:
+  tags:
+    - upgrade
+  when: upgrade_result is changed

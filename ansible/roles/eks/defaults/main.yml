@@ -1,0 +1,9 @@
+aws_vpc_cidr_block: 10.200.0.0/16
+aws_vpc_subnets:
+  - {cidr: 10.200.0.0/18, az: "{{ aws_region }}a"}
+  - {cidr: 10.200.64.0/18, az: "{{ aws_region }}b"}
+  - {cidr: 10.200.128.0/18, az: "{{ aws_region }}c"}
+aws_instance_types:
+  - m7i.4xlarge
+aws_capacity_type: 'ON_DEMAND' ## 'ON_DEMAND' or 'SPOT'
+aws_disk_size: 100

@@ -1,0 +1,18 @@
+longhorn_version: 1.6.1
+longhorn_dns: longhorn.{{ mgmt_dns_suffix | default('invalid') }}
+longhorn_storage_path: /var/lib/longhorn
+longhorn_storage_replicas: 3
+longhorn_snapshot_cron:  "0 * * * *" # once an hour
+longhorn_snapshot_retain: 48
+longhorn_snapshot_concurrency: 2
+longhorn_backup_cron:  "0 0 * * *"  # once a day
+longhorn_backup_retain: 14
+longhorn_backup_concurrency: 2
+longhorn_encryption_enabled: true
+
+prometheus_monitor_labels: {}
+longhorn_monitor_labels:
+  name: longhorn-prometheus-servicemonitor
+
+monitoring_enabled: true
+alerts_enabled: true

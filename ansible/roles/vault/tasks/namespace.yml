@@ -1,0 +1,36 @@
+- name: Create namespace
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ vault_namespace }}"
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "{{ vault_namespace }}"
+        labels:
+           access.manetu.io/vault: "true"                     # grants access to itself
+
+- name: Install NetworkPolicy
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ vault_namespace }}"
+    definition:
+      apiVersion: networking.k8s.io/v1
+      kind: NetworkPolicy
+      metadata:
+        name: vault-network-policy
+      spec:
+        podSelector: {}
+        policyTypes:
+          - Ingress
+        ingress:
+          - from:
+              - namespaceSelector:
+                  matchLabels:
+                    access.manetu.io/vault: "true"
+              - namespaceSelector:
+                  matchLabels:
+                    access.manetu.io/vaultpods: "true"
+                podSelector:
+                  matchLabels:
+                    access.manetu.io/vault: "true"

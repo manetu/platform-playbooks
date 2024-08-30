@@ -1,0 +1,17 @@
+vault_version: 0.27.0
+vault_enabled: false
+vault_namespace: manetu-hashicorp
+vault_replicas: 3
+vault_storage_size: 10Gi
+vault_storage_class: "{{ default_storage_class | default('default') }}"
+vault_key_shares: 1
+vault_key_threshold: 1
+vault_keys_path: .vault/vault-keys.yml
+vault_devmode: false
+vault_keys:
+  root_token: "test"  # only relevant when devmode=true.  Obtained from vault dynamically when devmode=false
+vault_operator_password: "test"
+vault_tls_duration: 87600h
+
+monitoring_enabled: true
+alerts_enabled: true

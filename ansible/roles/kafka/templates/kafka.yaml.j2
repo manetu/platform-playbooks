@@ -1,0 +1,7 @@
+kafka:
+  bootstrapServers:
+    - kafka-kafka-brokers.{{ kafka_namespace }}:9093
+  securityProtocol: SSL
+  sslCaLocation: /etc/mcp/kafka/kafka-cluster-ca.crt 
+  requestTimeoutMs: 20000
+  retryBackoffMs: 500

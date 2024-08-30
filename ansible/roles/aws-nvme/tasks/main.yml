@@ -1,0 +1,28 @@
+- name: Create a partition on the NVME drive
+  become: true
+  community.general.parted:
+    device: /dev/nvme1n1
+    number: 1
+    state: present
+    fs_type: xfs
+
+- name: Format NVME drive
+  become: true
+  community.general.filesystem:
+    fstype: xfs
+    dev: /dev/nvme1n1p1
+
+- name: Create mountpoint
+  become: true
+  ansible.builtin.file:
+    path: /var/lib/longhorn
+    state: directory
+    mode: '0755'
+
+- name: Mount NVME drive
+  become: true
+  ansible.posix.mount:
+    path: /var/lib/longhorn
+    src: /dev/nvme1n1p1
+    state: mounted
+    fstype: xfs

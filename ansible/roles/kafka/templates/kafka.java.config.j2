@@ -1,0 +1,7 @@
+request.timeout.ms=20000
+bootstrap.servers=kafka-kafka-brokers.{{ kafka_namespace }}:9093
+retry.backoff.ms=500
+security.protocol=SSL
+ssl.truststore.type=PEM
+ssl.truststore.location=/etc/mcp/kafka/kafka-cluster-ca.crt
+ssl.ca.location=/etc/mcp/kafka/kafka-cluster-ca.crt

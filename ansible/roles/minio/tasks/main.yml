@@ -1,0 +1,2 @@
+- include_tasks: core.yml
+  when: minio_enabled

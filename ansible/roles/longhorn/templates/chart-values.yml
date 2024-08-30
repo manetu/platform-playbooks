@@ -1,0 +1,16 @@
+ingress:
+  enabled: true
+  host: {{ longhorn_dns }}
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: true
+    traefik.ingress.kubernetes.io/router.middlewares: traefik-system-basic-auth@kubernetescrd
+
+persistence:
+  defaultClass: false
+defaultSettings:
+  defaultDataPath: "{{ longhorn_storage_path }}"
+{% if s3_enabled is sameas true -%}
+  backupTarget: "{{ 's3://' + s3_bucket + '@' + s3_region + '/backups/longhorn' }}"
+  backupTargetCredentialSecret: s3-secrets
+{% endif -%}

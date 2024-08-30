@@ -1,0 +1,53 @@
+strimzi_version: 0.40.0
+
+kafka_version: 3.7.0
+kafka_replicas: 3
+kafka_namespace: manetu-kafka
+kafka_storage_class: "{{ default_storage_class | default('default') }}"
+kafka_storage_size: 10Gi
+kafka_config:
+  offsets.topic.replication.factor: 3
+  transaction.state.log.replication.factor: 3
+  transaction.state.log.min.isr: 2
+  default.replication.factor: 3
+  min.insync.replicas: 2
+kafka_resources: {}
+#  requests:
+#    memory: 64Gi
+#    cpu: "8"
+#  limits:
+#    memory: 64Gi
+#    cpu: "12"
+
+prometheus_monitor_labels: {}
+kafka_monitor_labels:
+  app: strimzi
+
+kafka_metrics_config:
+  type: jmxPrometheusExporter
+  valueFrom:
+    configMapKeyRef:
+      name: kafka-metrics
+      key: kafka-metrics-config.yml
+
+zookeeper_metrics_config:
+  type: jmxPrometheusExporter
+  valueFrom:
+    configMapKeyRef:
+      name: kafka-metrics
+      key: zookeeper-metrics-config.yml
+
+zookeeper_replicas: 3
+zookeeper_storage_class: "{{ default_storage_class | default('default') }}"
+zookeeper_storage_size: 10Gi
+zookeeper_resources: {}
+#  requests:
+#    memory: 8Gi
+#    cpu: "2"
+#  limits:
+#    memory: 8Gi
+#    cpu: "2"
+
+storage_enabled: true
+monitoring_enabled: true
+alerts_enabled: true

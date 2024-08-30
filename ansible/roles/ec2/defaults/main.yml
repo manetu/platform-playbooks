@@ -1,0 +1,12 @@
+aws_vpc_cidr_block: 10.200.0.0/16
+aws_vpc_subnets:
+  - {cidr: 10.200.0.0/18, az: "{{ aws_region }}a"}
+aws_capacity_type: 'ON_DEMAND' ## 'ON_DEMAND' or 'SPOT'
+aws_instance_type: r6i.2xlarge
+aws_image_id: ami-003932de22c285676
+aws_volume_size: 100 # GB
+aws_volume_type: gp3
+aws_volume_iops: 4000
+aws_volume_throughput: 1000
+aws_tags: {}
+aws_route53_ttl: 3600

@@ -1,0 +1,4 @@
+- include_tasks: init/unseal.yml
+  when: not vault_devmode
+
+- include_tasks: init/config.yml
