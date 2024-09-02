@@ -1,4 +1,4 @@
-yugabyte_version: 2.20.3
+yugabyte_version: 2.20.6
 yugabyte_namespace: manetu-yugabyte
 yugabyte_master_replicas: 3
 yugabyte_master_storage_size: 10Gi
