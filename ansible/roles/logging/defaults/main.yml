@@ -1,7 +1,7 @@
 logging_enabled: true
 
-promtail_version: 6.14.1
-loki_version: 5.14.1
+promtail_version: 6.16.5
+loki_version: 6.11.0
 
 loki_replication_factor: 3
 loki_pod_replicas: 3
