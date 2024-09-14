@@ -1,3 +1,14 @@
+- name: Add extra labels to ServiceMonitor
+  when: prometheus_monitor_labels
+  kubernetes.core.k8s:
+    state: patched
+    namespace: "{{ minio_namespace }}"
+    name: minio
+    kind: ServiceMonitor
+    definition:
+      metadata:
+        labels: "{{ prometheus_monitor_labels | from_yaml }}"
+
 - name: Add MinIO Alert Rules
   when: alerts_enabled
   kubernetes.core.k8s:
