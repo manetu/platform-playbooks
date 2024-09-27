@@ -141,7 +141,7 @@ Manetu and Third-Party pods adhere to the Prometheus ServiceMonitor/PodMonitor C
 
 | Variable                     | Type | Default | Description |
 | ---------------------------- | ---- | ------- | ----------- |
-| monitoring_enabled           | bool | 'true'  | Top-level switch for installing metrics, alerts, and/or dashboards |
+| monitoring_enabled           | bool | 'false'  | Top-level switch for installing metrics, alerts, and/or dashboards |
 | prometheus_monitor_labels    | dict | {}      | Optional additional labels to apply to any Service/PodMonitors |
 
 #### Granting Access
@@ -159,8 +159,8 @@ Manetu curates a set of proprietary and third-party Prometheus AlertManager rule
 
 | Variable                     | Type | Default | Description |
 | ---------------------------- | ---- | ------- | ----------- |
-| monitoring_enabled           | bool | 'true'  | Top-level switch for installing metrics, alerts, and/or dashboards |
-| alerts_enabled               | bool | 'true'  | Option to enable the installation of PrometheusRule objects |
+| monitoring_enabled           | bool | 'false'  | Top-level switch for installing metrics, alerts, and/or dashboards |
+| alerts_enabled               | bool | 'false'  | Option to enable the installation of PrometheusRule objects |
 
 ### Dashboards
 Manetu curates a collection of proprietary and third-party Grafana dashboards that may be integrated into the customer’s Prometheus/Grafana stack.  Most third-party dashboards are available in the [public regitstry](https://grafana.com/grafana/dashboards/?pg=docs-grafana-latest-dashboards).  A few third-party dashboards are available via URL.  Lastly, Manetu-supplied dashboards are available in this repository.

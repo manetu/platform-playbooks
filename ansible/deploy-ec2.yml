@@ -23,8 +23,6 @@
         s3_enabled: false
         logging_enabled: false
         vault_enabled: false
-        monitoring_enabled: false
-        tracing_enabled: false
         lb_type: servicelb
         local_storage_enabled: true
         default_storage_class: local-path

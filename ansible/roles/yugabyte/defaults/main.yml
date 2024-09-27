@@ -24,6 +24,6 @@ yugabyte_resources: {}
 #      cpu: 12
 #      memory: 24Gi
 
-monitoring_enabled: true
-alerts_enabled: true
+monitoring_enabled: false
+alerts_enabled: false
 prometheus_monitor_labels: {}

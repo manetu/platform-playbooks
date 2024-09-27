@@ -22,7 +22,7 @@ manetu_rollbar_env:  ""                       # defaults to {{ Release.Namespace
 manetu_chart_values: {}  # Allows customization
 
 prometheus_monitor_labels: {}
-monitoring_enabled: true
-alerts_enabled: true
-tracing_enabled: true
+monitoring_enabled: false
+alerts_enabled: false
+tracing_enabled: false
 mp_test_enabled: false

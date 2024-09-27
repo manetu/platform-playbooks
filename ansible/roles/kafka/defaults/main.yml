@@ -49,5 +49,5 @@ zookeeper_resources: {}
 #    cpu: "2"
 
 storage_enabled: true
-monitoring_enabled: true
-alerts_enabled: true
+monitoring_enabled: false
+alerts_enabled: false

@@ -14,5 +14,5 @@ prometheus_monitor_labels: {}
 longhorn_monitor_labels:
   name: longhorn-prometheus-servicemonitor
 
-monitoring_enabled: true
-alerts_enabled: true
+monitoring_enabled: false
+alerts_enabled: false

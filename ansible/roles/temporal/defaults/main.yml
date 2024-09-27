@@ -25,5 +25,5 @@ temporal_dynamic_config: {}
 #    constraints: {}
 
 prometheus_monitor_labels: {}
-monitoring_enabled: true
-alerts_enabled: true
+monitoring_enabled: false
+alerts_enabled: false
