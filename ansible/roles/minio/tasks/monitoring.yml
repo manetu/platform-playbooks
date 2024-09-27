@@ -3,8 +3,9 @@
   kubernetes.core.k8s:
     state: patched
     namespace: "{{ minio_namespace }}"
-    name: minio
+    api_version: monitoring.coreos.com/v1
     kind: ServiceMonitor
+    name: minio
     definition:
       metadata:
         labels: "{{ prometheus_monitor_labels | from_yaml }}"
