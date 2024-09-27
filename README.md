@@ -241,7 +241,7 @@ Consult your chosen [Deployment Model](#deployment-model) documentation for spec
 
 > Warning: Deployment-level playbooks are intended to orchestrate the initial installation.  Running the deployment playbooks against a previously deployed instance may result in unexpected/undesirable changes to your system, such as rebooting nodes or applying an incompatible change.  For example, the deploy-embedded playbooks may reboot Kubernetes nodes to apply operating-system level updates, and the variable 'temporal_history_shards' cannot be changed after the system has been deployed.  Note that incompatible changes may include explicit settings in your inventory, or implicit changes by adopting a new profile (See [Profiles](#profiles) below).
 >
-> Thus, top-level redeployment via the deploy_xx playbooks for a running system is not supported.  For upgrades to the Manetu platform, see [Upgrades](#Upgrades).
+> Thus, top-level redeployment via the deploy_xx playbooks for a running system is not supported.  For upgrades to the Manetu platform, see [Upgrade](#upgrade).
 
 ### Profiles
 
