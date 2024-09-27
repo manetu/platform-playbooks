@@ -10,10 +10,12 @@
         kind: Namespace
         name: "{{ item }}"
       loop:
-        - manetu-platform
-        - manetu-temporal
-        - manetu-yugabyte
-        - manetu-kafka
-        - manetu-cassandra
-        - manetu-minio
-        - manetu-hashicorp
+        - "{{ manetu_namespace | default('manetu-platform') }}"
+        - "{{ temporal_namespace | default('manetu-temporal') }}"
+        - "{{ yugabyte_namespace | default('manetu-yugabyte') }}"
+        - "{{ kafka_namespace | default('manetu-kafka') }}"
+        - "{{ cassandra_namespace | default('manetu-cassandra') }}"
+        - "{{ minio_namespace | default('manetu-minio') }}"
+        - "{{ vault_namespace | default('manetu-hashicorp') }}"
+        - "{{ elasticsearch_namespace | default('manetu-elastic') }}"
+        - "{{ qdrant_namespace | default('manetu-qdrant') }}"

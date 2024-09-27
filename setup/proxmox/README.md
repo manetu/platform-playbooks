@@ -93,7 +93,7 @@ proxmox:
 From here, we create the base VMs with the following command
 
 ``` shell
-ansible-playbook create.yml -i my-proxmox-inventory.yml
+ansible-playbook setup/proxmox/create.yml -i my-proxmox-inventory.yml
 ```
 
 We must then manually gather the DHCP-assigned IPs to each of the VMs (TODO: offer static assignment?)
@@ -114,13 +114,13 @@ workers:
 Where the hostname var matches the names assigned in the 'vms' section.  Next, apply the init-hosts playbook to update the VMs.
 
 ``` shell
-ansible-playbook init-hosts.yml -i my-proxmox-inventory.yml
+ansible-playbook setup/proxmox/init-hosts.yml -i my-proxmox-inventory.yml
 ```
 
 From here, we have our core set of machines and should establish a snapshot that we can conveniently restore to if we need to iterate testing.
 
 ``` shell
-ansible-playbook snapshot.yml -i my-proxmox-inventory.yml
+ansible-playbook setup/proxmox/snapshot.yml -i my-proxmox-inventory.yml
 ```
 
 ## Use
@@ -154,13 +154,13 @@ k3s_secondary:
 If you ever want to reset the system back for testing, use the restore.yml playbook, like so:
 
 ``` shell
-ansible-playbook restore.yml -i my-proxmox-inventory.yml
+ansible-playbook setup/proxmox/restore.yml -i my-proxmox-inventory.yml
 ```
 
 followed by
 
 ``` shell
-ansible-playbook start.yml -i my-proxmox-inventory.yml
+ansible-playbook setup/proxmox/start.yml -i my-proxmox-inventory.yml
 ```
 
 ## Environment Tear-down
@@ -168,5 +168,5 @@ ansible-playbook start.yml -i my-proxmox-inventory.yml
 When you no longer need the environment:
 
 ``` shell
-ansible-playbook delete.yml -i my-proxmox-inventory.yml
+ansible-playbook setup/proxmox/delete.yml -i my-proxmox-inventory.yml
 ```
