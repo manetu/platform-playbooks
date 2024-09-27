@@ -17,3 +17,5 @@
         - "{{ cassandra_namespace | default('manetu-cassandra') }}"
         - "{{ minio_namespace | default('manetu-minio') }}"
         - "{{ vault_namespace | default('manetu-hashicorp') }}"
+        - "{{ elasticsearch_namespace | default('manetu-elastic') }}"
+        - "{{ qdrant_namespace | default('manetu-qdrant') }}"
