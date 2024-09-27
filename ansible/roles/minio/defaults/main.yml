@@ -13,5 +13,5 @@ minio_resources:
 minio_tls_duration: 87600h
 
 prometheus_monitor_labels: {}
-monitoring_enabled: true
-alerts_enabled: true
+monitoring_enabled: false
+alerts_enabled: false

@@ -114,3 +114,15 @@ k3s_secondary:
   hosts:
     node-[2:3]:
 ```
+
+##### Telemetry
+
+Telemetry features such as metrics, alerts, and tracing are disabled by default.  To enable, please add the following variables to your inventory:
+
+``` yaml
+all:
+  vars:
+    monitoring_enabled: true
+    alerts_enabled: true
+    tracing_enabled: true
+```

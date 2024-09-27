@@ -13,5 +13,5 @@ vault_keys:
 vault_operator_password: "test"
 vault_tls_duration: 87600h
 
-monitoring_enabled: true
-alerts_enabled: true
+monitoring_enabled: false
+alerts_enabled: false

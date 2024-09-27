@@ -5,7 +5,6 @@
         manetu_namespace: "{{ manetu_namespace | default('manetu-platform') }}"
         s3_enabled: "{{ s3_enabled | default(false) }}"
         s3_insecure: "{{ s3_insecure | default(false) }}"
-        tracing_enabled: "{{ tracing_enabled | default(false) }}"
 
 - name: "Deploy k8s infrastructure"
   hosts: config_host
