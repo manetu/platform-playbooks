@@ -99,34 +99,9 @@ You may use any valid Ansible Inventory technique to customize, such as editing 
 
 ```yaml
 all:
-  hosts:
-    node-1:
-      ansible_host: 10.20.32.40
-    node-2:
-      ansible_host: 10.20.32.42
-    node-3:
-      ansible_host: 10.20.32.41
-    node-4:
-      ansible_host: 10.20.32.43
   vars:
-    manetu_platform_version: 2.0.0-v2.0.0.b31.7505
+    manetu_platform_version: 2.2.0-v2.2.0.b26.8435
     manetu_dns: manetu.example.com
-
-config_host:
-  hosts:
-    node-1:
-
-k3s_primary:
-  hosts:
-    node-1:
-
-k3s_secondary:
-  hosts:
-    node-[2:3]:
-
-k3s_agents:
-  hosts:
-    node-4:
 ```
 
 Note that some options are available in a pre-configured manner called [Profiles](#Profiles).

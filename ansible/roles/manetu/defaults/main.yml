@@ -1,6 +1,6 @@
 manetu_platform_chart_ref: oci://registry.gitlab.com/manetu/manetu-charts/manetu-platform
 manetu_platform_mptest_chart_ref: oci://registry.gitlab.com/manetu/manetu-charts/mp-test
-manetu_platform_version: 2.2.0-v2.2.0.b21.8152
+manetu_platform_version: 2.2.0-v2.2.0.b26.8435
 manetu_chart_timeout: 15m
 manetu_namespace: manetu-platform
 manetu_registry_dns: registry.gitlab.com
