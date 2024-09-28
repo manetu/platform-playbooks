@@ -105,7 +105,7 @@ rm $DIR/operator.* $DIR/password
 echo "Your inventory has been created at $DIR."
 echo ""
 echo "------------------------------------------------------------"
-echo " Password: $PASSWORD"
+echo " Inventory Password: $PASSWORD"
 echo ""
 echo " Store it somewhere safe.  It will not be displayed again."
 echo "------------------------------------------------------------"

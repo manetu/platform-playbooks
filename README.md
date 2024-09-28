@@ -67,13 +67,13 @@ $ ./scripts/create-inventory.sh inventories/foo
 Your inventory has been created at inventories/foo.
 
 ------------------------------------------------------------
- Password: egTxDckC6OWDa1jbvUdBWM6aPofErnIhjw6TGXbrwi7WBehPnDxzWphiOlf7ReFV
+ Inventory Password: egTxDckC6OWDa1jbvUdBWM6aPofErnIhjw6TGXbrwi7WBehPnDxzWphiOlf7ReFV
 
  Store it somewhere safe.  It will not be displayed again.
 ------------------------------------------------------------
 ```
 
-As indicated, make a secure and reliable note of the password, such as within a 1Password vault.
+As indicated, make a secure and reliable note of the inventory password, such as within a 1Password vault.
 
 **NB.  Loss or corruption of the decryption password may result in the inability to maintain or recover a Manetu instance.**
 
