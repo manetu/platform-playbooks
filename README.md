@@ -251,7 +251,9 @@ The Platform Operator is responsible for inter-tenancy functions, such as creati
 - [yq](https://github.com/mikefarah/yq)
 - [Manetu Security Token](https://github.com/manetu/security-token)
 
-#### DNS
+#### Configure Environment Variables
+
+##### DNS
 
 Get your DNS name "manetu_dns" from your deployment inventory.
 
@@ -270,38 +272,31 @@ Use the DNS name to set MANETU_URL
 export MANETU_URL=https://manetu.example.com
 ```
 
-#### Access Token
-
-Get a JSON Web Token (JWT) for the platform operator via the manetu-security-token tool.
-
-You will need the password for your inventory
+##### Inventory Password
 
 ``` shell
 export INVENTORY_PASSWORD=egTxDckC6OWDa1jbvUdBWM6aPofErnIhjw6TGXbrwi7WBehPnDxzWphiOlf7ReFV
 ```
 
-``` shell
-export MANETU_TOKEN=$(manetu-security-token login --insecure pem --path --p12 inventories/myinventory/platform-operator-credentials.p12 --password $INVENTORY_PASSWORD)
-```
-
-#### Invoke the GraphQL API
+#### Run the 'create-realm' script
 
 ``` shell
-cat <<EOF | yq -r -o=json - | curl --insecure --data-binary @- --silent --show-error --fail --header 'Content-Type: application/json' --header "Authorization: Bearer $MANETU_TOKEN" $MANETU_URL/graphql | jq
-query: |
-  mutation {
-    create_realm(
-      id: "piedpiper",
-      iam_admin_password: "somepassword",
-      data: { name: "Pied Piper", logo_uri: "/static/mock/pied-piper-logo.png" }
-    )
-  }
-EOF
+./scripts/create-realm.sh --id piedpiper --name "Pied Piper" --inventory inventories/myinventory
 ```
 
-Point your web browser to your instance (e.g., https://manetu.example.com) and log in.
+This should result in output similar to the following:
 
-NB.  The --insecure flag is needed only for testing/development when utilizing self-signed certificates.
+``` shell
+Your realm has been created.
+
+------------------------------------------------------------
+ Administrator Password: Wviry78og2me3f9DGLrjSD29W3IrMmZ4
+
+ Store it somewhere safe.  It will not be displayed again.
+------------------------------------------------------------
+```
+
+Point your web browser to your instance (e.g., https://manetu.example.com) and log in using your realm ID with a username 'admin' and the password indicated above.
 
 ### Upgrade
 
