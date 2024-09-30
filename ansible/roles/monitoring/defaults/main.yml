@@ -1,3 +1,5 @@
+monitoring_enabled: false
+
 grafana_version: 8.5.0
 grafana_replicas: 1
 grafana_storage_class: "{{ default_storage_class | default('default') }}"

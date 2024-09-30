@@ -5,5 +5,5 @@ k3s_cluster_enabled: true
 k3s_role: server    # server or agent
 k3s_primary: true   # if role = server, indicates primary or secondary
 servicelb_enabled: "{{ ( lb_type | default('unknown')) == 'servicelb' }}"
-local_storage_enabled: false
+local_storage_enabled: "{{ ( storage_type | default('unknown')) == 'local' }}"
 k3s_external_ip:

@@ -15,3 +15,5 @@ promtail_http_listen_port: 9080
 promtail_grpc_listen_port: 0
 promtail_client_url: http://loki-gateway.logging.svc.cluster.local:80/loki/api/v1/push
 promtail_tenant_id: tenant1
+
+s3_insecure: false

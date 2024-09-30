@@ -47,7 +47,7 @@
       import_tasks: tasks/service-to-route53.yml
 
 - name: Deploy Third-party
-  import_playbook: third-party.yml
+  import_playbook: deploy-thirdparty.yml
 
 - name: Deploy Manetu
   import_playbook: manetu.yml

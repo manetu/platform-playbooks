@@ -24,8 +24,9 @@
         logging_enabled: false
         vault_enabled: false
         lb_type: servicelb
-        local_storage_enabled: true
+        storage_type: local
         default_storage_class: local-path
+        traefik_enabled: false
         #temporal_dev_mode: true
         #temporal_tls_enabled: false
         manetu_rollbar_enabled: false
@@ -41,17 +42,9 @@
             resources: {}
 
 - name: "Deploy k3s"
-  import_playbook: k3s.yml
-
-- name: "Deploy bare-bones k8s infrastructure"
-  hosts: config_host
-  roles:
-    - python
-    - manetu-namespace # needs to be early so components may install configmaps/secrets
-    - cert-manager
-    - istio
+  import_playbook: deploy-k3s.yml
 
 - name: "Deploy Third-party"
-  import_playbook: third-party.yml
+  import_playbook: deploy-thirdparty.yml
 
 - import_playbook: manetu.yml
