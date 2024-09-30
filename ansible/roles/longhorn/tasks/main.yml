@@ -1,4 +1,2 @@
-- include_tasks: install.yml
-
-- include_tasks: monitoring.yml
-  when: monitoring_enabled
+- include_tasks: core.yml
+  when: storage_type == "longhorn"

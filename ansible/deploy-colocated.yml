@@ -3,8 +3,6 @@
   tasks:
     - set_fact:
         manetu_namespace: "{{ manetu_namespace | default('manetu-platform') }}"
-        s3_enabled: "{{ s3_enabled | default(false) }}"
-        s3_insecure: "{{ s3_insecure | default(false) }}"
 
 - name: "Deploy k8s infrastructure"
   hosts: config_host
@@ -15,7 +13,7 @@
     - istio
 
 - name: "Deploy Third-party"
-  import_playbook: third-party.yml
+  import_playbook: deploy-thirdparty.yml
 
 - import_playbook: manetu.yml
 

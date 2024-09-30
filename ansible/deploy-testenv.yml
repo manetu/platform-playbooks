@@ -19,6 +19,6 @@
     - istio
 
 - name: "Deploy Third-party"
-  import_playbook: third-party.yml
+  import_playbook: deploy-thirdparty.yml
 
 # Manetu explicitly omitted: Managed by CI pipeline

@@ -1,4 +1,6 @@
 istio_version: 1.23.0
+istio_install: true
+istio_ingress_enabled: true
 istio_gateway_annotations: {}
 istio_gateway_service_type: LoadBalancer
 istio_tracing_sampling: 1.0  # % range of 0.0 to 100.0 with a precision of 0.01
@@ -10,4 +12,5 @@ istio_proxy_resources:
     cpu: 2000m
     memory: 1024Mi
 
+monitoring_enabled: false
 prometheus_monitor_labels: {}
