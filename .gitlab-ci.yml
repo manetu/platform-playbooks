@@ -1,0 +1,55 @@
+include:
+  - project: manetu/tools/ci-tools
+    ref: v2.1.0
+    file: /templates/library.yml
+
+.citools_variables:
+  variables:
+    MANETU_RELEASE_STREAM: "2.3.0"
+
+.playbooks_base:
+  image: registry.gitlab.com/manetu/tools/unified-builder:v2.1
+
+playbooks_build:
+  extends: .playbooks_base
+  stage: build
+  except:
+    - tags
+  script:
+    - echo "Build simulation"
+    - mkdir target
+    - echo "done" > target/foo.txt
+  artifacts:
+    paths:
+      - target
+
+# Integrate
+#helm_install:
+#  extends: .helm_install
+#  script:
+#    - |
+#        # Helm Install
+#        set -eu
+#        kubectl create configmap --from-file=target/platform-alertdefs.tgz candidate-platform-alertdefs
+#        deploy-mptest
+
+# Approve
+approve_release:
+  extends: .approve_release
+  when: on_success
+
+.publish:
+  extends: .release_template
+  dependencies:
+    - playbooks_build
+    - approve_release
+
+publish:
+  extends:
+    - .publish
+    - .playbooks_base
+  variables:
+    GIT_STRATEGY: fetch # need git repo for pushing upstream
+  script:
+    - echo "machine $GIT_MIRROR_HOST login $GIT_MIRROR_USERNAME password $GIT_MIRROR_PASSWORD" > $HOME/.netrc && chmod 600 $HOME/.netrc
+    - git push $GIT_MIRROR_REPO HEAD:$CI_COMMIT_BRANCH
