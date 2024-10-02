@@ -7,21 +7,26 @@ include:
   variables:
     MANETU_RELEASE_STREAM: "2.3.0"
 
-.playbooks_base:
+.archive_base:
   image: registry.gitlab.com/manetu/tools/unified-builder:v2.1
 
-playbooks_build:
-  extends: .playbooks_base
+archive_build:
+  extends: .archive_base
   stage: build
   except:
     - tags
   script:
-    - echo "Build simulation"
-    - mkdir target
-    - echo "done" > target/foo.txt
+    - make
   artifacts:
     paths:
       - target
+
+test:
+  extends: .helm_install
+  stage: integrate
+  variables:
+    PLAYBOOKS_REF: file://$CI_PROJECT_DIR
+    PLAYBOOK_SUBPATH: ansible
 
 # Integrate
 #helm_install:
@@ -38,18 +43,31 @@ approve_release:
   extends: .approve_release
   when: on_success
 
-.publish:
+.archive_release:
   extends: .release_template
   dependencies:
-    - playbooks_build
+    - archive_build
     - approve_release
 
-publish:
+github_mirror:
   extends:
-    - .publish
-    - .playbooks_base
+    - .archive_release
+    - .archive_base
   variables:
     GIT_STRATEGY: fetch # need git repo for pushing upstream
   script:
     - echo "machine $GIT_MIRROR_HOST login $GIT_MIRROR_USERNAME password $GIT_MIRROR_PASSWORD" > $HOME/.netrc && chmod 600 $HOME/.netrc
     - git push $GIT_MIRROR_REPO HEAD:$CI_COMMIT_BRANCH
+
+gitlab_package_registry:
+  extends:
+    - .archive_release
+    - .archive_base
+  script:
+    - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file target/manetu-playbooks.tgz "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/manetu-playbooks/$CV_NAKED_NEW_TAG/manetu-playbooks.tgz"'
+
+git_release:
+  extends: .git_release
+
+git_release_verify:
+  extends: .git_release_verify
