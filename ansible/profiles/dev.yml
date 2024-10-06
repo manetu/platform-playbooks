@@ -18,7 +18,10 @@ minio_resources:
     memory: 1Mi
 
 vault_replicas: 1
+
 cassandra_replicas: 1
+cassandra_resources: {} # chart defaults to cpu: 1500m and memory: 3Gi
+
 yugabyte_master_replicas: 1
 yugabyte_tserver_replicas: 1
 yugabyte_resources:

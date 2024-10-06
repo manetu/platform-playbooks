@@ -46,7 +46,7 @@ config_host:
 ### Deployment
 
 ```shell
-ansible-playbook -i path/to/inventory.yml ansible/deploy-eks.yml --ask-vault-pass --extra-vars @ansible/profiles/bigiron.yml
+ansible-playbook -i path/to/inventory.yml ansible/deploy-eks.yml --ask-vault-pass --extra-vars @ansible/profiles/large.yml
 ```
 
 ### Teardown

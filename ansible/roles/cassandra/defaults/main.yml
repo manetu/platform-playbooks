@@ -3,6 +3,13 @@ cassandra_namespace: manetu-cassandra
 cassandra_replicas: 3
 cassandra_storage_size: 10Gi
 cassandra_storage_class: "{{ default_storage_class | default('default') }}"
-cassandra_resources: {}
 cassandra_user: cassandra
 cassandra_tls_duration: 87600h
+
+cassandra_resources:
+  requests:
+    memory: 8Gi
+    cpu: 4
+  limits:
+    memory: 16Gi
+    cpu: 12
