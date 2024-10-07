@@ -7,3 +7,5 @@ aws_instance_types:
   - m7i.4xlarge
 aws_capacity_type: 'ON_DEMAND' ## 'ON_DEMAND' or 'SPOT'
 aws_disk_size: 100
+
+eks_version: "1.30" 

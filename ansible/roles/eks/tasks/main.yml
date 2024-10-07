@@ -83,7 +83,7 @@
 - name: Create EKS cluster
   community.aws.eks_cluster:
     name: "{{ aws_instance_name }}"
-    version: 1.28
+    version: "{{ eks_version }}"
     region: "{{ aws_region }}"
     role_arn: "{{ cluster_role.iam_role.arn }}"
     subnets: "{{ subnet_ids }}"
