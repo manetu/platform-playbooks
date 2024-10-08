@@ -5,7 +5,7 @@ manetu_chart_timeout: 15m
 manetu_namespace: manetu-platform
 manetu_registry_dns: registry.gitlab.com
 manetu_registry_login: true
-manetu_replicas_min: 2
+manetu_replicas_min: 3
 manetu_kafka_partitions: 18
 manetu_kafka_replicationfactor: 3
 manetu_vault_domain: manetu.io
