@@ -161,17 +161,17 @@
             editable: true
             options:
               path: /var/lib/grafana/dashboards/chaos-mesh
-          - name: 'overview'
+          - name: 'kubernetes'
             orgId: 1
             type: file
             disableDeletion: false
-            folder: 'overview'
+            folder: 'kubernetes'
             allowUiUpdates: true
             editable: true
             options:
-              path: /var/lib/grafana/dashboards/overview
+              path: /var/lib/grafana/dashboards/kubernetes
       dashboards:
-        overview:
+        kubernetes:
           k8s-views-global:
             gnetId: 15757
             revision: 31
@@ -188,10 +188,10 @@
             gnetId: 15760
             revision: 22
             datasource: Prometheus
+        manetu:
           status_page:
             json: |
               {{ lookup('file', 'status-page.json') | string }}
-        manetu:
           red_dashboard:
             json: |
               {{ lookup('file', 'red.json') | string }}
