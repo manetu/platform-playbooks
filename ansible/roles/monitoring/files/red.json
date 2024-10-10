@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 4,
+  "id": 42,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -92,7 +92,7 @@
         "sizing": "auto",
         "valueMode": "color"
       },
-      "pluginVersion": "10.4.0",
+      "pluginVersion": "11.1.5",
       "targets": [
         {
           "datasource": {
@@ -394,7 +394,7 @@
           "unit": "ms"
         }
       },
-      "pluginVersion": "10.4.0",
+      "pluginVersion": "11.1.5",
       "targets": [
         {
           "datasource": {
@@ -960,6 +960,7 @@
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -971,7 +972,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.4.0",
+      "pluginVersion": "11.1.5",
       "targets": [
         {
           "datasource": {
@@ -2512,7 +2513,7 @@
           "unit": "s"
         }
       },
-      "pluginVersion": "10.4.0",
+      "pluginVersion": "11.1.5",
       "targets": [
         {
           "datasource": {
@@ -2652,6 +2653,559 @@
       ],
       "title": "Lock Latency",
       "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 85
+      },
+      "id": 33,
+      "panels": [],
+      "title": "Yugabyte",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 86
+      },
+      "id": 37,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum(irate(rpc_latency_count{saved_name=\"handler_latency_yb_cqlserver_SQLProcessor_SelectStmt_count\"}[5m]))",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Select",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum(irate(rpc_latency_count{saved_name=\"handler_latency_yb_cqlserver_SQLProcessor_UpdateStmt_count\"}[5m]))",
+          "interval": "",
+          "legendFormat": "Update",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum(irate(rpc_latency_count{nsaved_name=\"handler_latency_yb_cqlserver_SQLProcessor_DeleteStmt_count\"}[5m]))",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Delete",
+          "range": true,
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum(irate(rpc_latency_count{saved_name=\"handler_latency_yb_cqlserver_SQLProcessor_InsertStmt_count\"}[5m]))",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Insert",
+          "range": true,
+          "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum(irate(rpc_latency_count{saved_name=\"handler_latency_yb_cqlserver_SQLProcessor_OtherStmts_count\"}[5m]))",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Other",
+          "range": true,
+          "refId": "E"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum(irate(rpc_latency_count{saved_name=\"handler_latency_yb_cqlserver_SQLProcessor_Transaction_count\"}[5m]))",
+          "interval": "",
+          "legendFormat": "Transaction",
+          "range": true,
+          "refId": "F"
+        }
+      ],
+      "title": "Total YCQL Ops / Sec",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "µs"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 86
+      },
+      "id": 38,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "max(rpc_latency{quantile=\"max\"})",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Max",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "max(rpc_latency{quantile=\"p99\"})",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "p99",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "max(rpc_latency{quantile=\"p95\"})",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "p95",
+          "range": true,
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "max(rpc_latency{quantile=\"p50\"})",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "p50",
+          "range": true,
+          "refId": "D"
+        }
+      ],
+      "title": "Op Latency",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "µs"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 95
+      },
+      "id": 35,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "avg(irate(rpc_latency_sum{saved_name=\"handler_latency_yb_consensus_ConsensusService_UpdateConsensus_sum\"}[5m])) / avg(irate(rpc_latency_count{saved_name=\"handler_latency_yb_consensus_ConsensusService_UpdateConsensus_count\"}[5m]))\r\n",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "UpdateConsensus",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "avg(irate(rpc_latency_sum{saved_name=\"handler_latency_yb_consensus_ConsensusService_RequestConsensusVote_sum\"}[5m])) / avg(irate(rpc_latency_count{saved_name=\"handler_latency_yb_consensus_ConsensusService_RequestConsensusVote_count\"}[5m]))\r\n",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "RequestConsensusVote",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "title": "Consensus Rpc Latencies",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 0,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "µs"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 95
+      },
+      "id": 36,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "avg(irate(log_sync_latency_sum{export_type=\"tserver_export\"}[5m])) / avg(irate(log_sync_latency_count{export_type=\"tserver_export\"}[5m]))",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Sync",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "avg(irate(log_group_commit_latency_sum{export_type=\"tserver_export\"}[5m])) / avg(irate(log_group_commit_latency_count{export_type=\"tserver_export\"}[5m]))",
+          "interval": "",
+          "legendFormat": "Commit",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "avg(irate(log_append_latency_sum{export_type=\"tserver_export\"}[5m])) / avg(irate(log_append_latency_count{export_type=\"tserver_export\"}[5m]))",
+          "interval": "",
+          "legendFormat": "Append",
+          "range": true,
+          "refId": "C"
+        }
+      ],
+      "title": "TServer Log Latency",
+      "type": "timeseries"
     }
   ],
   "refresh": "5s",
@@ -2710,13 +3264,13 @@
     ]
   },
   "time": {
-    "from": "now-15m",
+    "from": "now-5m",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "RED metrics",
   "uid": "dd0fac07-caf6-4762-8b65-0651e21b9101",
-  "version": 3,
+  "version": 11,
   "weekStart": ""
 }
