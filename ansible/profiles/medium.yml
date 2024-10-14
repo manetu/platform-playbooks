@@ -47,8 +47,11 @@ temporal_history_replicas: 6
 temporal_history_resources: {}
 temporal_history_shards: 1000
 
-manetu_replicas_min: 6
+manetu_replicas_min: 3
 manetu_chart_values:
+  mcp-attribute-service:
+    cp:
+      replicaCount: 12
   mcp-vault-service:
     cp:
       replicaCount: 12
@@ -57,4 +60,4 @@ manetu_chart_values:
       replicaCount: 12
   mcp-iam-service:
     cp:
-      replicaCount: 18
+      replicaCount: 12
