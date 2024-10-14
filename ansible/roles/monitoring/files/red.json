@@ -1254,7 +1254,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum(rate(temporal_workflow_endtoend_latency_bucket{namespace=~\"$namespace\"}[1m])) by (le, workflow_type, container)",
+          "expr": "sum(rate(temporal_workflow_endtoend_latency_bucket{namespace=~\"$namespace\"}[1m])) by (le)",
           "format": "heatmap",
           "instant": false,
           "legendFormat": "{{container}}/{{workflow_type}}",
@@ -1720,7 +1720,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(rate(temporal_workflow_task_execution_latency_bucket[1m])) by (le, workflow_type, container)",
+          "expr": "sum(rate(temporal_workflow_task_execution_latency_bucket[1m])) by (le)",
           "format": "heatmap",
           "instant": false,
           "legendFormat": "{{container}}/{{workflow_type}}",
@@ -2185,7 +2185,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "sum by (le, activity_type, task_queue) (rate(temporal_activity_execution_latency_bucket{namespace=~\"$namespace\"}[1m]))",
+          "expr": "sum by (le) (rate(temporal_activity_execution_latency_bucket{namespace=~\"$namespace\"}[1m]))",
           "format": "heatmap",
           "instant": false,
           "legendFormat": "{{task_queue}}/{{activity_type}}",
@@ -2554,7 +2554,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "sum by (le, activity_type, task_queue) (rate(temporal_local_activity_execution_latency_bucket{namespace=~\"$namespace\"}[1m]))",
+          "expr": "sum by (le) (rate(temporal_local_activity_execution_latency_bucket{namespace=~\"$namespace\"}[1m]))",
           "format": "heatmap",
           "instant": false,
           "legendFormat": "{{task_queue}}/{{activity_type}}",
@@ -4455,6 +4455,6 @@
   "timezone": "",
   "title": "RED metrics",
   "uid": "dd0fac07-caf6-4762-8b65-0651e21b9101",
-  "version": 16,
+  "version": 17,
   "weekStart": ""
 }
