@@ -8,4 +8,4 @@ aws_instance_types:
 aws_capacity_type: 'ON_DEMAND' ## 'ON_DEMAND' or 'SPOT'
 aws_disk_size: 100
 
-eks_version: "1.30" 
+eks_version: "1.31"
