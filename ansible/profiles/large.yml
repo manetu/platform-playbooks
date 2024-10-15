@@ -60,7 +60,7 @@ temporal_dynamic_config:
     constraints: {}
 
 manetu_replicas_min: 6
-manetu_chart_values:
+manetu_base_chart_values: # merges with {{ manetu_chart_values }}
   mcp-attribute-service:
     cp:
       replicaCount: 18

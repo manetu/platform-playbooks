@@ -19,6 +19,7 @@ manetu_peer_mtls_mode: STRICT                 # STRICT, PERMISSIVE, DISABLE
 manetu_rollbar_enabled: true
 manetu_rollbar_env:  ""                       # defaults to {{ Release.Namespace }}.{{ Release.Name }}
 
+manetu_base_chart_values: {}  # Profile-based customization merged with {{ manetu_chart_values }}
 manetu_chart_values: {}  # Allows customization
 
 prometheus_monitor_labels: {}
