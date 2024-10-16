@@ -1,4 +1,3 @@
-yugabyte_tserver_replicas: 3
 yugabyte_resources:
   master:
     requests:
@@ -9,13 +8,13 @@ yugabyte_resources:
       memory: 2Gi
   tserver:
     requests:
-      cpu: 6
+      cpu: 4
       memory: 24Gi
     limits:
-      cpu: 8
+      cpu: 12
       memory: 32Gi
 
-kafka_replicas: 6
+kafka_replicas: 3
 kafka_resources:
   requests:
     memory: 8Gi
@@ -26,12 +25,9 @@ kafka_resources:
 
 zookeeper_replicas: 3
 zookeeper_resources:
-  requests:
-    memory: 4Gi
-    cpu: 1
   limits:
     memory: 4Gi
-    cpu: 1
+    cpu: 250m
 
 cassandra_replicas: 3
 cassandra_resources:
@@ -39,25 +35,74 @@ cassandra_resources:
     memory: 16Gi
     cpu: 10
   limits:
+    memory: 32Gi
     cpu: 12
 
+temporal_frontend_replicas: 3
+temporal_frontend_resources:
+  requests:
+    cpu: 1
+
 temporal_matching_replicas: 6
+temporal_matching_resources:
+  requests:
+    cpu: 500m
 
 temporal_history_replicas: 6
-temporal_history_resources: {}
-temporal_history_shards: 1000
+temporal_history_resources:
+  requests:
+    cpu: 1500m
 
-manetu_replicas_min: 3
+temporal_dynamic_config:
+  matching.numTaskqueueReadPartitions:
+  - value: 10
+    constraints: {}
+  matching.numTaskqueueWritePartitions:
+  - value: 10
+    constraints: {}
+
+manetu_replicas_min: 2
 manetu_base_chart_values:  # merges with {{ manetu_chart_values }}
+  mcp-graphql-service:
+    resources:
+      requests:
+        cpu: 500m
   mcp-attribute-service:
+    gw:
+      resources:
+        requests:
+          cpu: 500m
     cp:
-      replicaCount: 12
+      resources:
+        requests:
+          memory: 2Gi
+          cpu: 2
   mcp-vault-service:
+    gw:
+      resources:
+        requests:
+          cpu: 250m
     cp:
-      replicaCount: 12
+      resources:
+        requests:
+          memory: 1Gi
+          cpu: 1
   mcp-keycustodian-service-v2:
+    gw:
+      resources:
+        requests:
+          cpu: 250m
     cp:
-      replicaCount: 12
+      resources:
+        requests:
+          memory: 1Gi
+          cpu: 500m
   mcp-iam-service:
+    gw:
+      resources:
+        requests:
+          cpu: 250m
     cp:
-      replicaCount: 12
+      resources:
+        requests:
+          cpu: 500m

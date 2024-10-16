@@ -14,7 +14,10 @@ temporal_dev_storage_class: "{{ default_storage_class | default('default') }}"
 
 temporal_cassandra_replication_factor: 3
 
+temporal_frontend_resources: {}
+temporal_matching_resources: {}
 temporal_history_resources: {}
+temporal_worker_resources: {}
 
 temporal_dynamic_config: {}
 #  matching.numTaskqueueReadPartitions:

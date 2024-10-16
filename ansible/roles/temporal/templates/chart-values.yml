@@ -47,13 +47,16 @@ server:
   dynamicConfig: {{ temporal_dynamic_config }}
   frontend:
     replicaCount: {{ temporal_frontend_replicas }}
+    resources: {{ temporal_frontend_resources }}
   history:
     replicaCount: {{ temporal_history_replicas }}
     resources: {{ temporal_history_resources }}
   matching:
     replicaCount: {{ temporal_matching_replicas }}
+    resources: {{ temporal_matching_resources }}
   worker:
     replicaCount: {{ temporal_worker_replicas }}
+    resources: {{ temporal_worker_resources }}
 
   additionalVolumes:
     - name: internode-cert
