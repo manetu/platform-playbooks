@@ -147,6 +147,7 @@
     chart_version: "{{ cassandra_version }}"
     release_namespace: "{{ cassandra_namespace }}"
     values:
+      tolerations: "{{ cassandra_tolerations | from_yaml }}"
       replicaCount: "{{ cassandra_replicas }}"
       persistence:
         enabled: "{{ storage_enabled | default('true') }}"

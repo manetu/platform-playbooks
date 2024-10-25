@@ -77,6 +77,10 @@
     release_namespace: "{{ yugabyte_namespace }}"
     wait: true
     values:
+      master:
+        tolerations: "{{ yugabyte_master_tolerations | from_yaml }}"
+      tserver:
+        tolerations: "{{ yugabyte_tserver_tolerations | from_yaml }}"
       replicas:
         master: "{{ yugabyte_master_replicas }}"
         tserver: "{{ yugabyte_tserver_replicas }}"
