@@ -9,13 +9,13 @@ yugabyte_resources:
       memory: 2Gi
   tserver:
     requests:
-      cpu: 8
-      memory: 24Gi
+      cpu: 14
+      memory: 32Gi
     limits:
-      cpu: 12
-      memory: 24Gi
+      cpu: 16
+      memory: 32Gi
 
-kafka_replicas: 9
+kafka_replicas: 6
 kafka_resources:
   requests:
     memory: 8Gi
@@ -36,11 +36,11 @@ zookeeper_resources:
 cassandra_replicas: 6
 cassandra_resources:
   requests:
-    memory: 24Gi
-    cpu: 10
+    memory: 32Gi
+    cpu: 14
   limits:
-    memory: 24Gi
-    cpu: 12
+    memory: 32Gi
+    cpu: 16
 
 temporal_server_replicas: 5
 temporal_frontend_replicas: 18
@@ -63,13 +63,13 @@ manetu_replicas_min: 6
 manetu_base_chart_values: # merges with {{ manetu_chart_values }}
   mcp-attribute-service:
     cp:
-      replicaCount: 18
+      replicaCount: 6
   mcp-vault-service:
     cp:
-      replicaCount: 18
+      replicaCount: 6
   mcp-keycustodian-service-v2:
     cp:
-      replicaCount: 18
+      replicaCount: 6
   mcp-iam-service:
     cp:
-      replicaCount: 18
+      replicaCount: 6

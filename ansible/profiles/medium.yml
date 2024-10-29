@@ -25,7 +25,7 @@ kafka_resources:
 
 zookeeper_replicas: 3
 zookeeper_resources:
-  limits:
+  requests:
     memory: 4Gi
     cpu: 250m
 
@@ -36,7 +36,7 @@ cassandra_resources:
     cpu: 10
   limits:
     memory: 32Gi
-    cpu: 12
+    cpu: 16
 
 temporal_frontend_replicas: 3
 temporal_frontend_resources:
@@ -48,6 +48,7 @@ temporal_matching_resources:
   requests:
     cpu: 500m
 
+temporal_history_shards: 2000
 temporal_history_replicas: 6
 temporal_history_resources:
   requests:
@@ -87,6 +88,15 @@ manetu_base_chart_values:  # merges with {{ manetu_chart_values }}
         requests:
           memory: 1Gi
           cpu: 1
+      temporal:
+        worker:
+          maxConcurrentActivityTaskPollers: 100
+          maxConcurrentWorkflowTaskPollers: 100
+          maxConcurrentActivityExecutionSize: 500
+          # maxConcurrentLocalActivityExecutionSize: 200
+          # maxConcurrentWorkflowTaskExecutionSize: 200
+          workflowCacheSize: 1000
+          maxWorkflowThreadCount: 2200
   mcp-keycustodian-service-v2:
     gw:
       resources:
@@ -97,6 +107,15 @@ manetu_base_chart_values:  # merges with {{ manetu_chart_values }}
         requests:
           memory: 1Gi
           cpu: 500m
+      temporal:
+        worker:
+          maxConcurrentActivityTaskPollers: 100
+          maxConcurrentWorkflowTaskPollers: 100
+          # maxConcurrentActivityExecutionSize: 200
+          # maxConcurrentLocalActivityExecutionSize: 200
+          # maxConcurrentWorkflowTaskExecutionSize: 200
+          workflowCacheSize: 1000
+          maxWorkflowThreadCount: 1800
   mcp-iam-service:
     gw:
       resources:
@@ -106,3 +125,11 @@ manetu_base_chart_values:  # merges with {{ manetu_chart_values }}
       resources:
         requests:
           cpu: 500m
+      temporal:
+        worker:
+          maxConcurrentActivityTaskPollers: 100
+          maxConcurrentWorkflowTaskPollers: 100
+          # maxConcurrentActivityExecutionSize: 200
+          # maxConcurrentLocalActivityExecutionSize: 200
+          # maxConcurrentWorkflowTaskExecutionSize: 200
+          workflowCacheSize: 1000
