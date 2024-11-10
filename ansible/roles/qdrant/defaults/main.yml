@@ -1,4 +1,4 @@
-qdrant_version: 1.11.3
+qdrant_version: 1.12.2
 qdrant_enabled: false
 qdrant_namespace: manetu-qdrant
 qdrant_storage_size: 10Gi
