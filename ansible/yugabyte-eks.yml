@@ -6,8 +6,6 @@
         monitoring_enabled: false
         alerts_enabled: false
         yugabyte_loadbalancer: true
-        yugabyte_master_storage_class: gp3
-        yugabyte_tserver_storage_class: gp3
 
 - name: Create EKS environment
   gather_facts: false

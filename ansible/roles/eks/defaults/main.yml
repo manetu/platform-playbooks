@@ -8,4 +8,8 @@ aws_instance_types:
 aws_capacity_type: 'ON_DEMAND' ## 'ON_DEMAND' or 'SPOT'
 aws_disk_size: 100
 
+aws_storage_default_iops: "16000"
+aws_storage_default_throughput: "1000"
+aws_storage_premium_iops: "4000"
+
 eks_version: "1.31"

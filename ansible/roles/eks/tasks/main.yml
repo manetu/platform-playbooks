@@ -142,18 +142,33 @@
     chart_ref: aws-ebs-csi-driver/aws-ebs-csi-driver
     release_namespace: kube-system
 
-- name: Create 'gp3' StorageClass
+- name: Create 'default' StorageClass
   kubernetes.core.k8s:
     state: present
     definition:
       kind: StorageClass
       apiVersion: storage.k8s.io/v1
       metadata:
-        name: gp3
+        name: default
       provisioner: ebs.csi.aws.com
       volumeBindingMode: WaitForFirstConsumer
       parameters:
         csi.storage.k8s.io/fstype: xfs
         type: gp3
-        iops: "16000"
-        throughput: "1000"
+        iops: "{{ aws_storage_default_iops | quote }}"
+        throughput: "{{ aws_storage_default_throughput | quote }}"
+
+- name: Create 'premium' StorageClass
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      kind: StorageClass
+      apiVersion: storage.k8s.io/v1
+      metadata:
+        name: premium
+      provisioner: ebs.csi.aws.com
+      volumeBindingMode: WaitForFirstConsumer
+      parameters:
+        csi.storage.k8s.io/fstype: xfs
+        type: io2
+        iops: "{{ aws_storage_premium_iops | quote }}"
