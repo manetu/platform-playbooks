@@ -2,8 +2,6 @@
 
 set -eu
 
-#set -x
-
 #GLOBALS
 ID="piedpiper"
 NAME="Pied Piper"
@@ -38,7 +36,7 @@ export MANETU_TOKEN=$(manetu-security-token login --insecure pem --path --p12 $I
 
 echo "Creating realm $ID ($NAME) on $MANETU_URL"
 
-cat <<EOF | yq -r -o=json - | curl --insecure --data-binary @- --silent --show-error --fail --header 'Content-Type: application/json' --header "Authorization: Bearer $MANETU_TOKEN" $MANETU_URL/graphql | jq
+cat <<EOF | yq -r -o=json - | curl --insecure --data-binary @- --silent --show-error --fail --header 'Content-Type: application/json' --header "Authorization: Bearer $MANETU_TOKEN" $MANETU_URL/graphql | jq 'if .errors then "\(.errors[].message)\n" | halt_error(1) else halt end'
 query: |
   mutation {
     create_realm(
