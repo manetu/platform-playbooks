@@ -8,7 +8,7 @@ include:
     MANETU_RELEASE_STREAM: "2.3.0"
 
 .archive_base:
-  image: registry.gitlab.com/manetu/tools/unified-builder:v2.1
+  image: registry.gitlab.com/manetu/tools/unified-builder:v3.0
 
 archive_build:
   extends: .archive_base
