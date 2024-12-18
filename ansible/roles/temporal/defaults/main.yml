@@ -19,8 +19,6 @@ temporal_matching_resources: {}
 temporal_history_resources: {}
 temporal_worker_resources: {}
 
-temporal_retention_period: 1h
-
 temporal_dynamic_config: {}
 #  matching.numTaskqueueReadPartitions:
 #  - value: 5
