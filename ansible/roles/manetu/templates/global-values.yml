@@ -53,27 +53,8 @@ global:
       existingSecret: platform-operator-secrets
     otel:
       enabled: {{ tracing_enabled }}
-    gw:
-      resources:
-        requests:
-          memory: 128Mi
-        limits:
-          memory: 2Gi
-    cp:
-      resources:
-        requests:
-          memory: 128Mi
-        limits:
-          memory: 2Gi
-    ep:
-      resources:
-        requests:
-          memory: 128Mi
-        limits:
-          memory: 2Gi
-    sp:
-      resources:
-        requests:
-          memory: 128Mi
-        limits:
-          memory: 2Gi
+    resources:
+      requests:
+        memory: 128Mi
+      limits:
+        memory: 2Gi
