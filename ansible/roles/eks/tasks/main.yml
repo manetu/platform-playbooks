@@ -100,6 +100,7 @@
       - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
       - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
       - arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy
+      - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
     assume_role_policy_document: |
       {
           "Version": "2012-10-17",
@@ -202,3 +203,22 @@
         csi.storage.k8s.io/fstype: xfs
         type: io2
         iops: "{{ aws_storage_premium_iops | quote }}"
+
+- name: Add Cloudwatch chart repo
+  when: aws_cloudwatch_enabled
+  kubernetes.core.helm_repository:
+    name: aws-observability
+    repo_url: "https://aws-observability.github.io/helm-charts"
+
+- name: Install Cloudwatch
+  when: aws_cloudwatch_enabled
+  kubernetes.core.helm:
+    name: amazon-cloudwatch-observability
+    chart_ref: aws-observability/amazon-cloudwatch-observability
+    chart_version: "{{ aws_cloudwatch_version }}"
+    create_namespace: true
+    release_namespace: "{{ aws_cloudwatch_namespace }}"
+    wait: true
+    values:
+      clusterName: "{{ aws_instance_name }}"
+      region: "{{ aws_region }}"
