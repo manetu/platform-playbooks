@@ -1,3 +1,5 @@
+eks_version: "1.31"
+
 aws_vpc_cidr_block: 10.200.0.0/16
 aws_vpc_subnets:
   - {cidr: 10.200.0.0/18, az: "{{ aws_region }}a"}
@@ -12,4 +14,7 @@ aws_storage_default_iops: "16000"
 aws_storage_default_throughput: "1000"
 aws_storage_premium_iops: "4000"
 
-eks_version: "1.31"
+aws_additional_admins: {} ## arns added here will gain system:masters level kubectl access
+#  roles:
+#    - arn:foo
+#    - arn:bar

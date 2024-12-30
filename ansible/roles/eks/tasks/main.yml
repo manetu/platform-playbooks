@@ -131,6 +131,36 @@
 - name: Install KUBECONFIG
   shell: eksctl utils write-kubeconfig --kubeconfig=$HOME/.kube/config  --name {{ aws_instance_name }} --region {{ aws_region }}
 
+- name: Get current aws-auth
+  when: aws_additional_admins.roles is defined
+  kubernetes.core.k8s_info:
+    kind: ConfigMap
+    namespace: kube-system
+    name: aws-auth
+  register: awsauth
+
+- when: aws_additional_admins.roles is defined
+  set_fact:
+    existing_roles: "{{ awsauth.resources | map(attribute='data') | map(attribute='mapRoles') | first | from_yaml | list}}"
+
+- when: aws_additional_admins.roles is defined
+  set_fact:
+    new_roles: '{{ (new_roles | default([]))  + [_doc] }}'
+  loop: "{{ aws_additional_admins.roles }}"
+  vars:
+    _doc: {groups: ["system:masters"], rolearn: "{{item}}", username: "{{item}}"}
+
+- name: Update aws-auth
+  when: aws_additional_admins.roles is defined
+  kubernetes.core.k8s_json_patch:
+    kind: ConfigMap
+    namespace: kube-system
+    name: aws-auth
+    patch:
+      - op: replace
+        path: /data/mapRoles
+        value: "{{ ([existing_roles[0]] + new_roles) | to_yaml }}"
+
 - name: Add the EBS CSI Driver helm repo
   kubernetes.core.helm_repository:
     name: aws-ebs-csi-driver
