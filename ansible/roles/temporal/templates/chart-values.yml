@@ -1,7 +1,4 @@
 fullnameOverride: "temporal"
-serviceAccount:
-  create: false
-  name: "temporal"
 server:
 {% if monitoring_enabled %}
   metrics:
@@ -14,14 +11,26 @@ server:
   config:
     numHistoryShards: {{ temporal_history_shards }}
     tls:
-      enabled: true
       internode:
-        secret: temporal-internode-certificate
-        serverName: "temporal.{{ temporal_namespace }}.cluster.svc.local"
+        server:
+          certFile: /etc/temporal/certs/internode/tls.crt
+          keyFile: /etc/temporal/certs/internode/tls.key
+          requireClientAuth: true
+          clientCaFiles:
+            - /etc/temporal/certs/internode/ca.crt
+        client:
+          serverName: "temporal.{{ temporal_namespace }}.cluster.svc.local"
+          rootCaFiles:
+            - /etc/temporal/certs/internode/ca.crt
       frontend:
-        requireClientAuth: false
-        secret: temporal-frontend-certificate
-        serverName: "temporal-frontend.{{ temporal_namespace }}.cluster.svc.local"
+        server:
+          certFile: /etc/temporal/certs/frontend/tls.crt
+          keyFile: /etc/temporal/certs/frontend/tls.key
+          requireClientAuth: false
+        client:
+          serverName: "temporal-frontend.{{ temporal_namespace }}.cluster.svc.local"
+          rootCaFiles:
+            - /etc/temporal/certs/frontend/ca.crt
 
     persistence:
       default:
@@ -33,17 +42,9 @@ server:
           replicationFactor: {{ temporal_cassandra_replication_factor }}
           tls:
             enabled: true
-            caData: {{ cassandra_ca_crt | b64encode }}
-      visibility:
-        cassandra:
-          hosts: ["cassandra.{{ cassandra_namespace }}"]
-          port: 9042
-          user: "cassandra"
-          existingSecret: temporal-cassandra-secret
-          replicationFactor: {{ temporal_cassandra_replication_factor }}
-          tls:
-            enabled: true
-            caData: {{ cassandra_ca_crt | b64encode }}
+            enableHostVerification: false
+            caFile: /etc/cassandra/ca.crt
+
   dynamicConfig: {{ temporal_dynamic_config }}
   frontend:
     replicaCount: {{ temporal_frontend_replicas }}
@@ -65,6 +66,12 @@ server:
     - name: frontend-cert
       secret:
         secretName: temporal-frontend-certificate
+    - name: cassandra-secrets
+      secret:
+        secretName: temporal-cassandra-secret
+        items:
+          - key: ca.crt
+            path: ca.crt
 
   additionalVolumeMounts:
     - name: internode-cert
@@ -73,17 +80,29 @@ server:
     - name: frontend-cert
       readOnly: true
       mountPath: /etc/temporal/certs/frontend
+    - name: cassandra-secrets
+      mountPath: /etc/cassandra
+      readOnly: true
 
 admintools:
   additionalVolumes:
     - name: frontend-cert
       secret:
         secretName: temporal-frontend-certificate
+    - name: cassandra-secrets
+      secret:
+        secretName: temporal-cassandra-secret
+        items:
+          - key: ca.crt
+            path: ca.crt
 
   additionalVolumeMounts:
     - name: frontend-cert
       readOnly: true
       mountPath: /etc/temporal/certs/frontend
+    - name: cassandra-secrets
+      mountPath: /etc/cassandra
+      readOnly: true
 
 schema:
   setup:
@@ -126,7 +145,8 @@ web:
       value: /etc/temporal/certs/frontend/tls.key
 
 elasticsearch:
-  enabled: false
+  enabled: true
+  replicas: {{ temporal_elasticsearch_replicas }}
 prometheus:
   enabled: false
 grafana:

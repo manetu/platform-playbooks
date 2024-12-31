@@ -1,3 +1,8 @@
+- name: Add Temporal chart repo
+  kubernetes.core.helm_repository:
+    name: temporal
+    repo_url: "https://go.temporal.io/helm-charts/"
+
 - name: Create namespace
   kubernetes.core.k8s:
     state: present
@@ -136,23 +141,12 @@
           name: temporal-ca-issuer
           kind: Issuer
 
-- name: Create temporary directory for Temporal Chart
-  ansible.builtin.tempfile:
-    state: directory
-    suffix: temporal-chart
-  register: tmpdir
-
-- name: Upload Temporal chart
-  copy:
-    src: chart/
-    dest: "{{ tmpdir.path }}"
-
 - name: Install Temporal
   kubernetes.core.helm:
     namespace: "{{ temporal_namespace }}"
     name: temporal
-    chart_ref: "{{ tmpdir.path }}"
-    dependency_update: true
+    chart_ref: temporal/temporal
+    chart_version: "{{ temporal_version }}"
     wait: true
     values: "{{ lookup('template', 'chart-values.yml') | from_yaml }}"
 
