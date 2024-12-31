@@ -1,7 +1,8 @@
+yugabyte_tserver_replicas: 6
 yugabyte_resources:
   master:
     requests:
-      cpu: 1
+      cpu: 250m
       memory: 2Gi
     limits:
       cpu: 1
@@ -9,16 +10,16 @@ yugabyte_resources:
   tserver:
     requests:
       cpu: 4
-      memory: 24Gi
+      memory: 12Gi
     limits:
-      cpu: 12
-      memory: 32Gi
+      cpu: 8 
+      memory: 16Gi
 
-kafka_replicas: 3
+kafka_replicas: 6
 kafka_resources:
   requests:
     memory: 8Gi
-    cpu: 2
+    cpu: 1
   limits:
     memory: 16Gi
     cpu: 3
@@ -28,31 +29,40 @@ zookeeper_resources:
   requests:
     memory: 4Gi
     cpu: 250m
+  limits:
+    memory: 8Gi
+    cpu: 2000m
 
-cassandra_replicas: 3
+cassandra_replicas: 6
 cassandra_resources:
   requests:
-    memory: 16Gi
-    cpu: 10
+    memory:  8Gi
+    cpu:  4
   limits:
-    memory: 32Gi
-    cpu: 16
+    memory: 16Gi
+    cpu: 12 
 
-temporal_frontend_replicas: 3
+temporal_frontend_replicas: 6
 temporal_frontend_resources:
   requests:
-    cpu: 1
+    cpu: 250m
+  limits:
+    cpu: 2 
 
 temporal_matching_replicas: 6
 temporal_matching_resources:
   requests:
-    cpu: 500m
+    cpu: 250m
+  limits:
+    cpu: 1 
 
-temporal_history_shards: 2000
+temporal_history_shards: 2048 # Max 4096 per temporal
 temporal_history_replicas: 6
 temporal_history_resources:
   requests:
-    cpu: 1500m
+    cpu: 1
+  limits:
+    cpu: 4 
 
 temporal_dynamic_config:
   matching.numTaskqueueReadPartitions:
@@ -62,32 +72,62 @@ temporal_dynamic_config:
   - value: 10
     constraints: {}
 
+istio_proxy_resources:
+  requests:
+    cpu: 10m
+
 manetu_replicas_min: 2
 manetu_base_chart_values:  # merges with {{ manetu_chart_values }}
   mcp-graphql-service:
+    replicaCount: 6
     resources:
       requests:
         cpu: 500m
+        memory: 2Gi
+      limits:
+        memory: 4Gi
   mcp-attribute-service:
     gw:
+      replicaCount: 6
       resources:
         requests:
           cpu: 500m
+          memory: 2Gi
+        limits:
+          memory: 4Gi
     cp:
+      replicaCount: 6
       resources:
         requests:
+          cpu: 1
           memory: 2Gi
-          cpu: 2
+        limits:
+          memory: 4Gi
+      temporal:
+        worker:
+          maxConcurrentActivityTaskPollers: 100 # default 5
+          maxConcurrentWorkflowTaskPollers: 100 # default 2
+          # maxConcurrentActivityExecutionSize: 200 # default
+          maxConcurrentLocalActivityExecutionSize: 1000
+          # maxConcurrentWorkflowTaskExecutionSize: 200 # default
+          # workflowCacheSize: 600 # default
+          maxWorkflowThreadCount: 2200 # sum of all above
   mcp-vault-service:
     gw:
       resources:
         requests:
           cpu: 250m
+          memory: 2Gi
+        limits:
+          memory: 4Gi
     cp:
+      replicaCount: 6
       resources:
         requests:
-          memory: 1Gi
-          cpu: 1
+          cpu: 500m
+          memory: 2Gi
+        limits:
+          memory: 4Gi
       temporal:
         worker:
           maxConcurrentActivityTaskPollers: 100
@@ -99,14 +139,21 @@ manetu_base_chart_values:  # merges with {{ manetu_chart_values }}
           maxWorkflowThreadCount: 2200
   mcp-keycustodian-service-v2:
     gw:
+      replicaCount: 6
       resources:
         requests:
           cpu: 250m
+          memory: 2Gi
+        limits:
+          memory: 4Gi
     cp:
+      replicaCount: 6
       resources:
         requests:
-          memory: 1Gi
-          cpu: 500m
+          cpu: 250m
+          memory: 2Gi
+        limits:
+          memory: 4Gi
       temporal:
         worker:
           maxConcurrentActivityTaskPollers: 100
@@ -121,10 +168,17 @@ manetu_base_chart_values:  # merges with {{ manetu_chart_values }}
       resources:
         requests:
           cpu: 250m
+          memory: 2Gi
+        limits:
+          memory: 4Gi
     cp:
+      replicaCount: 6
       resources:
         requests:
-          cpu: 500m
+          cpu: 250m
+          memory: 2Gi
+        limits:
+          memory: 4Gi
       temporal:
         worker:
           maxConcurrentActivityTaskPollers: 100
