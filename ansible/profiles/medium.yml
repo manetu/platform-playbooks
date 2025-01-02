@@ -72,10 +72,6 @@ temporal_dynamic_config:
   - value: 10
     constraints: {}
 
-istio_proxy_resources:
-  requests:
-    cpu: 10m
-
 manetu_replicas_min: 2
 manetu_base_chart_values:  # merges with {{ manetu_chart_values }}
   mcp-graphql-service:
