@@ -9,8 +9,8 @@ yugabyte_resources:
       memory: 2Gi
   tserver:
     requests:
-      cpu: 2
-      memory: 24Gi
+      cpu: 4
+      memory: 12Gi
     limits:
       cpu: 8 
       memory: 16Gi
@@ -36,8 +36,8 @@ zookeeper_resources:
 cassandra_replicas: 6
 cassandra_resources:
   requests:
-    memory: 16Gi
-    cpu: 5
+    memory:  8Gi
+    cpu:  4
   limits:
     memory: 16Gi
     cpu: 12 
@@ -56,7 +56,7 @@ temporal_matching_resources:
   limits:
     cpu: 1 
 
-temporal_history_shards: 2048
+temporal_history_shards: 2048 # Max 4096 per temporal
 temporal_history_replicas: 6
 temporal_history_resources:
   requests:
