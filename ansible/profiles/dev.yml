@@ -38,6 +38,7 @@ temporal_frontend_replicas: 1
 temporal_history_replicas: 1
 temporal_matching_replicas: 1
 temporal_worker_replicas: 1
+temporal_elasticsearch_replicas: 1
 temporal_cassandra_replication_factor: 1
 temporal_history_shards: 500
 
