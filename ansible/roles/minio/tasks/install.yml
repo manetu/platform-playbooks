@@ -97,6 +97,7 @@
         dnsNames:
           - "*.{{ minio_namespace }}.cluster.svc.local"
           - "*.minio-svc.{{ minio_namespace }}.svc.cluster.local"
+          - "*.minio-svc.{{ minio_namespace }}.svc"
           - "*.{{ minio_namespace }}"
           - "minio"
         secretName: minio-certificate
