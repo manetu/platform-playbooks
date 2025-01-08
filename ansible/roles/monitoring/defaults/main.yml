@@ -1,6 +1,6 @@
 monitoring_enabled: false
 
-grafana_version: 8.5.0
+grafana_version: 8.8.2
 grafana_replicas: 1
 grafana_storage_class: "{{ default_storage_class | default('default') }}"
 grafana_storage_size: 10Gi
