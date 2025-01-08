@@ -1,5 +1,5 @@
 minio_enabled: true
-minio_version: 5.2.0
+minio_version: 5.4.0
 minio_namespace: manetu-minio
 minio_replicas: 3
 minio_mode: distributed
