@@ -1,4 +1,4 @@
-yugabyte_version: 2.20.7
+yugabyte_version: 2.20.8
 yugabyte_namespace: manetu-yugabyte
 yugabyte_master_tolerations: []
   # - key: dedicated
