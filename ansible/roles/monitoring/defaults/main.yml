@@ -6,7 +6,7 @@ grafana_storage_class: "{{ default_storage_class | default('default') }}"
 grafana_storage_size: 10Gi
 grafana_dns: grafana.{{ mgmt_dns_suffix }}
 
-prometheus_version: 62.3.1
+prometheus_version: 67.8.0
 prometheus_datasource_url: http://prometheus-kube-prometheus-prometheus:9090
 prometheus_replicas: 3
 prometheus_storage_class: "{{ default_storage_class | default('default') }}"
