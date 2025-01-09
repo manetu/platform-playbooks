@@ -63,7 +63,7 @@
           - 'qdrant-3.qdrant-headless'
           - 'qdrant-4.qdrant-headless'
           - 'qdrant-5.qdrant-headless'
-          - "*.{{ qdrant_namespace }}.cluster.svc.local"
+          - "*.{{ qdrant_namespace }}.svc.cluster.local"
           - "*.{{ qdrant_namespace }}"
         secretName: qdrant-certificate
         usage:

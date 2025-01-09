@@ -95,7 +95,7 @@
         duration: "{{ minio_tls_duration }}"
         commonName: minio-internal
         dnsNames:
-          - "*.{{ minio_namespace }}.cluster.svc.local"
+          - "*.{{ minio_namespace }}.svc.cluster.local"
           - "*.minio-svc.{{ minio_namespace }}.svc.cluster.local"
           - "*.minio-svc.{{ minio_namespace }}.svc"
           - "*.{{ minio_namespace }}"

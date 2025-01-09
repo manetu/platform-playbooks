@@ -19,7 +19,7 @@ server:
           clientCaFiles:
             - /etc/temporal/certs/internode/ca.crt
         client:
-          serverName: "temporal.{{ temporal_namespace }}.cluster.svc.local"
+          serverName: "temporal.{{ temporal_namespace }}.svc.cluster.local"
           rootCaFiles:
             - /etc/temporal/certs/internode/ca.crt
       frontend:
@@ -28,7 +28,7 @@ server:
           keyFile: /etc/temporal/certs/frontend/tls.key
           requireClientAuth: false
         client:
-          serverName: "temporal-frontend.{{ temporal_namespace }}.cluster.svc.local"
+          serverName: "temporal-frontend.{{ temporal_namespace }}.svc.cluster.local"
           rootCaFiles:
             - /etc/temporal/certs/frontend/ca.crt
 

@@ -108,7 +108,7 @@
         duration: "{{ temporal_tls_duration }}"
         commonName: temporal-internode
         dnsNames:
-          - "*.{{ temporal_namespace }}.cluster.svc.local"
+          - "*.{{ temporal_namespace }}.svc.cluster.local"
           - "*.{{ temporal_namespace }}"
         secretName: temporal-internode-certificate
         usage:
@@ -134,7 +134,7 @@
         dnsNames:
           - "temporal-frontend"
           - "temporal-frontend.{{ temporal_namespace }}"
-          - "temporal-frontend.{{ temporal_namespace }}.cluster.svc.local"
+          - "temporal-frontend.{{ temporal_namespace }}.svc.cluster.local"
         secretName: temporal-frontend-certificate
         usage:
           - "server auth"

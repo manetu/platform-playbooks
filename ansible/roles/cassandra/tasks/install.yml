@@ -108,7 +108,7 @@
         duration: "{{ cassandra_tls_duration }}"
         commonName: cassandra-internal
         dnsNames:
-          - "*.{{ cassandra_namespace }}.cluster.svc.local"
+          - "*.{{ cassandra_namespace }}.svc.cluster.local"
           - "*.{{ cassandra_namespace }}"
         secretName: cassandra-certificate
         usage:

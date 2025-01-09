@@ -45,7 +45,7 @@
         duration: "{{ vault_tls_duration }}"
         commonName: vault-internal
         dnsNames:
-          - "*.{{ vault_namespace }}.cluster.svc.local"
+          - "*.{{ vault_namespace }}.svc.cluster.local"
           - "*.{{ vault_namespace }}"
           - "*.vault-internal"
           - "localhost"
