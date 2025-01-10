@@ -16,6 +16,7 @@ temporal_dev_storage_class: "{{ default_storage_class | default('default') }}"
 
 temporal_cassandra_replication_factor: 3
 
+temporal_elasticsearch_storage_class: "{{ default_storage_class | default('default') }}"
 temporal_elasticsearch_storage_size: 10Gi
 temporal_elasticsearch_resources: {}
 #  requests:

@@ -161,6 +161,7 @@ elasticsearch:
     resources:
       requests:
         storage: "{{ temporal_elasticsearch_storage_size }}"
+    storageClassName: "{{ temporal_elasticsearch_storage_class }}"
   resources: {{ temporal_elasticsearch_resources }}
 prometheus:
   enabled: false
