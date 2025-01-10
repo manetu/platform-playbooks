@@ -157,11 +157,13 @@ elasticsearch:
   replicas: {{ temporal_elasticsearch_replicas }}
   persistence:
     enabled: "{{ storage_enabled | default('true') }}"
+{% if storage_enabled  %}
   volumeClaimTemplate:
     resources:
       requests:
         storage: "{{ temporal_elasticsearch_storage_size }}"
     storageClassName: "{{ temporal_elasticsearch_storage_class }}"
+{% endif  %}
   resources: {{ temporal_elasticsearch_resources }}
 prometheus:
   enabled: false
