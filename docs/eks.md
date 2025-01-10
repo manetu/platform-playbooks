@@ -40,6 +40,14 @@ config_host:
     localhost:
       ansible_connection: local
 ```
+## Notes on naming
+The value for the key `all.vars.aws_instance_name:` is used to name a number of aws objects in the deployment including the VPC, the eks cluster, security groups, and aws policies. 
+
+The value of the key: `all.vars.aws_route_53_zone:` is a hosted Route 53 zone which will hold a number of DNS entries associated with the deployment. The zone must already exist and the IAM entity executing the playbook should have write access to the zone.
+
+The value for the key `all.vars.manetu_dns:` is the fully qualified DNS name to be associated with the platform ingress port load balancer. This entry will be an CNAME record added to the Route53 zone specifed by `all.vars.aws_route53_zone`. In the attached example the platform ingress will be accessed at https://manetu.perflab.dev.manetu.io.
+
+The value of the key `all.vars.mgmt_dns_suffix:` is used to create a DNS wildcard entry to associate with the management interface ingress port load balancer. This entry will be a CNAME record added to the Route53 zone specifed by `all.vars.aws_route53_zone`. In the attached example a wildcard CNAME entry `*.perflab.dev.manetu.io` will be created. Various management UIs will be accessible via this suffix, e.g. `https://grafana.perflab.dev.manetu.io`
 
 ## Operations
 
