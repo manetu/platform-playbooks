@@ -41,6 +41,7 @@ temporal_dynamic_config: {}
 #  - value: 5
 #    constraints: {}
 
+storage_enabled: true
 prometheus_monitor_labels: {}
 monitoring_enabled: false
 alerts_enabled: false
