@@ -32,7 +32,7 @@ config:
     enabled: true
     p2p:
       port: 6335
-      enable_tls: true
+      enable_tls: false # to be enabled
   collection:
     # Number of replicas of each shard that network tries to maintain
     replication_factor: "{{ qdrant_replication_factor }}"
