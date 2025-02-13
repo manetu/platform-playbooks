@@ -1,4 +1,4 @@
-cassandra_version: 12.1.1
+cassandra_version: 12.1.3
 cassandra_namespace: manetu-cassandra
 cassandra_replicas: 3
 cassandra_storage_size: 10Gi
