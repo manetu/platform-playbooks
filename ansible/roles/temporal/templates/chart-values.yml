@@ -1,5 +1,10 @@
 fullnameOverride: "temporal"
+
 server:
+{% if temporal_version is defined %}
+  image:
+    tag: {{ temporal_version }}
+{% endif %}
 {% if monitoring_enabled %}
   metrics:
     serviceMonitor:
@@ -85,6 +90,10 @@ server:
       readOnly: true
 
 admintools:
+{% if temporal_version is defined %}
+  image:
+    tag: {{ temporal_version }}
+{% endif %}
   additionalVolumes:
     - name: frontend-cert
       secret:
