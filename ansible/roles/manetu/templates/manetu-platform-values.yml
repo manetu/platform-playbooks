@@ -1,5 +1,5 @@
 gateway:
-  gateway: ingress-gw
+  gateway: {{ manetu_gateway_selector }}
   tls:
     credentialName: manetu-certificate
 
