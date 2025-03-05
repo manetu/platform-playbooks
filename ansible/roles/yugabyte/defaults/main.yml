@@ -17,6 +17,8 @@ yugabyte_tserver_replicas: 3
 yugabyte_tserver_storage_size: 10Gi
 yugabyte_tserver_storage_class: "{{ default_storage_class | default('default') }}"
 yugabyte_loadbalancer: false
+yugabyte_cql_auth_enabled: true
+yugabyte_tls_enabled: true
 yugabyte_tls_duration: 87600h
 yugabyte_resources:
   master:

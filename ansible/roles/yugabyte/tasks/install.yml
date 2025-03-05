@@ -37,6 +37,7 @@
 #                    access.manetu.io/yugabyte: "true"
 
 - name: Create CA certificate
+  when: yugabyte_tls_enabled
   kubernetes.core.k8s:
     state: present
     namespace: "{{ yugabyte_namespace }}"
@@ -57,6 +58,7 @@
           kind: ClusterIssuer
 
 - name: Create CA issuer
+  when: yugabyte_tls_enabled
   kubernetes.core.k8s:
     state: present
     namespace: "{{ yugabyte_namespace }}"
@@ -98,19 +100,19 @@
       resource: "{{ yugabyte_resources | from_yaml }}"
       oldNamingStyle: false
       tls:
-        enabled: true
-        nodeToNode: true
-        clientToServer: true
+        enabled: "{{ yugabyte_tls_enabled }}"
+        nodeToNode: "{{ yugabyte_tls_enabled }}"
+        clientToServer: "{{ yugabyte_tls_enabled }}"
         insecure: false    # disallow any service with unencrypted communication
         certManager:
-          enabled: true
+          enabled: "{{ yugabyte_tls_enabled }}"
           bootstrapSelfsigned: false
           issuer: yugabyte-ca-issuer
           certificates:
             duration: "{{yugabyte_tls_duration}}"
       gflags:
         tserver:
-          use_cassandra_authentication: true
+          use_cassandra_authentication: "{{ yugabyte_cql_auth_enabled }}"
           ysql_enable_auth: true
           ysql_pg_conf_csv: password_encryption=scram-sha-256
       serviceMonitor:
@@ -129,6 +131,7 @@
   loop: "{{ range(0, yugabyte_master_replicas) }}"
 
 - name: Copy YCQL script to cluster
+  when: yugabyte_cql_auth_enabled
   kubernetes.core.k8s_cp:
     namespace: "{{ yugabyte_namespace }}"
     pod:  yugabyte-yb-master-0
@@ -137,6 +140,7 @@
     remote_path: /tmp/update-ycql-password.sh
 
 - name: Set YCQL password
+  when: yugabyte_cql_auth_enabled
   kubernetes.core.k8s_exec:
     namespace: "{{ yugabyte_namespace }}"
     pod: yugabyte-yb-master-0
@@ -169,6 +173,7 @@
   until: result is not failed
 
 - name: Get CA certificate
+  when: yugabyte_tls_enabled
   kubernetes.core.k8s_info:
     kind: Secret
     namespace: "{{ yugabyte_namespace }}"
@@ -187,10 +192,10 @@
         name: yugabyte-secrets
       type: Opaque
       data:
-        YUGABYTE_TLS_CERT: "{{ client_cert.resources[0].data['ca.crt']  }}"
-        YUGABYTE_USERNAME: "{{ 'cassandra' | b64encode }}"
-        YUGABYTE_PASSWORD: "{{ yugabyte_password | b64encode }}"
-        YSQL_USERNAME: "{{ 'yugabyte' | b64encode }}"
+        YUGABYTE_TLS_CERT: "{{ client_cert.resources[0].data['ca.crt'] | default('') }}"
+        YUGABYTE_USERNAME: "{{ yugabyte_cql_auth_enabled | ternary(('cassandra' | b64encode), '') }}"
+        YUGABYTE_PASSWORD: "{{ yugabyte_cql_auth_enabled | ternary((yugabyte_password | b64encode), '') }}"
+        YSQL_USERNAME: "{{'yugabyte' | b64encode }}"
         YSQL_PASSWORD: "{{ yugabyte_password | b64encode }}"
 
 - name: Create Yugabyte configuration for Manetu
@@ -205,5 +210,5 @@
       data:
         YUGABYTE_HOSTS: "{{ ('yugabyte-yb-tservers.' + yugabyte_namespace + '.svc.cluster.local') }}"
         YUGABYTE_PORT: "9042"
-        YUGABYTE_TLS_ENABLED: "true"
+        YUGABYTE_TLS_ENABLED: "{{ yugabyte_tls_enabled | string | lower | quote }}"
         YSQL_PORT: "5433"
