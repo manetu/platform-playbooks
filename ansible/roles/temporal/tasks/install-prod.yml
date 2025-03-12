@@ -142,12 +142,23 @@
           name: temporal-ca-issuer
           kind: Issuer
 
+- name: Create temporary directory for Temporal Chart
+  ansible.builtin.tempfile:
+    state: directory
+    suffix: temporal-chart
+  register: tmpdir
+
+- name: Upload Temporal chart
+  copy:
+    src: chart/
+    dest: "{{ tmpdir.path }}"
+
 - name: Install Temporal
   kubernetes.core.helm:
     namespace: "{{ temporal_namespace }}"
     name: temporal
-    chart_ref: temporal/temporal
-    chart_version: "{{ temporal_helmchart_version }}"
+    chart_ref: "{{ tmpdir.path }}"
+    dependency_update: true
     wait: true
     values: "{{ lookup('template', 'chart-values.yml') | from_yaml }}"
 

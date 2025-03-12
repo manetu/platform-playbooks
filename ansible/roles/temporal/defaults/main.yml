@@ -1,4 +1,3 @@
-temporal_helmchart_version: 0.55.0
 #temporal_version: 1.26.2 # Uses chart defaults if unset
 temporal_namespace: manetu-temporal
 temporal_dns: temporal.{{ mgmt_dns_suffix | default('invalid') }}
