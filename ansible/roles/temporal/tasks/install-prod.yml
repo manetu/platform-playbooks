@@ -36,31 +36,6 @@
                   matchLabels:
                     access.manetu.io/temporal: "true"
 
-- name: Get Cassandra certificate
-  kubernetes.core.k8s_info:
-    kind: Secret
-    namespace: "{{ cassandra_namespace }}"
-    name: cassandra-client-certificate
-    wait: true
-  register: client_cert
-
-- set_fact:
-    cassandra_ca_crt: "{{ client_cert.resources[0].data['ca.crt'] | b64decode }}"
-
-- name: Create Cassandra credentials
-  kubernetes.core.k8s:
-    state: present
-    namespace: "{{ temporal_namespace }}"
-    definition:
-      apiVersion: v1
-      kind: Secret
-      metadata:
-        name: temporal-cassandra-secret
-      type: Opaque
-      data:
-        password: "{{ cassandra_password | b64encode }}"
-        ca.crt: "{{ cassandra_ca_crt | b64encode }}"
-
 - name: Create CA certificate
   kubernetes.core.k8s:
     state: present
@@ -93,6 +68,82 @@
       spec:
         ca:
           secretName: temporal-ca-secret
+
+- name: Create ElasticSearch credentials
+  kubernetes.core.k8s:
+    namespace: "{{ temporal_namespace }}"
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: temporal-elasticsearch-credentials
+      type: kubernetes.io/basic-auth
+      stringData:
+        username: elastic
+        password: "{{ temporal_elasticsearch_password }}"
+        roles: superuser
+
+- name: Create ElasticSearch TLS certificate
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ temporal_namespace }}"
+    definition:
+      apiVersion: cert-manager.io/v1
+      kind: Certificate
+      metadata:
+        name: temporal-elasticsearch-certificate
+      spec:
+        isCA: false
+        duration: "{{ temporal_tls_duration }}"
+        commonName: temporal-elasticsearch
+        dnsNames:
+          - "temporal-elasticsearch-es-http"
+          - "temporal-elasticsearch-es-http.{{ temporal_namespace }}.es.local"
+          - "temporal-elasticsearch-es-http.{{ temporal_namespace }}.svc"
+          - "temporal-elasticsearch-es-http.{{ temporal_namespace }}"
+          - "temporal-elasticsearch-es-internal-http.{{ temporal_namespace }}.svc"
+          - "temporal-elasticsearch-es-internal-http.{{ temporal_namespace }}"
+          - "*.temporal-elasticsearch-es-default.{{ temporal_namespace }}.svc"
+        secretName: temporal-elasticsearch-certificate
+        usage:
+          - "server auth"
+        issuerRef:
+          name: temporal-ca-issuer
+          kind: Issuer
+
+- name: Deploy ElasticSearch based visibility store
+  kubernetes.core.k8s:
+    namespace: "{{ temporal_namespace }}"
+    state: present
+    wait: yes
+    wait_timeout: "{{ temporal_elasticsearch_wait_timeout }}"
+    definition: "{{ lookup('template', 'elasticsearch.yml') | from_yaml }}"
+
+- name: Get Cassandra certificate
+  kubernetes.core.k8s_info:
+    kind: Secret
+    namespace: "{{ cassandra_namespace }}"
+    name: cassandra-client-certificate
+    wait: true
+  register: client_cert
+
+- set_fact:
+    cassandra_ca_crt: "{{ client_cert.resources[0].data['ca.crt'] | b64decode }}"
+
+- name: Create Cassandra credentials
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ temporal_namespace }}"
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: temporal-cassandra-secret
+      type: Opaque
+      data:
+        password: "{{ cassandra_password | b64encode }}"
+        ca.crt: "{{ cassandra_ca_crt | b64encode }}"
 
 - name: Create Internode TLS certificate
   kubernetes.core.k8s:
@@ -141,6 +192,17 @@
         issuerRef:
           name: temporal-ca-issuer
           kind: Issuer
+
+- name: Initialize Schema
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ temporal_namespace }}"
+    definition: "{{ lookup('template', 'schema-init.yml') | from_yaml }}"
+    wait: yes
+    wait_timeout: 120
+    wait_condition:
+      type: Complete
+      status: True
 
 - name: Create temporary directory for Temporal Chart
   ansible.builtin.tempfile:

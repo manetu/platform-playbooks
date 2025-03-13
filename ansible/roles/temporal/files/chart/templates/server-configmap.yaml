@@ -15,7 +15,7 @@ data:
 
     persistence:
       defaultStore: {{ $server.config.persistence.defaultStore }}
-      visibilityStore: visibility
+      visibilityStore: {{ $server.config.persistence.visibilityStore }}
       numHistoryShards: {{ $server.config.numHistoryShards }}
       datastores:
         {{- if ne (include "temporal.persistence.driver" (list $ "default")) "custom" }}

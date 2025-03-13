@@ -1,13 +1,3 @@
-- name: Apply ECK CRD manifest to the cluster.
-  kubernetes.core.k8s:
-    state: present
-    src:  https://download.elastic.co/downloads/eck/{{ elastic_cloud_version }}/crds.yaml
-
-- name: Create ECK operator.
-  kubernetes.core.k8s:
-    state: present
-    src:  https://download.elastic.co/downloads/eck/{{ elastic_cloud_version }}/operator.yaml
-
 - name: Create namespace
   kubernetes.core.k8s:
     name: "{{ elasticsearch_namespace }}"

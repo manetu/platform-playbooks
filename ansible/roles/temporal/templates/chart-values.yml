@@ -1,10 +1,8 @@
 fullnameOverride: "temporal"
 
 server:
-{% if temporal_version is defined %}
   image:
     tag: {{ temporal_version }}
-{% endif %}
 {% if monitoring_enabled %}
   metrics:
     serviceMonitor:
@@ -38,6 +36,7 @@ server:
             - /etc/temporal/certs/frontend/ca.crt
 
     persistence:
+      visibilityStore: es-visibility
       default:
         cassandra:
           hosts: ["cassandra.{{ cassandra_namespace }}"]
@@ -49,6 +48,22 @@ server:
             enabled: true
             enableHostVerification: false
             caFile: /etc/cassandra/ca.crt
+      visibility:
+        driver: elasticsearch
+      additionalStores:
+        es-visibility:
+          elasticsearch:
+            version: "v8"
+            url:
+              scheme: "https"
+              host: "temporal-elasticsearch-es-http:9200"
+            indices:
+              visibility: temporal_visibility_v1_dev
+            username: "elastic"
+            password: {{ temporal_elasticsearch_password }}
+            tls:
+              enabled: true
+              caFile: /etc/elasticsearch/ca.crt
 
   dynamicConfig: {{ temporal_dynamic_config }}
   frontend:
@@ -77,6 +92,12 @@ server:
         items:
           - key: ca.crt
             path: ca.crt
+    - name: elasticsearch-secrets
+      secret:
+        secretName: temporal-elasticsearch-certificate
+        items:
+          - key: ca.crt
+            path: ca.crt
 
   additionalVolumeMounts:
     - name: internode-cert
@@ -88,12 +109,13 @@ server:
     - name: cassandra-secrets
       mountPath: /etc/cassandra
       readOnly: true
+    - name: elasticsearch-secrets
+      mountPath: /etc/elasticsearch
+      readOnly: true
 
 admintools:
-{% if temporal_version is defined %}
   image:
     tag: {{ temporal_version }}
-{% endif %}
   additionalVolumes:
     - name: frontend-cert
       secret:
@@ -122,12 +144,12 @@ admintools:
       value: /etc/temporal/certs/frontend/tls.key
 
 schema:
+  createDatabase:
+    enabled: false
   setup:
-    enabled: true
-    backoffLimit: 100
+    enabled: false
   update:
-    enabled: true
-    backoffLimit: 100
+    enabled: false
 
 web:
   enabled: true
@@ -162,18 +184,7 @@ web:
       value: /etc/temporal/certs/frontend/tls.key
 
 elasticsearch:
-  enabled: true
-  replicas: {{ temporal_elasticsearch_replicas }}
-  persistence:
-    enabled: "{{ storage_enabled | default('true') }}"
-{% if storage_enabled  %}
-  volumeClaimTemplate:
-    resources:
-      requests:
-        storage: "{{ temporal_elasticsearch_storage_size }}"
-    storageClassName: "{{ temporal_elasticsearch_storage_class }}"
-{% endif  %}
-  resources: {{ temporal_elasticsearch_resources }}
+  enabled: false
 prometheus:
   enabled: false
 grafana:

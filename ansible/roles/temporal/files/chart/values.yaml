@@ -135,6 +135,7 @@ server:
     #   claimMapper: default
     persistence:
       defaultStore: default
+      visibilityStore: visibility
       additionalStores: {}
       default:
         driver: "cassandra"
