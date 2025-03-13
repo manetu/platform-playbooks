@@ -1,0 +1,4 @@
+dependencies:
+  - role: manetu-regcred
+    vars:
+      manetu_regcred_namespace: "{{ manetu_namespace }}"

@@ -1,0 +1,12 @@
+- name: Create Manetu regcred secrets
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ manetu_regcred_namespace }}"
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: manetu-regcred
+      type: kubernetes.io/dockerconfigjson
+      data:
+        .dockerconfigjson:  "{{ lookup('template', 'dockerconfig.json') | to_json | b64encode }}"

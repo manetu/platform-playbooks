@@ -77,19 +77,6 @@
       data:
         SMTP_AUTH_TOKEN: "{{ '!! SMTP UNSET !!' | b64encode }}"
 
-- name: Create registry secrets
-  kubernetes.core.k8s:
-    state: present
-    namespace: "{{ manetu_namespace }}"
-    definition:
-      apiVersion: v1
-      kind: Secret
-      metadata:
-        name: manetu-regcred
-      type: kubernetes.io/dockerconfigjson
-      data:
-        .dockerconfigjson:  "{{ lookup('template', 'dockerconfig.json') | to_json | b64encode }}"
-
 - name: Create PRSK Secret
   when: prsk_password is defined
   kubernetes.core.k8s:
