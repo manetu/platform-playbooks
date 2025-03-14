@@ -19,7 +19,7 @@ temporal_cassandra_replication_factor: 3
 temporal_cassandra_keyspace: temporal
 
 temporal_elasticsearch_version: 7.17.28
-temporal_elasticsearch_wait_timeout: 120
+temporal_elasticsearch_wait_timeout: 300
 temporal_elasticsearch_replicas: 3
 temporal_elasticsearch_storage_class: "{{ default_storage_class | default('default') }}"
 temporal_elasticsearch_storage_size: 10Gi
