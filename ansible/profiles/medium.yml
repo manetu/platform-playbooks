@@ -12,7 +12,7 @@ yugabyte_resources:
       cpu: 4
       memory: 12Gi
     limits:
-      cpu: 8 
+      cpu: 8
       memory: 16Gi
 
 kafka_replicas: 6
@@ -40,21 +40,21 @@ cassandra_resources:
     cpu:  4
   limits:
     memory: 16Gi
-    cpu: 12 
+    cpu: 12
 
 temporal_frontend_replicas: 6
 temporal_frontend_resources:
   requests:
     cpu: 250m
   limits:
-    cpu: 2 
+    cpu: 2
 
 temporal_matching_replicas: 6
 temporal_matching_resources:
   requests:
     cpu: 250m
   limits:
-    cpu: 1 
+    cpu: 1
 
 temporal_history_shards: 2048 # Max 4096 per temporal
 temporal_history_replicas: 6
@@ -62,14 +62,36 @@ temporal_history_resources:
   requests:
     cpu: 1
   limits:
-    cpu: 4 
+    cpu: 4
 
+# see https://docs.temporal.io/references/dynamic-configuration#service-level-rps-limits
 temporal_dynamic_config:
+  frontend.rps:
+    - value: 4800                          # default: 2400
+      constraints: {}
+  frontend.namespaceRPS:
+    - value: 4800                          # default: 2400
+      constraints: {}
+  frontend.persistenceMaxQPS:
+    - value: 4000                          # default: 2000
+      constraints: {}
+  history.rps:
+    - value: 6000                          # default: 3000
+      constraints: {}
+  history.persistenceMaxQPS:
+    - value: 18000                         # default: 9000
+      constraints: {}
+  matching.rps:
+    - value: 2400                          # default: 1200
+      constraints: {}
+  matching.persistenceMaxQPS:
+    - value: 18000                         # default: 9000
+      constraints: {}
   matching.numTaskqueueReadPartitions:
-  - value: 10
+  - value: 10                              # default: 4
     constraints: {}
   matching.numTaskqueueWritePartitions:
-  - value: 10
+  - value: 10                              # default: 4
     constraints: {}
 
 manetu_replicas_min: 2
