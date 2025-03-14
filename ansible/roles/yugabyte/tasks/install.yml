@@ -81,8 +81,10 @@
     values:
       master:
         tolerations: "{{ yugabyte_master_tolerations | from_yaml }}"
+        memoryLimitHardPercentage: 100
       tserver:
         tolerations: "{{ yugabyte_tserver_tolerations | from_yaml }}"
+        memoryLimitHardPercentage: 100
       replicas:
         master: "{{ yugabyte_master_replicas }}"
         tserver: "{{ yugabyte_tserver_replicas }}"
