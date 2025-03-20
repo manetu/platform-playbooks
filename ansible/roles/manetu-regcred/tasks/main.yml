@@ -1,3 +1,13 @@
+- name: Ensure namespace exists
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ manetu_regcred_namespace }}"
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "{{ manetu_regcred_namespace }}"
+
 - name: Create Manetu regcred secrets
   kubernetes.core.k8s:
     state: present
