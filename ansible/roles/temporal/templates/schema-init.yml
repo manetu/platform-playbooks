@@ -10,6 +10,7 @@ spec:
       restartPolicy: OnFailure
       securityContext: {}
       serviceAccountName: default
+      tolerations: {{ temporal_tolerations }}
       initContainers:
         - name: waitfor-visibilitystore
           image: {{ temporal_schema_image }}
@@ -75,7 +76,6 @@ spec:
               name: cassandra-secrets
               readOnly: true
           resources: {}
-          tolerations: {{ temporal_tolerations }}
         - name: temporal-visibilitystore-init
           image: {{ temporal_schema_image }}
           imagePullPolicy: IfNotPresent
@@ -114,7 +114,6 @@ spec:
           #    name: temporal-elasticsearch-certs
           #    readOnly: true
           resources: {}
-          tolerations: {{ temporal_tolerations }}
       volumes:
         - name: cassandra-secrets
           secret:
