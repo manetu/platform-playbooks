@@ -47,10 +47,11 @@
     - name: Delete EKS Node Group
       community.aws.eks_nodegroup:
         state: absent
-        name: "{{ aws_instance_name }}"
+        name: "{{ aws_instance_name + '-' + item }}"
         region: "{{ aws_region }}"
         cluster_name: "{{ aws_instance_name }}"
         wait: true
+      loop: "{{ aws_nodegroups | map(attribute='name') | list | default(['primary']) }}"
 
     - name: Delete IAM EKS Node Role
       amazon.aws.iam_role:

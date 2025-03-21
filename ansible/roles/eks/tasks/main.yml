@@ -114,20 +114,22 @@
 
 - name: Create EKS Node Group
   community.aws.eks_nodegroup:
-    name: "{{ aws_instance_name }}"
+    name: "{{ aws_instance_name + '-' + item.name }}"
     state: present
     region: "{{ aws_region }}"
     cluster_name: "{{ aws_instance_name }}"
     node_role: "{{ node_role.iam_role.arn }}"
     subnets: "{{ subnet_ids }}"
-    scaling_config: "{{ aws_scaling_config }}"
-    disk_size: "{{ aws_disk_size }}"
-    ami_type: 'AL2_x86_64'
-    instance_types: "{{ aws_instance_types }}"
-    capacity_type: "{{ aws_capacity_type }}"
+    scaling_config: "{{ item.scaling_config | default(aws_scaling_config) }}"
+    disk_size: "{{ item.disk_size | default(aws_disk_size) }}"
+    ami_type: "{{ item.ami_type | default(aws_ami_type) }}"
+    instance_types: "{{ item.instance_types | default(aws_instance_types) }}"
+    capacity_type: "{{ item.capacity_type | default(aws_capacity_type) }}"
+    taints: "{{ item.taints | default([]) }}"
     tags:
-      Name: "{{ aws_instance_name }}"
+      Name: "{{ aws_instance_name + '-' + item.name }}"
     wait: true
+  loop: "{{ aws_nodegroups }}"
 
 - name: Install KUBECONFIG
   shell: eksctl utils write-kubeconfig --kubeconfig=$HOME/.kube/config  --name {{ aws_instance_name }} --region {{ aws_region }}
