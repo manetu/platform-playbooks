@@ -225,7 +225,8 @@
     wait: true
     values: "{{ lookup('template', 'chart-values.yml') | from_yaml }}"
 
-- name: Get CA certificate
+- name: Get frontend CA certificate
+  when: temporal_tls_enabled
   kubernetes.core.k8s_info:
     kind: Secret
     namespace: "{{ temporal_namespace }}"
