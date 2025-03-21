@@ -26,6 +26,7 @@ server:
           serverName: "temporal.{{ temporal_namespace }}.svc.cluster.local"
           rootCaFiles:
             - /etc/temporal/certs/internode/ca.crt
+{% if temporal_tls_enabled %}
       frontend:
         server:
           certFile: /etc/temporal/certs/frontend/tls.crt
@@ -35,6 +36,7 @@ server:
           serverName: "temporal-frontend.{{ temporal_namespace }}.svc.cluster.local"
           rootCaFiles:
             - /etc/temporal/certs/frontend/ca.crt
+{% endif %}
 
     persistence:
       visibilityStore: es-visibility
@@ -84,9 +86,11 @@ server:
     - name: internode-cert
       secret:
         secretName: temporal-internode-certificate
+{% if temporal_tls_enabled %}
     - name: frontend-cert
       secret:
         secretName: temporal-frontend-certificate
+{% endif %}
     - name: cassandra-secrets
       secret:
         secretName: temporal-cassandra-secret
@@ -104,9 +108,11 @@ server:
     - name: internode-cert
       readOnly: true
       mountPath: /etc/temporal/certs/internode
+{% if temporal_tls_enabled %}
     - name: frontend-cert
       readOnly: true
       mountPath: /etc/temporal/certs/frontend
+{% endif %}
     - name: cassandra-secrets
       mountPath: /etc/cassandra
       readOnly: true
@@ -119,9 +125,11 @@ admintools:
     tag: {{ temporal_version }}
   tolerations: {{ temporal_tolerations }}
   additionalVolumes:
+{% if temporal_tls_enabled %}
     - name: frontend-cert
       secret:
         secretName: temporal-frontend-certificate
+{% endif %}
     - name: cassandra-secrets
       secret:
         secretName: temporal-cassandra-secret
@@ -130,13 +138,16 @@ admintools:
             path: ca.crt
 
   additionalVolumeMounts:
+{% if temporal_tls_enabled %}
     - name: frontend-cert
       readOnly: true
       mountPath: /etc/temporal/certs/frontend
+{% endif %}
     - name: cassandra-secrets
       mountPath: /etc/cassandra
       readOnly: true
 
+{% if temporal_tls_enabled %}
   additionalEnv:
     - name: TEMPORAL_TLS_CA
       value: /etc/temporal/certs/frontend/ca.crt
@@ -144,6 +155,7 @@ admintools:
       value: /etc/temporal/certs/frontend/tls.crt
     - name: TEMPORAL_TLS_KEY
       value: /etc/temporal/certs/frontend/tls.key
+{% endif %}
 
 schema:
   createDatabase:
@@ -168,6 +180,7 @@ web:
       - "{{ temporal_dns }}"
 {% endif %}
 
+{% if temporal_tls_enabled %}
   additionalVolumes:
     - name: frontend-cert
       secret:
@@ -185,6 +198,7 @@ web:
       value: /etc/temporal/certs/frontend/tls.crt
     - name: TEMPORAL_TLS_KEY
       value: /etc/temporal/certs/frontend/tls.key
+{% endif %}
 
 elasticsearch:
   enabled: false

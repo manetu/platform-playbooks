@@ -170,6 +170,7 @@
           kind: Issuer
 
 - name: Create Frontend TLS certificate
+  when: temporal_tls_enabled
   kubernetes.core.k8s:
     state: present
     namespace: "{{ temporal_namespace }}"
@@ -243,10 +244,11 @@
         name: temporal-config
       data:
         TEMPORAL_HOSTPORT: "temporal-frontend.{{ temporal_namespace }}:7233"
-        TEMPORAL_TLS_ENABLED: "true"
+        TEMPORAL_TLS_ENABLED: "{{ temporal_tls_enabled | string | lower | quote }}"
         TEMPORAL_TLS_MUTUAL: "false"
 
 - name: Create Temporal secrets for Manetu
+  when: temporal_tls_enabled
   kubernetes.core.k8s:
     state: present
     namespace: "{{ manetu_namespace }}"

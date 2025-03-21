@@ -10,6 +10,7 @@ temporal_matching_replicas: 3
 temporal_worker_replicas: 3
 temporal_elasticsearch_replicas: 3
 temporal_history_shards: 1000   # IMPORTANT: This value cannot be changed, once it's set.  Tune about 1000/replica
+temporal_tls_enabled: true
 temporal_tls_duration: 87600h
 temporal_dev_mode: false
 temporal_dev_storage_size: 10Gi

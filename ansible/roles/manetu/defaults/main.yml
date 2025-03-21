@@ -34,3 +34,4 @@ monitoring_enabled: false
 alerts_enabled: false
 tracing_enabled: false
 mp_test_enabled: false
+temporal_tls_enabled: true

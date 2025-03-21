@@ -46,9 +46,11 @@ global:
       enabled: true
       hostPort: temporal-frontend.{{ temporal_namespace | default('manetu-temporal') }}:7233
       tls:
-        enabled: {{ temporal_tls_enabled | default('true') }}
+        enabled: {{ temporal_tls_enabled }}
         mtls: false
+{% if temporal_tls_enabled %}
         secret: temporal-secrets
+{% endif %}
     platformoperator:
       existingSecret: platform-operator-secrets
     otel:
