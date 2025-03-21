@@ -10,6 +10,12 @@ minio_persistence_size: 4Gi
 minio_resources:
   requests:
     memory: 1Gi
+minio_tolerations: "{{ default_tolerations | default([]) }}"
+# - key: dedicated
+#   operator: Equal
+#   value: experimental
+#   effect: NoSchedule
+
 minio_tls_duration: 87600h
 
 prometheus_monitor_labels: {}

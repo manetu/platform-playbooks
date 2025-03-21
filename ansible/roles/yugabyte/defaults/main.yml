@@ -1,6 +1,6 @@
 yugabyte_version: 2.20.8
 yugabyte_namespace: manetu-yugabyte
-yugabyte_master_tolerations: []
+yugabyte_master_tolerations: "{{ default_tolerations | default([]) }}"
   # - key: dedicated
   #   operator: Equal
   #   value: experimental
@@ -8,7 +8,7 @@ yugabyte_master_tolerations: []
 yugabyte_master_replicas: 3
 yugabyte_master_storage_size: 10Gi
 yugabyte_master_storage_class: "{{ default_storage_class | default('default') }}"
-yugabyte_tserver_tolerations: []
+yugabyte_tserver_tolerations: "{{ default_tolerations | default([]) }}"
   # - key: dedicated
   #   operator: Equal
   #   value: experimental

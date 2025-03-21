@@ -14,6 +14,9 @@ spec:
     version: "{{ kafka_version }}"
     replicas: {{ kafka_replicas }}
     resources: {{ kafka_resources | from_yaml }}
+    template:
+      pod:
+        tolerations: {{ kafka_tolerations | from_yaml }}
     listeners:
       - name: plain
         port: 9092
@@ -41,6 +44,9 @@ spec:
   zookeeper:
     replicas: {{ zookeeper_replicas }}
     resources: {{ zookeeper_resources | from_yaml }}
+    template:
+      pod:
+        tolerations: {{ zookeeper_tolerations | from_yaml }}
     storage:
 {% if storage_enabled %}
       type: persistent-claim

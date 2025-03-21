@@ -12,6 +12,11 @@ vault_keys:
   root_token: "test"  # only relevant when devmode=true.  Obtained from vault dynamically when devmode=false
 vault_operator_password: "test"
 vault_tls_duration: 87600h
+vault_tolerations: "{{ default_tolerations | default([]) }}"
+# - key: dedicated
+#   operator: Equal
+#   value: experimental
+#   effect: NoSchedule
 
 monitoring_enabled: false
 alerts_enabled: false

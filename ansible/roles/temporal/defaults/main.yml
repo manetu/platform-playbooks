@@ -15,6 +15,12 @@ temporal_dev_mode: false
 temporal_dev_storage_size: 10Gi
 temporal_dev_storage_class: "{{ default_storage_class | default('default') }}"
 
+temporal_tolerations: "{{ default_tolerations | default([]) }}"
+# - key: dedicated
+#   operator: Equal
+#   value: experimental
+#   effect: NoSchedule
+
 temporal_cassandra_replication_factor: 3
 temporal_cassandra_keyspace: temporal
 
@@ -30,6 +36,12 @@ temporal_elasticsearch_resources: {}
 #  limits:
 #    cpu: "1000m"
 #    memory: "2Gi"
+
+temporal_elasticsearch_tolerations: "{{ default_tolerations | default([]) }}"
+# - key: dedicated
+#   operator: Equal
+#   value: experimental
+#   effect: NoSchedule
 
 temporal_frontend_resources: {}
 temporal_matching_resources: {}

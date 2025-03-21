@@ -2,6 +2,7 @@ global:
   enabled: true
   tlsDisable: false
 server:
+  tolerations: "{{ vault_tolerations | from_yaml }}"
   dev:
     enabled: {{ vault_devmode | string | lower }}
     devRootToken: {{ vault_keys.root_token }}

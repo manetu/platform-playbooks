@@ -18,6 +18,12 @@ kafka_resources: {}
 #  limits:
 #    memory: 64Gi
 #    cpu: "12"
+kafka_tolerations: "{{ default_tolerations | default([]) }}"
+  # - key: dedicated
+  #   operator: Equal
+  #   value: experimental
+  #   effect: NoSchedule
+
 
 prometheus_monitor_labels: {}
 kafka_monitor_labels:
@@ -47,6 +53,12 @@ zookeeper_resources: {}
 #  limits:
 #    memory: 8Gi
 #    cpu: "2"
+zookeeper_tolerations: "{{ default_tolerations | default([]) }}"
+  # - key: dedicated
+  #   operator: Equal
+  #   value: experimental
+  #   effect: NoSchedule
+
 
 storage_enabled: true
 monitoring_enabled: false

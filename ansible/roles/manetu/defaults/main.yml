@@ -23,6 +23,12 @@ manetu_rollbar_env:  ""                       # defaults to {{ Release.Namespace
 manetu_base_chart_values: {}  # Profile-based customization merged with {{ manetu_chart_values }}
 manetu_chart_values: {}  # Allows customization
 
+manetu_tolerations: "{{ default_tolerations | default([]) }}"
+# - key: dedicated
+#   operator: Equal
+#   value: experimental
+#   effect: NoSchedule
+
 prometheus_monitor_labels: {}
 monitoring_enabled: false
 alerts_enabled: false

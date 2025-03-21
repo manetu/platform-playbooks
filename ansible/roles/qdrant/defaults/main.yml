@@ -10,3 +10,8 @@ qdrant_shard_number_per_node: 2
 qdrant_tls_duration: 87600h
 
 qdrant_resources: {}
+qdrant_tolerations: "{{ default_tolerations | default([]) }}"
+# - key: dedicated
+#   operator: Equal
+#   value: experimental
+#   effect: NoSchedule
