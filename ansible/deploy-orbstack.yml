@@ -1,0 +1,27 @@
+- name: "Set defaults"
+  hosts: all
+  tasks:
+    - set_fact:
+        manetu_namespace: "{{ manetu_namespace | default('manetu-platform') }}"
+        manetu_dns: manetu.k8s.orb.local
+        mgmt_dns_suffix: k8s.orb.local
+        default_storage_class: local-path
+        monitoring_enabled: true
+        traefik_enabled: false
+        mgmt_ingress_class_name: istio
+        mgmt_ingress_annotations:
+          kubernetes.io/ingress.class: istio
+
+- name: "Deploy k8s infrastructure"
+  hosts: config_host
+  roles:
+    - python
+    - manetu-namespace # needs to be early so components may install configmaps/secrets
+    - monitoring
+    - cert-manager
+    - istio
+
+- name: "Deploy Third-party"
+  import_playbook: deploy-thirdparty.yml
+
+- import_playbook: manetu.yml
