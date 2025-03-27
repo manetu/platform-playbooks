@@ -51,7 +51,7 @@
         region: "{{ aws_region }}"
         cluster_name: "{{ aws_instance_name }}"
         wait: true
-      loop: "{{ aws_nodegroups | map(attribute='name') | list | default(['primary']) }}"
+      loop: "{{ aws_nodegroups | default([ (dict(name='primary')) ]) | map(attribute='name') | list }}"
 
     - name: Delete IAM EKS Node Role
       amazon.aws.iam_role:
