@@ -68,7 +68,7 @@ server:
               enabled: true
               caFile: /etc/elasticsearch/ca.crt
 
-  dynamicConfig: {{ temporal_dynamic_config }}
+  dynamicConfig: {{ temporal_base_dynamic_config | ansible.builtin.combine(temporal_dynamic_config, recursive=true) }}
   frontend:
     replicaCount: {{ temporal_frontend_replicas }}
     resources: {{ temporal_frontend_resources }}

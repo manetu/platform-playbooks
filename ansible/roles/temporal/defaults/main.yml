@@ -51,7 +51,37 @@ temporal_worker_resources: {}
 
 temporal_retention_period: 1h
 
-temporal_dynamic_config: {}
+temporal_base_dynamic_config:
+  system.enableNexus:
+    - value: false
+  system.enableEagerWorkflowStart:
+    - value: true
+  system.enableActivityEagerExecution:
+    - value: true
+  history.ReplicationEnableUpdateWithNewTaskMerge:
+    - value: true
+  history.enableWorkflowExecutionTimeoutTimer:
+    - value: true
+  history.clientOwnershipCachingEnabled:
+    - value: true
+  history.ReplicationTaskProcessorShardQPS:
+    - value: 1000                             # default: 30
+  history.ReplicationStreamSenderHighPriorityQPS:
+    - value: 1000                             # default: 100
+  history.ReplicationStreamSenderLowPriorityQPS:
+    - value: 1000                             # default: 100
+  history.transferProcessorMaxPollRPS:
+    - value: 1000                             # default: 20
+  history.timerProcessorMaxPollRPS:
+    - value: 1000                             # default: 20
+  history.outboundProcessorMaxPollRPS:
+    - value: 1000                             # default: 20
+  history.outboundQueue.hostScheduler.maxTaskRPS:
+    - value: 1000                             # default: 100
+  history.visibilityProcessorMaxPollRPS:
+    - value: 1000                             # default: 20
+
+temporal_dynamic_config: {}  # merged with temporal_base_dynamic_config
 #  matching.numTaskqueueReadPartitions:
 #  - value: 5
 #    constraints: {}
