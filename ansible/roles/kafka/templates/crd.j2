@@ -16,6 +16,8 @@ spec:
     resources: {{ kafka_resources | from_yaml }}
     template:
       pod:
+        affinity: {{ kafka_affinity | from_yaml }}
+        nodeSelector: {{ kafka_nodeSelector | from_yaml }}
         tolerations: {{ kafka_tolerations | from_yaml }}
     listeners:
       - name: plain
@@ -46,6 +48,8 @@ spec:
     resources: {{ zookeeper_resources | from_yaml }}
     template:
       pod:
+        affinity: {{ zookeeper_affinity | from_yaml }}
+        nodeSelector: {{ zookeeper_nodeSelector | from_yaml }}
         tolerations: {{ zookeeper_tolerations | from_yaml }}
     storage:
 {% if storage_enabled %}

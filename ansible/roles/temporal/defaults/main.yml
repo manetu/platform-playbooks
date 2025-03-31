@@ -16,6 +16,8 @@ temporal_dev_mode: false
 temporal_dev_storage_size: 10Gi
 temporal_dev_storage_class: "{{ default_storage_class | default('default') }}"
 
+temporal_affinity: "{{ default_affinity | default({}) }}"
+temporal_nodeSelector: "{{ default_nodeSelector | default({}) }}"
 temporal_tolerations: "{{ default_tolerations | default([]) }}"
 # - key: dedicated
 #   operator: Equal
@@ -38,6 +40,8 @@ temporal_elasticsearch_resources: {}
 #    cpu: "1000m"
 #    memory: "2Gi"
 
+temporal_elasticsearch_affinity: "{{ default_affinity | default({}) }}"
+temporal_elasticsearch_nodeSelector: "{{ default_nodeSelector | default({}) }}"
 temporal_elasticsearch_tolerations: "{{ default_tolerations | default([]) }}"
 # - key: dedicated
 #   operator: Equal

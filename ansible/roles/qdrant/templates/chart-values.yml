@@ -7,6 +7,8 @@ apiKey: true
 replicaCount: "{{ qdrant_replicas }}"
 
 resource: "{{ qdrant_resources | from_yaml }}"
+affinity: "{{ qdrant_affinity | from_yaml }}"
+nodeSelector: "{{ qdrant_nodeSelector | from_yaml }}"
 tolerations: "{{ qdrant_tolerations | from_yaml }}"
 
 additionalVolumes:

@@ -18,6 +18,8 @@ kafka_resources: {}
 #  limits:
 #    memory: 64Gi
 #    cpu: "12"
+kafka_affinity: "{{ default_affinity | default({}) }}"
+kafka_nodeSelector: "{{ default_nodeSelector | default({}) }}"
 kafka_tolerations: "{{ default_tolerations | default([]) }}"
   # - key: dedicated
   #   operator: Equal
@@ -53,6 +55,8 @@ zookeeper_resources: {}
 #  limits:
 #    memory: 8Gi
 #    cpu: "2"
+zookeeper_affinity: "{{ default_affinity | default({}) }}"
+zookeeper_nodeSelector: "{{ default_nodeSelector | default({}) }}"
 zookeeper_tolerations: "{{ default_tolerations | default([]) }}"
   # - key: dedicated
   #   operator: Equal

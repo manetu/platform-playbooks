@@ -1,5 +1,7 @@
 yugabyte_version: 2.20.8
 yugabyte_namespace: manetu-yugabyte
+yugabyte_master_affinity: "{{ default_affinity | default({}) }}"
+yugabyte_master_nodeSelector: "{{ default_nodeSelector | default({}) }}"
 yugabyte_master_tolerations: "{{ default_tolerations | default([]) }}"
   # - key: dedicated
   #   operator: Equal
@@ -8,6 +10,9 @@ yugabyte_master_tolerations: "{{ default_tolerations | default([]) }}"
 yugabyte_master_replicas: 3
 yugabyte_master_storage_size: 10Gi
 yugabyte_master_storage_class: "{{ default_storage_class | default('default') }}"
+
+yugabyte_tserver_affinity: "{{ default_affinity | default({}) }}"
+yugabyte_tserver_nodeSelector: "{{ default_nodeSelector | default({}) }}"
 yugabyte_tserver_tolerations: "{{ default_tolerations | default([]) }}"
   # - key: dedicated
   #   operator: Equal

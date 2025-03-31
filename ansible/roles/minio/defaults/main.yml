@@ -10,6 +10,8 @@ minio_persistence_size: 4Gi
 minio_resources:
   requests:
     memory: 1Gi
+minio_affinity: "{{ default_affinity | default({}) }}"
+minio_nodeSelector: "{{ default_nodeSelector | default({}) }}"
 minio_tolerations: "{{ default_tolerations | default([]) }}"
 # - key: dedicated
 #   operator: Equal

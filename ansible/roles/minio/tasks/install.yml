@@ -153,6 +153,8 @@
         storageClass: "{{ minio_persistence_storage_class }}"
         size: "{{ minio_persistence_size }}"
       resources: "{{ minio_resources }}"
+      affinity: "{{ minio_affinity }}"
+      nodeSelector: "{{ minio_nodeSelector }}"
       tolerations: "{{ minio_tolerations }}"
       postJob:
         tolerations: "{{ minio_tolerations }}"

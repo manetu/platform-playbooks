@@ -10,6 +10,8 @@ spec:
       restartPolicy: OnFailure
       securityContext: {}
       serviceAccountName: default
+      affinity: {{ temporal_affinity }}
+      nodeSelector: {{ temporal_nodeSelector }}
       tolerations: {{ temporal_tolerations }}
       initContainers:
         - name: waitfor-visibilitystore

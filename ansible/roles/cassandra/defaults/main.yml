@@ -5,6 +5,8 @@ cassandra_storage_size: 10Gi
 cassandra_storage_class: "{{ default_storage_class | default('default') }}"
 cassandra_user: cassandra
 cassandra_tls_duration: 87600h
+cassandra_affinity: "{{ default_affinity | default({}) }}"
+cassandra_nodeSelector: "{{ default_nodeSelector | default({}) }}"
 cassandra_tolerations: "{{ default_tolerations | default([]) }}"
   # - key: dedicated
   #   operator: Equal

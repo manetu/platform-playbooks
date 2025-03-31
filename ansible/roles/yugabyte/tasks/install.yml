@@ -80,9 +80,13 @@
     wait: true
     values:
       master:
+        affinity: "{{ yugabyte_master_affinity | from_yaml }}"
+        nodeSelector: "{{ yugabyte_master_nodeSelector | from_yaml }}"
         tolerations: "{{ yugabyte_master_tolerations | from_yaml }}"
         memoryLimitHardPercentage: 100
       tserver:
+        affinity: "{{ yugabyte_tserver_affinity | from_yaml }}"
+        nodeSelector: "{{ yugabyte_tserver_nodeSelector | from_yaml }}"
         tolerations: "{{ yugabyte_tserver_tolerations | from_yaml }}"
         memoryLimitHardPercentage: 100
       replicas:

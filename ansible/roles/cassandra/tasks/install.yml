@@ -147,6 +147,8 @@
     chart_version: "{{ cassandra_version }}"
     release_namespace: "{{ cassandra_namespace }}"
     values:
+      affinity: "{{ cassandra_affinity | from_yaml }}"
+      nodeSelector: "{{ cassandra_nodeSelector | from_yaml }}"
       tolerations: "{{ cassandra_tolerations | from_yaml }}"
       replicaCount: "{{ cassandra_replicas }}"
       persistence:

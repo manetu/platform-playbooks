@@ -3,6 +3,8 @@ fullnameOverride: "temporal"
 server:
   image:
     tag: {{ temporal_version }}
+  affinity: {{ temporal_affinity }}
+  nodeSelector: {{ temporal_nodeSelector }}
   tolerations: {{ temporal_tolerations }}
 {% if monitoring_enabled %}
   metrics:
@@ -123,6 +125,8 @@ server:
 admintools:
   image:
     tag: {{ temporal_version }}
+  affinity: {{ temporal_affinity }}
+  nodeSelector: {{ temporal_nodeSelector }}
   tolerations: {{ temporal_tolerations }}
   additionalVolumes:
 {% if temporal_tls_enabled %}
@@ -167,6 +171,8 @@ schema:
 
 web:
   enabled: true
+  affinity: {{ temporal_affinity }}
+  nodeSelector: {{ temporal_nodeSelector }}
   tolerations: {{ temporal_tolerations }}
 
 {% if mgmt_dns_suffix is defined %}
