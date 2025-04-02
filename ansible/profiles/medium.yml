@@ -9,11 +9,11 @@ yugabyte_resources:
       memory: 2Gi
   tserver:
     requests:
-      cpu: 4
-      memory: 12Gi
+      cpu: 8
+      memory: 32Gi
     limits:
       cpu: 8
-      memory: 16Gi
+      memory: 32Gi
 
 kafka_replicas: 6
 kafka_resources:
@@ -32,15 +32,6 @@ zookeeper_resources:
   limits:
     memory: 8Gi
     cpu: 2000m
-
-cassandra_replicas: 6
-cassandra_resources:
-  requests:
-    memory:  8Gi
-    cpu:  4
-  limits:
-    memory: 16Gi
-    cpu: 12
 
 temporal_frontend_replicas: 6
 temporal_frontend_resources:

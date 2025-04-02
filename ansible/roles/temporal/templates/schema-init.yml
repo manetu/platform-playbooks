@@ -52,10 +52,10 @@ spec:
 
               temporal-cassandra-tool create -k {{ temporal_cassandra_keyspace }} --replication-factor "{{ temporal_cassandra_replication_factor }}"
               temporal-cassandra-tool setup-schema -v "0.0"
-              temporal-cassandra-tool update-schema --schema-dir /etc/temporal/schema/cassandra/temporal/versioned
+              temporal-cassandra-tool update-schema --schema-dir $TEMPORAL_SCHEMA_PATH/yugabyte/temporal/versioned
           env:
             - name: CASSANDRA_HOST
-              value: cassandra.manetu-cassandra
+              value: {{ ('yugabyte-yb-tservers.' + yugabyte_namespace + '.svc.cluster.local') }}
             - name: CASSANDRA_PORT
               value: "9042"
             - name: CASSANDRA_KEYSPACE
@@ -65,17 +65,17 @@ spec:
             - name: CASSANDRA_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: temporal-cassandra-secret
+                  name: temporal-yugabyte-secret
                   key: password
             - name: CASSANDRA_ENABLE_TLS
-              value: "true"
+              value: "{{ yugabyte_tls_enabled | string | lower }}"
             - name: CASSANDRA_TLS_CA
-              value: /etc/cassandra/ca.crt
+              value: /etc/yugabyte/ca.crt
             - name: CASSANDRA_TLS_DISABLE_HOST_VERIFICATION
               value: "true"
           volumeMounts:
-            - mountPath: /etc/cassandra
-              name: cassandra-secrets
+            - mountPath: /etc/yugabyte
+              name: yugabyte-secrets
               readOnly: true
           resources: {}
         - name: temporal-visibilitystore-init
@@ -87,7 +87,7 @@ spec:
             - |
               set -eux
 
-              curl $CURL_OPTS -X PUT --fail --user "$ES_USER:$ES_PWD" $ES_SCHEME://$ES_HOST:$ES_PORT/_template/temporal_visibility_v1_template -H "Content-Type: application/json" --data-binary "@schema/elasticsearch/visibility/index_template_$ES_VERSION.json" --write-out "\n";
+              curl $CURL_OPTS -X PUT --fail --user "$ES_USER:$ES_PWD" $ES_SCHEME://$ES_HOST:$ES_PORT/_template/temporal_visibility_v1_template -H "Content-Type: application/json" --data-binary "@$TEMPORAL_SCHEMA_PATH/elasticsearch/visibility/index_template_$ES_VERSION.json" --write-out "\n";
 
               curl $CURL_OPTS --head --fail --user "$ES_USER:$ES_PWD" $ES_SCHEME://$ES_HOST:$ES_PORT/$ES_VISIBILITY_INDEX ||
               curl $CURL_OPTS -X PUT --fail --user "$ES_USER:$ES_PWD" $ES_SCHEME://$ES_HOST:$ES_PORT/$ES_VISIBILITY_INDEX --write-out "\n";
@@ -117,9 +117,9 @@ spec:
           #    readOnly: true
           resources: {}
       volumes:
-        - name: cassandra-secrets
+        - name: yugabyte-secrets
           secret:
-            secretName: temporal-cassandra-secret
+            secretName: temporal-yugabyte-secret
             defaultMode: 420
             items:
               - key: ca.crt

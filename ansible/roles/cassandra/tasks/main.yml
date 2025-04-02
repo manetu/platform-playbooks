@@ -1,2 +1,0 @@
-- include_tasks: install.yml
-  when: temporal_dev_mode is not defined or not temporal_dev_mode

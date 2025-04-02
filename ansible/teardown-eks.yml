@@ -14,7 +14,6 @@
         - manetu-temporal
         - manetu-yugabyte
         - manetu-kafka
-        - manetu-cassandra
         - manetu-minio
         - manetu-hashicorp
         - manetu-qdrant

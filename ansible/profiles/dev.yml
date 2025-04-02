@@ -19,8 +19,6 @@ minio_resources:
 
 vault_replicas: 1
 
-cassandra_replicas: 1
-
 yugabyte_master_replicas: 1
 yugabyte_tserver_replicas: 1
 yugabyte_resources:
@@ -32,6 +30,9 @@ yugabyte_resources:
     requests:
       cpu: 1m
       memory: 1Mi
+    limits:
+      cpu: 16
+      memory: 16Gi
 
 temporal_server_replicas: 1
 temporal_frontend_replicas: 1

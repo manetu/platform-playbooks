@@ -2,7 +2,8 @@ fullnameOverride: "temporal"
 
 server:
   image:
-    tag: {{ temporal_version }}
+    repository: {{ temporal_server_image }}
+    tag: {{ temporal_server_version }}
   affinity: {{ temporal_affinity }}
   nodeSelector: {{ temporal_nodeSelector }}
   tolerations: {{ temporal_tolerations }}
@@ -41,21 +42,25 @@ server:
 {% endif %}
 
     persistence:
+      defaultStore: yugabyte
       visibilityStore: es-visibility
       default:
-        cassandra:
-          hosts: ["cassandra.{{ cassandra_namespace }}"]
-          port: 9042
-          user: "cassandra"
-          existingSecret: temporal-cassandra-secret
-          replicationFactor: {{ temporal_cassandra_replication_factor }}
-          tls:
-            enabled: true
-            enableHostVerification: false
-            caFile: /etc/cassandra/ca.crt
+        driver: custom
       visibility:
         driver: elasticsearch
       additionalStores:
+        yugabyte:
+          customDatastore:
+            name: "yugabyte"
+            options:
+              hosts:  {{ ('yugabyte-yb-tservers.' + yugabyte_namespace + '.svc.cluster.local') }}
+              keyspace: {{ temporal_cassandra_keyspace }}
+              replicationFactor: {{ temporal_cassandra_replication_factor }}
+              user: cassandra
+              tls:
+                enabled: {{ yugabyte_tls_enabled | string | lower }}
+                enableHostVerification: false
+                caFile: /etc/yugabyte/ca.crt
         es-visibility:
           elasticsearch:
             version: "v8"
@@ -93,9 +98,9 @@ server:
       secret:
         secretName: temporal-frontend-certificate
 {% endif %}
-    - name: cassandra-secrets
+    - name: yugabyte-secrets
       secret:
-        secretName: temporal-cassandra-secret
+        secretName: temporal-yugabyte-secret
         items:
           - key: ca.crt
             path: ca.crt
@@ -115,12 +120,19 @@ server:
       readOnly: true
       mountPath: /etc/temporal/certs/frontend
 {% endif %}
-    - name: cassandra-secrets
-      mountPath: /etc/cassandra
+    - name: yugabyte-secrets
+      mountPath: /etc/yugabyte
       readOnly: true
     - name: elasticsearch-secrets
       mountPath: /etc/elasticsearch
       readOnly: true
+
+  additionalEnv:
+    - name: YUGABYTE_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: temporal-yugabyte-secret
+          key: password
 
 admintools:
   image:
@@ -134,9 +146,9 @@ admintools:
       secret:
         secretName: temporal-frontend-certificate
 {% endif %}
-    - name: cassandra-secrets
+    - name: yugabyte-secrets
       secret:
-        secretName: temporal-cassandra-secret
+        secretName: temporal-yugabyte-secret
         items:
           - key: ca.crt
             path: ca.crt
@@ -147,8 +159,8 @@ admintools:
       readOnly: true
       mountPath: /etc/temporal/certs/frontend
 {% endif %}
-    - name: cassandra-secrets
-      mountPath: /etc/cassandra
+    - name: yugabyte-secrets
+      mountPath: /etc/yugabyte
       readOnly: true
 
 {% if temporal_tls_enabled %}

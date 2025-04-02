@@ -1,4 +1,4 @@
-yugabyte_version: 2.20.8
+yugabyte_version: 2024.2.2
 yugabyte_namespace: manetu-yugabyte
 yugabyte_master_affinity: "{{ default_affinity | default({}) }}"
 yugabyte_master_nodeSelector: "{{ default_nodeSelector | default({}) }}"

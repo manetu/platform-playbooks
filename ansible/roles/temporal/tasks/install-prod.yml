@@ -14,7 +14,7 @@
         name: "{{ temporal_namespace }}"
         labels:
           access.manetu.io/temporal: "true"                     # grants access to itself
-          access.manetu.io/cassandra: "true"                    # grants access to the cassandra cluster
+          access.manetu.io/yugabyte: "true"                     # grants access to the yugabyte cluster
 
 - name: Install Network Policy
   when: notyet is defined
@@ -120,18 +120,16 @@
     wait_timeout: "{{ temporal_elasticsearch_wait_timeout }}"
     definition: "{{ lookup('template', 'elasticsearch.yml') | from_yaml }}"
 
-- name: Get Cassandra certificate
+- name: Get Yugabyte certificate
+  when: yugabyte_tls_enabled
   kubernetes.core.k8s_info:
     kind: Secret
-    namespace: "{{ cassandra_namespace }}"
-    name: cassandra-client-certificate
+    namespace: "{{ yugabyte_namespace }}"
+    name: yugabyte-client-tls
     wait: true
-  register: client_cert
+  register: yugabyte_cert
 
-- set_fact:
-    cassandra_ca_crt: "{{ client_cert.resources[0].data['ca.crt'] | b64decode }}"
-
-- name: Create Cassandra credentials
+- name: Create Yugabyte secrets
   kubernetes.core.k8s:
     state: present
     namespace: "{{ temporal_namespace }}"
@@ -139,11 +137,11 @@
       apiVersion: v1
       kind: Secret
       metadata:
-        name: temporal-cassandra-secret
+        name: temporal-yugabyte-secret
       type: Opaque
       data:
-        password: "{{ cassandra_password | b64encode }}"
-        ca.crt: "{{ cassandra_ca_crt | b64encode }}"
+        password: "{{ yugabyte_password | b64encode }}"
+        ca.crt: "{{ yugabyte_cert.resources[0].data['ca.crt'] | default('') }}"
 
 - name: Create Internode TLS certificate
   kubernetes.core.k8s:

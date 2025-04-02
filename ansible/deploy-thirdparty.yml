@@ -2,7 +2,6 @@
   hosts: config_host
   roles:
     - vault
-    - cassandra
     - kafka
     - yugabyte
     - minio
@@ -31,18 +30,6 @@
         wait_sleep: 10
         wait_timeout: 360
       loop: "{{ range(0, yugabyte_tserver_replicas) }}"
-    - name: "Wait for Cassandra pods"
-      when: temporal_dev_mode is not defined or not temporal_dev_mode
-      kubernetes.core.k8s_info:
-        namespace: "{{ cassandra_namespace }}"
-        kind: Pod
-        field_selectors:
-          - status.phase=Running
-        name: "{{ 'cassandra-' + item|string }}"
-        wait: yes
-        wait_sleep: 10
-        wait_timeout: 360
-      loop: "{{ range(0, cassandra_replicas) }}"
 
 - name: "Deploy Temporal"
   hosts: config_host

@@ -1,8 +1,9 @@
-temporal_version: 1.27.1
-temporal_schema_image: temporalio/admin-tools:{{ temporal_version }}
+temporal_version: 1.27.1                 # overall upstream release
+temporal_server_version: v1.0.0          # manetu-yugabyte server release
+temporal_server_image: manetu/temporal-yugabyte
+temporal_schema_image: "{{ temporal_server_image }}:{{ temporal_server_version }}-admin-tools"
 temporal_namespace: manetu-temporal
 temporal_dns: temporal.{{ mgmt_dns_suffix | default('invalid') }}
-cassandra_namespace: manetu-cassandra
 temporal_server_replicas: 3
 temporal_frontend_replicas: 3
 temporal_history_replicas: 3
@@ -97,6 +98,9 @@ storage_enabled: true
 prometheus_monitor_labels: {}
 monitoring_enabled: false
 alerts_enabled: false
+
+yugabyte_namespace: manetu-yugabyte
+yugabyte_tls_enabled: true
 
 mgmt_ingress_class_name: traefik
 mgmt_ingress_annotations:

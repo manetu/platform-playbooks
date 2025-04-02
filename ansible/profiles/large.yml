@@ -33,15 +33,6 @@ zookeeper_resources:
     memory: 8Gi
     cpu: 2
 
-cassandra_replicas: 6
-cassandra_resources:
-  requests:
-    memory: 32Gi
-    cpu: 14
-  limits:
-    memory: 32Gi
-    cpu: 16
-
 temporal_server_replicas: 5
 temporal_frontend_replicas: 18
 temporal_matching_replicas: 18
