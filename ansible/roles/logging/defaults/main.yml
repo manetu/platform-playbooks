@@ -17,3 +17,9 @@ promtail_client_url: http://loki-gateway.logging.svc.cluster.local:80/loki/api/v
 promtail_tenant_id: tenant1
 
 s3_insecure: false
+
+mgmt_ingress_class_name: traefik
+mgmt_ingress_annotations:
+  traefik.ingress.kubernetes.io/router.entrypoints: websecure
+  traefik.ingress.kubernetes.io/router.tls: "true"
+  traefik.ingress.kubernetes.io/router.middlewares: traefik-system-basic-auth@kubernetescrd

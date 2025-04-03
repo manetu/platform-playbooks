@@ -178,12 +178,10 @@ web:
 {% if mgmt_dns_suffix is defined %}
   ingress:
     enabled: true
-    annotations:
-      traefik.ingress.kubernetes.io/router.entrypoints: "websecure"
-      traefik.ingress.kubernetes.io/router.tls: "true"
-      traefik.ingress.kubernetes.io/router.middlewares: "traefik-system-basic-auth@kubernetescrd"
+    className: {{ mgmt_ingress_class_name }}
+    annotations: {{ mgmt_ingress_annotations }}
     hosts:
-      - "{{ temporal_dns }}"
+      - {{ temporal_dns }}
 {% endif %}
 
 {% if temporal_tls_enabled %}

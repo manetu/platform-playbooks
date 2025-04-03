@@ -14,20 +14,17 @@
         enabled: true
       cr:
         create: true
-        name: kiali 
+        name: kiali
         spec:
           auth:
             strategy: anonymous
           deployment:
             ingress:
-              class_name: "traefik"  
+              class_name: "{{ mgmt_ingress_class_name }}"
               enabled: true
               override_yaml:
                 metadata:
-                  annotations:
-                    traefik.ingress.kubernetes.io/router.entrypoints: "websecure" 
-                    traefik.ingress.kubernetes.io/router.tls: "true"
-                    traefik.ingress.kubernetes.io/router.middlewares: "traefik-system-basic-auth@kubernetescrd"
+                  annotations: "{{ mgmt_ingress_annotations | from_yaml }}"
           server:
             web_fqdn: "{{ kiali_dns }}"
             web_schema: https
@@ -39,7 +36,7 @@
             tracing:
               auth:
                 type: none
-              enabled: true 
+              enabled: true
               in_cluster_url: '{{ jaeger_internal_url }}'
               use_grpc: true
-              url: '{{ jaeger_external_url }}'
+              url: '{{ jaeger_external_url }}' \ No newline at end of file

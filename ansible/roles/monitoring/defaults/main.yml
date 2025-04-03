@@ -23,3 +23,9 @@ alertmanager_global_config: {}
 
 chaos_mesh_datasource_url: http://chaos-dashboard.chaos-mesh:2333
 loki_datasource_url: http://loki-gateway.logging.svc.cluster.local
+
+mgmt_ingress_class_name: traefik
+mgmt_ingress_annotations:
+  traefik.ingress.kubernetes.io/router.entrypoints: websecure
+  traefik.ingress.kubernetes.io/router.tls: "true"
+  traefik.ingress.kubernetes.io/router.middlewares: traefik-system-basic-auth@kubernetescrd

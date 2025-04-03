@@ -6,3 +6,9 @@ elasticsearch_storage_size: 10Gi
 elasticsearch_storage_class: "{{ default_storage_class | default('default') }}"
 elasticsearch_replicas: 3
 kibana_replicas: 2
+
+mgmt_ingress_class_name: traefik
+mgmt_ingress_annotations:
+  traefik.ingress.kubernetes.io/router.entrypoints: websecure
+  traefik.ingress.kubernetes.io/router.tls: "true"
+  traefik.ingress.kubernetes.io/router.middlewares: traefik-system-basic-auth@kubernetescrd

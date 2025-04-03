@@ -17,18 +17,18 @@
         auth_enabled: "{{ loki_auth_enabled }}"
         server:
           http_listen_port: "{{ loki_http_listen_port }}"
-          log_level: "{{ log_level }}"          
+          log_level: "{{ log_level }}"
         compactor:
           working_directory: /var/loki/compactor
           shared_store: s3
           retention_enabled: true
           retention_delete_delay: 2h
-          retention_delete_worker_count: 150    
+          retention_delete_worker_count: 150
         storage:
           bucketNames:
             chunks: "{{ loki_bucket }}"
             ruler: "{{ loki_bucket }}"
-            admin: "{{ loki_bucket }}"         
+            admin: "{{ loki_bucket }}"
           type: s3
           s3:
             endpoint: "{{ s3_endpoint }}"
@@ -60,10 +60,8 @@
             enabled: false
       ingress:
         enabled: true
-        annotations: { 
-          traefik.ingress.kubernetes.io/router.entrypoints: websecure ,
-          traefik.ingress.kubernetes.io/router.tls: "true"           
-        }
+        ingressClassName: "{{ mgmt_ingress_class_name }}"
+        annotations: "{{ mgmt_ingress_annotations | from_yaml }}"
         paths:
           write:
             - /api/prom/push
@@ -105,7 +103,7 @@
     wait: yes
     wait_sleep: 10
     wait_timeout: 480
-  loop: "{{ range(0, loki_pod_replicas) | product(('loki-backend', 'loki-write')) }}" 
+  loop: "{{ range(0, loki_pod_replicas) | product(('loki-backend', 'loki-write')) }}"
 
 - name: Install Promtail using Helm
   kubernetes.core.helm:
@@ -129,7 +127,7 @@
             - backoff_config:
                 min_period: 1500ms
                 max_retries: 60
-          scrape_configs: 
+          scrape_configs:
             - job_name: system
               static_configs:
                 - targets:
@@ -137,4 +135,3 @@
                   labels:
                     job: varlogs
                     __path__: /var/log/*.log
-              

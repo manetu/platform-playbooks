@@ -13,20 +13,17 @@
     values:
       dashboard:
         service:
-          type: ClusterIP      
+          type: ClusterIP
         securityMode: false
         ingress:
           enabled: true
-          annotations:
-            traefik.ingress.kubernetes.io/router.entrypoints: "websecure" 
-            traefik.ingress.kubernetes.io/router.tls: "true"
-            traefik.ingress.kubernetes.io/router.middlewares: traefik-system-basic-auth@kubernetescrd
+          ingressClassName: "{{ mgmt_ingress_class_name }}"
+          annotations: "{{ mgmt_ingress_annotations | from_yaml }}"
           hosts:
             - name: "{{ chaos_mesh_dns }}"
-          ingressClassName: "traefik"
       controllerManager:
         leaderElection:
-          enabled: false          
+          enabled: false
 
 - name: Wait for Chaos Controller Manager pods
   kubernetes.core.k8s_info:
@@ -54,7 +51,7 @@
       kind: ServiceMonitor
       metadata:
         name: chaos-controller-manager
-        namespace: chaos-mesh        
+        namespace: chaos-mesh
       spec:
         endpoints:
           - interval: 30s
@@ -73,7 +70,7 @@
       kind: ServiceMonitor
       metadata:
         name: chaos-daemon
-        namespace: chaos-mesh        
+        namespace: chaos-mesh
       spec:
         endpoints:
           - interval: 30s

@@ -97,3 +97,9 @@ storage_enabled: true
 prometheus_monitor_labels: {}
 monitoring_enabled: false
 alerts_enabled: false
+
+mgmt_ingress_class_name: traefik
+mgmt_ingress_annotations:
+  traefik.ingress.kubernetes.io/router.entrypoints: websecure
+  traefik.ingress.kubernetes.io/router.tls: "true"
+  traefik.ingress.kubernetes.io/router.middlewares: traefik-system-basic-auth@kubernetescrd

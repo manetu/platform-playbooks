@@ -4,3 +4,9 @@ chaos_mesh_dns: chaos-mesh.{{ mgmt_dns_suffix }}
 pod_kill_schedule: '1 * * * *'
 pod_kill_pause: 'true' # If set to true, test will be injected in paused state, if false, test will be injected in running state
 pod_kill_amount: '1'
+
+mgmt_ingress_class_name: traefik
+mgmt_ingress_annotations:
+  traefik.ingress.kubernetes.io/router.entrypoints: websecure
+  traefik.ingress.kubernetes.io/router.tls: "true"
+  traefik.ingress.kubernetes.io/router.middlewares: traefik-system-basic-auth@kubernetescrd
