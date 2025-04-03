@@ -7,7 +7,7 @@ internal:
   ingress:
     enabled: true
     cnamePrefix: {{ manetu_internal_dns }}
-    destination: istio-ingress-gw.istio-system.svc.cluster.local # This is the CNAME destination
+    destination: istio-{{ manetu_gateway_selector }}.istio-system.svc.cluster.local # This is the CNAME destination
 
 kafka-metrics:
   enabled: false
