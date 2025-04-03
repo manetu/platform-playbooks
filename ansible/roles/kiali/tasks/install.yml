@@ -39,4 +39,4 @@
               enabled: true
               in_cluster_url: '{{ jaeger_internal_url }}'
               use_grpc: true
-              url: '{{ jaeger_external_url }}' \ No newline at end of file
+              url: '{{ jaeger_external_url }}'
