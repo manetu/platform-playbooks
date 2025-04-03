@@ -14,7 +14,7 @@ manetu_gateway_tls_internal: true             # turn this off to manage the gate
 manetu_gateway_tls_ca_duration: 87600h
 manetu_gateway_tls_namespace: istio-system
 manetu_gateway_tls_name: manetu-certificate   # the name of the TLS secret within {{manetu_gateway_tls_namespace}}  namespace
-manetu_gateway_selector: ingress-gw           # the value of the "spec.selector.istio" in manetu-platform's Gateway
+manetu_gateway_selector: ingressgateway       # the value of the "spec.selector.istio" in manetu-platform's Gateway
 manetu_internal_dns: ingress                  # This will create 'ingress.manetu-platform'
 manetu_peer_mtls_mode: STRICT                 # STRICT, PERMISSIVE, DISABLE
 manetu_rollbar_enabled: true

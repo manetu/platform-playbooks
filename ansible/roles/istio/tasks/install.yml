@@ -41,10 +41,22 @@
           resources: "{{ istio_proxy_resources | from_yaml }}"
     wait: true
 
+- name: Register IngressClass
+  kubernetes.core.k8s:
+    state: present
+    namespace: istio-system
+    definition:
+      apiVersion: networking.k8s.io/v1
+      kind: IngressClass
+      metadata:
+        name: istio
+      spec:
+        controller: istio.io/ingress-controller
+
 - name: Install Istio Ingress Gateway
   when: istio_ingress_enabled
   kubernetes.core.helm:
-    name: istio-ingress-gw
+    name: istio-ingressgateway
     chart_ref: istio/gateway
     chart_version: "{{ istio_version }}"
     release_namespace: istio-system

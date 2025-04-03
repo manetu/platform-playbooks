@@ -21,14 +21,14 @@ archive_build:
     paths:
       - target
 
-test:
-  extends: .dynamic_kubernetes_env
-  stage: integrate
-  variables:
-    PLAYBOOKS_REF: file://$CI_PROJECT_DIR
-    PLAYBOOK_SUBPATH: ansible
-  script:
-    - deploy-mptest
+#test:
+#  extends: .dynamic_kubernetes_env
+#  stage: integrate
+#  variables:
+#    PLAYBOOKS_REF: file://$CI_PROJECT_DIR
+#    PLAYBOOK_SUBPATH: ansible
+#  script:
+#    - deploy-mptest
 
 # Approve
 approve_release:

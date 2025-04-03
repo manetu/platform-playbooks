@@ -39,7 +39,7 @@
   hosts: config_host
   vars:
     aws_route53_namespace: istio-system
-    aws_route53_service: istio-ingress-gw
+    aws_route53_service: istio-ingressgateway
     aws_route53_record: "{{ manetu_dns }}"
   tasks:
     - when: aws_route53_zone is defined
