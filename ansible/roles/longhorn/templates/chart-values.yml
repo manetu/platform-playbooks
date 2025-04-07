@@ -2,7 +2,7 @@ ingress:
   enabled: true
   host: {{ longhorn_dns }}
   ingressClassName: "{{ mgmt_ingress_class_name }}"
-  annotations: "{{ mgmt_ingress_annotations | from_yaml }}"
+  annotations: {{ mgmt_ingress_annotations | from_yaml }}
 
 persistence:
   defaultClass: false
