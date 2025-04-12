@@ -1,6 +1,16 @@
 yugabyte_version: 2024.2.2
 yugabyte_namespace: manetu-yugabyte
-yugabyte_master_affinity: "{{ default_affinity | default({}) }}"
+
+yugabyte_master_affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: yb-master
+        topologyKey: kubernetes.io/hostname
+
 yugabyte_master_nodeSelector: "{{ default_nodeSelector | default({}) }}"
 yugabyte_master_tolerations: "{{ default_tolerations | default([]) }}"
   # - key: dedicated
@@ -11,7 +21,16 @@ yugabyte_master_replicas: 3
 yugabyte_master_storage_size: 10Gi
 yugabyte_master_storage_class: "{{ default_storage_class | default('default') }}"
 
-yugabyte_tserver_affinity: "{{ default_affinity | default({}) }}"
+yugabyte_tserver_affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: yb-tserver
+        topologyKey: kubernetes.io/hostname
+
 yugabyte_tserver_nodeSelector: "{{ default_nodeSelector | default({}) }}"
 yugabyte_tserver_tolerations: "{{ default_tolerations | default([]) }}"
   # - key: dedicated

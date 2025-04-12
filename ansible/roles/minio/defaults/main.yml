@@ -10,7 +10,25 @@ minio_persistence_size: 4Gi
 minio_resources:
   requests:
     memory: 1Gi
-minio_affinity: "{{ default_affinity | default({}) }}"
+minio_affinity: 
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        labelSelector:
+          matchLabels:
+            app: minio
+            release: minio
+        topologyKey: kubernetes.io/hostname
+minio_topology_spread_constraints:
+  - maxSkew: 1
+    topologyKey: topology.kubernetes.io/zone
+    whenUnsatisfiable: ScheduleAnyway
+    labelSelector:
+      matchLabels:
+        app: minio
+        release: minio
+
 minio_nodeSelector: "{{ default_nodeSelector | default({}) }}"
 minio_tolerations: "{{ default_tolerations | default([]) }}"
 # - key: dedicated

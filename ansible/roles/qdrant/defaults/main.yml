@@ -10,7 +10,23 @@ qdrant_shard_number_per_node: 2
 qdrant_tls_duration: 87600h
 
 qdrant_resources: {}
-qdrant_affinity: "{{ default_affinity | default({}) }}"
+qdrant_affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: qdrant
+        topologyKey: kubernetes.io/hostname
+qdrant_topology_spread_constraints:
+  - maxSkew: 1
+    topologyKey: topology.kubernetes.io/zone
+    whenUnsatisfiable: ScheduleAnyway
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/name: qdrant
+
 qdrant_nodeSelector: "{{ default_nodeSelector | default({}) }}"
 qdrant_tolerations: "{{ default_tolerations | default([]) }}"
 # - key: dedicated

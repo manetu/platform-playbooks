@@ -60,6 +60,6 @@ global:
         memory: 128Mi
       limits:
         memory: 2Gi
-    affinity: {{ manetu_affinity }}
+    affinity: {}
     nodeSelector: {{ manetu_nodeSelector }}
     tolerations: {{ manetu_tolerations }}

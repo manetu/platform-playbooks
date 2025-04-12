@@ -12,7 +12,23 @@ vault_keys:
   root_token: "test"  # only relevant when devmode=true.  Obtained from vault dynamically when devmode=false
 vault_operator_password: "test"
 vault_tls_duration: 87600h
-vault_affinity: "{{ default_affinity | default({}) }}"
+vault_affinity: 
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: vault
+        topologyKey: kubernetes.io/hostname
+vault_topology_spread_constraints:
+  - maxSkew: 1
+    topologyKey: topology.kubernetes.io/zone
+    whenUnsatisfiable: ScheduleAnyway
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/name: vault
+
 vault_nodeSelector: "{{ default_nodeSelector | default({}) }}"
 vault_tolerations: "{{ default_tolerations | default([]) }}"
 # - key: dedicated

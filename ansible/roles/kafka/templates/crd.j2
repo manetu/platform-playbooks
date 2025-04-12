@@ -19,6 +19,7 @@ spec:
         affinity: {{ kafka_affinity | from_yaml }}
         nodeSelector: {{ kafka_nodeSelector | from_yaml }}
         tolerations: {{ kafka_tolerations | from_yaml }}
+        topologySpreadConstraints: {{ kafka_topology_spread_constraints | from_yaml }}
     listeners:
       - name: plain
         port: 9092
@@ -51,6 +52,7 @@ spec:
         affinity: {{ zookeeper_affinity | from_yaml }}
         nodeSelector: {{ zookeeper_nodeSelector | from_yaml }}
         tolerations: {{ zookeeper_tolerations | from_yaml }}
+        topologySpreadConstraints: {{ zookeeper_topology_spread_constraints | from_yaml }}
     storage:
 {% if storage_enabled %}
       type: persistent-claim

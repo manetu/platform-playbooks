@@ -154,6 +154,7 @@
         size: "{{ minio_persistence_size }}"
       resources: "{{ minio_resources }}"
       affinity: "{{ minio_affinity }}"
+      topologySpreadConstraints: "{{ minio_topology_spread_constraints }}"
       nodeSelector: "{{ minio_nodeSelector }}"
       tolerations: "{{ minio_tolerations }}"
       postJob:

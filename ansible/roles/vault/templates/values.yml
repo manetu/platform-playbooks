@@ -3,6 +3,7 @@ global:
   tlsDisable: false
 server:
   affinity: "{{ vault_affinity | from_yaml }}"
+  topologySpreadConstraints: "{{ vault_topology_spread_constraints | from_yaml }}"
   nodeSelector: "{{ vault_nodeSelector | from_yaml }}"
   tolerations: "{{ vault_tolerations | from_yaml }}"
   dev:

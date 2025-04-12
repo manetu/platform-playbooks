@@ -23,7 +23,7 @@ manetu_rollbar_env:  ""                       # defaults to {{ Release.Namespace
 manetu_base_chart_values: {}  # Profile-based customization merged with {{ manetu_chart_values }}
 manetu_chart_values: {}  # Allows customization
 
-manetu_affinity: "{{ default_affinity | default({}) }}"
+manetu_affinity: {}
 manetu_nodeSelector: "{{ default_nodeSelector | default({}) }}"
 manetu_tolerations: "{{ default_tolerations | default([]) }}"
 # - key: dedicated
