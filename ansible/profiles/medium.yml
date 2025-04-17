@@ -2,58 +2,64 @@ yugabyte_tserver_replicas: 6
 yugabyte_resources:
   master:
     requests:
-      cpu: 250m
-      memory: 2Gi
+      cpu: 100m
+      memory: 500Mi
     limits:
       cpu: 1
-      memory: 2Gi
+      memory: 1Gi
   tserver:
     requests:
       cpu: 8
-      memory: 32Gi
+      memory: 24Gi
     limits:
-      cpu: 8
+      cpu: 12
       memory: 32Gi
 
 kafka_replicas: 6
 kafka_resources:
   requests:
-    memory: 8Gi
-    cpu: 1
+    memory: 6Gi
+    cpu: 1000m
   limits:
-    memory: 16Gi
-    cpu: 3
+    memory: 10Gi
+    cpu: 2000m
 
 zookeeper_replicas: 3
 zookeeper_resources:
   requests:
-    memory: 4Gi
-    cpu: 250m
+    memory: 1Gi
+    cpu: 100m
   limits:
-    memory: 8Gi
-    cpu: 2000m
+    memory: 2Gi
+    cpu: 1
 
 temporal_frontend_replicas: 6
 temporal_frontend_resources:
   requests:
-    cpu: 250m
+    cpu: 550m
+    memory: 250Mi
   limits:
     cpu: 2
+    memory: 1Gi
 
 temporal_matching_replicas: 6
 temporal_matching_resources:
   requests:
-    cpu: 250m
+    cpu: 350m
+    memory: 250Mi
   limits:
-    cpu: 1
+    cpu: 2
+    memory: 1Gi
 
 temporal_history_shards: 2048 # Max 4096 per temporal
 temporal_history_replicas: 6
 temporal_history_resources:
   requests:
-    cpu: 1
+    cpu: 1500m
+    memory: 3Gi
   limits:
     cpu: 4
+    memory: 6Gi
 
 # see https://docs.temporal.io/references/dynamic-configuration#service-level-rps-limits
 temporal_dynamic_config:
@@ -85,33 +91,44 @@ temporal_dynamic_config:
   - value: 10                              # default: 4
     constraints: {}
 
+istio_proxy_resources:
+  requests:
+    cpu: 10m
+    memory: 128Mi
+  limits:
+    cpu: 2000m
+    memory: 1024Mi
+
 manetu_replicas_min: 2
 manetu_base_chart_values:  # merges with {{ manetu_chart_values }}
   mcp-graphql-service:
-    replicaCount: 3
+    replicaCount: 6
+    istioProxyCpu: 100m
     resources:
       requests:
-        cpu: 500m
+        cpu: 300m
         memory: 2Gi
       limits:
         memory: 4Gi
   mcp-attribute-service:
     gw:
-      replicaCount: 3
+      replicaCount: 6
+      istioProxyCpu: 100m
       resources:
         requests:
-          cpu: 500m
+          cpu: 200m
           memory: 2Gi
         limits:
           memory: 4Gi
     cp:
-      replicaCount: 3
+      replicaCount: 6
+      istioProxyCpu: 100m
       resources:
         requests:
-          cpu: 1
-          memory: 2Gi
+          cpu:  750m
+          memory: 3Gi
         limits:
-          memory: 4Gi
+          memory: 5Gi
       temporal:
         worker:
           maxConcurrentActivityTaskPollers: 100 # default 5
@@ -123,17 +140,19 @@ manetu_base_chart_values:  # merges with {{ manetu_chart_values }}
           maxWorkflowThreadCount: 2200 # sum of all above
   mcp-vault-service:
     gw:
+      istioProxyCpu: 100m
       resources:
         requests:
-          cpu: 250m
+          cpu: 100m
           memory: 2Gi
         limits:
           memory: 4Gi
     cp:
-      replicaCount: 3
+      replicaCount: 6
+      istioProxyCpu: 100m
       resources:
         requests:
-          cpu: 500m
+          cpu: 400m
           memory: 2Gi
         limits:
           memory: 4Gi
@@ -148,19 +167,21 @@ manetu_base_chart_values:  # merges with {{ manetu_chart_values }}
           maxWorkflowThreadCount: 2200
   mcp-keycustodian-service-v2:
     gw:
-      replicaCount: 3
+      istioProxyCpu: 100m
+      replicaCount: 6
       resources:
         requests:
           cpu: 250m
-          memory: 2Gi
+          memory: 1Gi
         limits:
           memory: 4Gi
     cp:
-      replicaCount: 3
+      istioProxyCpu: 100m
+      replicaCount: 6
       resources:
         requests:
-          cpu: 250m
-          memory: 2Gi
+          cpu: 200m
+          memory: 1500Mi
         limits:
           memory: 4Gi
       temporal:
@@ -172,20 +193,42 @@ manetu_base_chart_values:  # merges with {{ manetu_chart_values }}
           # maxConcurrentWorkflowTaskExecutionSize: 200
           workflowCacheSize: 1000
           maxWorkflowThreadCount: 1800
+  mcp-accesslog-service:
+    gw:
+      istioProxyCpu: 1m
+      resources:
+        requests:
+          cpu: 5m # runs when not contended
+  mcp-analytics-service:
+    sp:
+      istioProxyCpu: 1m
+      resources:
+        requests:
+          cpu: 5m # runs when not contended
   mcp-iam-service:
+    query:
+      replicaCount: 6
+      istioProxyCpu: 100m
+      resources:
+        requests:
+          cpu: 200m
+          memory: 500Mi
+        limits:
+          memory: 2Gi
     gw:
       resources:
         requests:
-          cpu: 250m
-          memory: 2Gi
+          cpu: 150m
+          memory: 1Gi
         limits:
           memory: 4Gi
     cp:
-      replicaCount: 3
+      replicaCount: 6
+      istioProxyCpu: 100m
       resources:
         requests:
           cpu: 250m
-          memory: 2Gi
+          memory: 1Gi
         limits:
           memory: 4Gi
       temporal:
