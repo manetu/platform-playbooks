@@ -55,7 +55,7 @@ temporal_history_shards: 2048 # Max 4096 per temporal
 temporal_history_replicas: 6
 temporal_history_resources:
   requests:
-    cpu: 1500m
+    cpu: 1200m
     memory: 3Gi
   limits:
     cpu: 4
