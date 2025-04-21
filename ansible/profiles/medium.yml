@@ -63,27 +63,6 @@ temporal_history_resources:
 
 # see https://docs.temporal.io/references/dynamic-configuration#service-level-rps-limits
 temporal_dynamic_config:
-  frontend.rps:
-    - value: 4800                          # default: 2400
-      constraints: {}
-  frontend.namespaceRPS:
-    - value: 4800                          # default: 2400
-      constraints: {}
-  frontend.persistenceMaxQPS:
-    - value: 4000                          # default: 2000
-      constraints: {}
-  history.rps:
-    - value: 6000                          # default: 3000
-      constraints: {}
-  history.persistenceMaxQPS:
-    - value: 18000                         # default: 9000
-      constraints: {}
-  matching.rps:
-    - value: 2400                          # default: 1200
-      constraints: {}
-  matching.persistenceMaxQPS:
-    - value: 18000                         # default: 9000
-      constraints: {}
   matching.numTaskqueueReadPartitions:
   - value: 10                              # default: 4
     constraints: {}

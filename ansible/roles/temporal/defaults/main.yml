@@ -70,21 +70,48 @@ temporal_base_dynamic_config:
   history.clientOwnershipCachingEnabled:
     - value: true
   history.ReplicationTaskProcessorShardQPS:
-    - value: 1000                             # default: 30
+    - value: 1000000                          # default: 30
+  history.ReplicationTaskProcessorHostQPS:
+    - value: 1000000                          # default: 1500
   history.ReplicationStreamSenderHighPriorityQPS:
-    - value: 1000                             # default: 100
+    - value: 1000000                          # default: 100
   history.ReplicationStreamSenderLowPriorityQPS:
-    - value: 1000                             # default: 100
+    - value: 1000000                          # default: 100
   history.transferProcessorMaxPollRPS:
-    - value: 1000                             # default: 20
+    - value: 1000000                          # default: 20
   history.timerProcessorMaxPollRPS:
-    - value: 1000                             # default: 20
+    - value: 1000000                          # default: 20
   history.outboundProcessorMaxPollRPS:
-    - value: 1000                             # default: 20
+    - value: 1000000                          # default: 20
   history.outboundQueue.hostScheduler.maxTaskRPS:
-    - value: 1000                             # default: 100
+    - value: 1000000                          # default: 100
   history.visibilityProcessorMaxPollRPS:
-    - value: 1000                             # default: 20
+    - value: 1000000                          # default: 20
+  history.rps:
+    - value: 1000000                          # default: 3000
+  history.persistenceMaxQPS:
+    - value: 1000000                          # default: 9000
+  history.persistencePerShardNamespaceMaxQPS:
+    - value: 1000000                          # default: 0
+  frontend.rps:
+    - value: 1000000                          # default: 2400
+  frontend.namespaceRPS:
+    - value: 1000000                          # default: 2400
+  frontend.persistenceMaxQPS:
+    - value: 1000000                          # default: 2000
+  frontend.namespaceRPS.visibility:
+    - value: 1000000                          # default: 10
+  matching.rps:
+    - value: 1000000                          # default: 1200
+  matching.persistenceMaxQPS:
+    - value: 1000000                          # default: 9000
+  matching.forwarderMaxRatePerSecond:
+    - value: 1000000                          # default: 10
+  system.visibilityPersistenceMaxReadQPS:
+    - value: 1000000                          # default: 9000
+  system.visibilityPersistenceMaxWriteQPS:
+    - value: 1000000                          # default: 9000
+
 
 temporal_dynamic_config: {}  # merged with temporal_base_dynamic_config
 #  matching.numTaskqueueReadPartitions:
