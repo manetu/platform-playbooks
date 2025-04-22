@@ -1,4 +1,6 @@
 fullnameOverride: "temporal"
+imagePullSecrets:
+  - name: manetu-regcred
 
 server:
   image:
