@@ -56,8 +56,7 @@ manetu_base_chart_values: # merges with {{ manetu_chart_values }}
     cp:
       replicaCount: 6
   mcp-vault-service:
-    cp:
-      replicaCount: 6
+    replicaCount: 6
   mcp-keycustodian-service-v2:
     cp:
       replicaCount: 6

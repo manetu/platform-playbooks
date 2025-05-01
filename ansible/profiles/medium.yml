@@ -118,23 +118,15 @@ manetu_base_chart_values:  # merges with {{ manetu_chart_values }}
           # workflowCacheSize: 600 # default
           maxWorkflowThreadCount: 2200 # sum of all above
   mcp-vault-service:
-    gw:
-      istioProxyCpu: 100m
-      resources:
-        requests:
-          cpu: 100m
-          memory: 2Gi
-        limits:
-          memory: 4Gi
+    replicaCount: 6
+    istioProxyCpu: 100m
+    resources:
+      requests:
+        cpu: 400m
+        memory: 2Gi
+      limits:
+        memory: 4Gi
     cp:
-      replicaCount: 6
-      istioProxyCpu: 100m
-      resources:
-        requests:
-          cpu: 400m
-          memory: 2Gi
-        limits:
-          memory: 4Gi
       temporal:
         worker:
           maxConcurrentActivityTaskPollers: 100

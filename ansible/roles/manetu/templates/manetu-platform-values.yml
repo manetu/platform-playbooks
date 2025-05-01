@@ -17,6 +17,9 @@ mcp-attribute-service:
     enabled: {{ qdrant_enabled | default('false') }}
     secretName: qdrant-config
 
+mcp-vault-service:
+  consolidated: true
+
 mcp-keycustodian-service-v2:
   vault:
     enabled: {{ vault_enabled | default('false') }}
