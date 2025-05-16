@@ -21,6 +21,15 @@ do
     shift
 done
 
+# if base64 is the GNU version it will wrap lines by default. This is bad
+
+BASE64OPT=""
+base64cmd=$(base64 --version)
+if [[ $base64cmd == *"GNU"* ]]; then
+    BASE64OPT="-w0"
+fi
+
+
 pwgen! () {
     echo $(pwgen -s 64 1)
 }
@@ -71,7 +80,7 @@ EOF
 
 create_vars () {
     cat <<EOF
-manetu_platform_operator_cert: $(cat $1 | base64)
+manetu_platform_operator_cert: $(cat $1 | base64 $BASE64OPT)
 EOF
 }
 
