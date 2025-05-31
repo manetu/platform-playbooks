@@ -1,6 +1,6 @@
 include:
   - project: manetu/tools/ci-tools
-    ref: v3.0.0
+    ref: v3.1.0
     file: /templates/library.yml
 
 .citools_variables:
@@ -21,14 +21,14 @@ archive_build:
     paths:
       - target
 
-#test:
-#  extends: .dynamic_kubernetes_env
-#  stage: integrate
-#  variables:
-#    PLAYBOOKS_REF: file://$CI_PROJECT_DIR
-#    PLAYBOOK_SUBPATH: ansible
-#  script:
-#    - deploy-mptest
+test:
+  extends: .dynamic_kubernetes_env
+  stage: integrate
+  variables:
+    PLAYBOOKS_REF: file://$CI_PROJECT_DIR
+    PLAYBOOK_SUBPATH: ansible
+  script:
+    - deploy-mptest
 
 # Approve
 approve_release:
