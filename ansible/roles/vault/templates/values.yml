@@ -2,10 +2,10 @@ global:
   enabled: true
   tlsDisable: false
 server:
-  affinity: "{{ vault_affinity | from_yaml }}"
-  topologySpreadConstraints: "{{ vault_topology_spread_constraints | from_yaml }}"
-  nodeSelector: "{{ vault_nodeSelector | from_yaml }}"
-  tolerations: "{{ vault_tolerations | from_yaml }}"
+  affinity: {{ vault_affinity | from_yaml }}
+  topologySpreadConstraints: {{ vault_topology_spread_constraints | from_yaml }}
+  nodeSelector: {{ vault_nodeSelector | from_yaml }}
+  tolerations: {{ vault_tolerations | from_yaml }}
   dev:
     enabled: {{ vault_devmode | string | lower }}
     devRootToken: {{ vault_keys.root_token }}
