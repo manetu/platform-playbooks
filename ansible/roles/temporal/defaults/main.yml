@@ -1,6 +1,6 @@
 temporal_version: 1.27.1                 # overall upstream release
-temporal_server_version: v1.1.0          # manetu-yugabyte server release
-temporal_server_image: manetu/temporal-yugabyte
+temporal_server_version: 1.1             # manetu-yugabyte server release
+temporal_server_image: ghcr.io/manetu/temporal-yugabyte
 temporal_schema_image: "{{ temporal_server_image }}:{{ temporal_server_version }}-admin-tools"
 temporal_namespace: manetu-temporal
 temporal_dns: temporal.{{ mgmt_dns_suffix | default('invalid') }}

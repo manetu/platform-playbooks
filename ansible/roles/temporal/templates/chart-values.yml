@@ -6,6 +6,7 @@ server:
   image:
     repository: {{ temporal_server_image }}
     tag: {{ temporal_server_version }}
+    pullPolicy: Always
   affinity: {{ temporal_affinity }}
   nodeSelector: {{ temporal_nodeSelector }}
   tolerations: {{ temporal_tolerations }}
