@@ -11,7 +11,7 @@ yugabyte_master_affinity:
             app.kubernetes.io/name: yb-master
         topologyKey: kubernetes.io/hostname
 
-yugabyte_master_nodeSelector: "{{ default_nodeSelector | default({}) }}"
+yugabyte_nodeSelector: "{{ default_nodeSelector | default({}) }}"
 yugabyte_master_tolerations: "{{ default_tolerations | default([]) }}"
   # - key: dedicated
   #   operator: Equal
@@ -31,7 +31,6 @@ yugabyte_tserver_affinity:
             app.kubernetes.io/name: yb-tserver
         topologyKey: kubernetes.io/hostname
 
-yugabyte_tserver_nodeSelector: "{{ default_nodeSelector | default({}) }}"
 yugabyte_tserver_tolerations: "{{ default_tolerations | default([]) }}"
   # - key: dedicated
   #   operator: Equal
