@@ -28,5 +28,5 @@
 - name: Install Helm
   become: yes
   shell: |
-    curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+    curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | DESIRED_VERSION="v3.17.4" bash
     chmod a+x /usr/local/bin/helm
