@@ -23,6 +23,8 @@ global:
       kind: istio
       tls:
         enabled: {{ manetu_gateway_tls }}
+      http:
+        httpsRedirect: {{ manetu_http_redirect }}
     kafka:
       alterTopics: true
       createTopics: true

@@ -4,6 +4,7 @@
     - set_fact:
         manetu_namespace: "{{ manetu_namespace | default('manetu-platform') }}"
         manetu_dns: manetu.k8s.orb.local
+        manetu_http_redirect: false
         mgmt_dns_suffix: k8s.orb.local
         default_storage_class: local-path
         monitoring_enabled: true
