@@ -72,7 +72,7 @@ groups:
       annotations:
         summary: 'Kafka {{ $labels.service_name }}: 1000 topics reached'
         description: 'The number of active topics in the cluster has reached 1000.'
-    
+
     - alert: Request_Queue_Time_Max
       expr: max(kafka_network_requestmetrics_requestqueuetimems{executor_name="kafka"})by(service_name) > 100
       for: 1m
@@ -90,12 +90,3 @@ groups:
       annotations:
         summary: 'Kafka {{ $labels.service_name }}: {{ $value }}ms response queue time'
         description: 'Max response queue time exceeded 100ms for a request. It is the length of time, in milliseconds, that the request waits in the response queue.'
-
-    - alert: Zookeeper_Sync_Connect
-      expr: avg(kafka_server_sessionexpirelistener_zookeepersyncconnects_total{executor_name="kafka"})by(service_name) < 1
-      for: 1m
-      labels:
-        severity: warning
-      annotations:
-        summary: 'Kafka {{ $labels.service_name }}: Zookeeper Sync Disconected'
-        description: 'Zookeeper Sync Disconected'

@@ -1,7 +1,37 @@
 apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaNodePool
+metadata:
+  name: kafka
+  labels:
+    strimzi.io/cluster: kafka
+spec:
+  replicas: {{ kafka_replicas }}
+  resources: {{ kafka_resources | from_yaml }}
+  roles:
+    - controller
+    - broker
+  storage:
+{% if storage_enabled %}
+    type: jbod
+    volumes:
+      - id: 0
+        type: persistent-claim
+        size: "{{ kafka_storage_size }}"
+        class: "{{ kafka_storage_class }}"
+        deleteClaim: false
+        kraftMetadata: shared
+{% else %}
+    type: ephemeral
+{% endif %}
+
+---
+apiVersion: kafka.strimzi.io/v1beta2
 kind: Kafka
 metadata:
   name: kafka
+  annotations:
+    strimzi.io/node-pools: enabled
+    strimzi.io/kraft: enabled
 spec:
   kafkaExporter:
     topic: ".*"
@@ -12,8 +42,6 @@ spec:
     validityDays: 3650
   kafka:
     version: "{{ kafka_version }}"
-    replicas: {{ kafka_replicas }}
-    resources: {{ kafka_resources | from_yaml }}
     template:
       pod:
         affinity: {{ kafka_affinity | from_yaml }}
@@ -31,38 +59,7 @@ spec:
         tls: true
     config: {{ kafka_config }}
     metricsConfig: {{ kafka_metrics_config }}
-    storage:
-{% if storage_enabled %}
-      type: jbod
-      volumes:
-        - id: 0
-          type: persistent-claim
-          size: "{{ kafka_storage_size }}"
-          class: "{{ kafka_storage_class }}"
-          deleteClaim: false
-{% else %}
-      type: ephemeral
-{% endif %}
 
-  zookeeper:
-    replicas: {{ zookeeper_replicas }}
-    resources: {{ zookeeper_resources | from_yaml }}
-    template:
-      pod:
-        affinity: {{ zookeeper_affinity | from_yaml }}
-        nodeSelector: {{ zookeeper_nodeSelector | from_yaml }}
-        tolerations: {{ zookeeper_tolerations | from_yaml }}
-        topologySpreadConstraints: {{ zookeeper_topology_spread_constraints | from_yaml }}
-    storage:
-{% if storage_enabled %}
-      type: persistent-claim
-      size: "{{ zookeeper_storage_size }}"
-      class: "{{ zookeeper_storage_class }}"
-      deleteClaim: false
-{% else %}
-      type: ephemeral
-{% endif %}
-    metricsConfig: {{ zookeeper_metrics_config }}
 ---
 kind: ConfigMap
 apiVersion: v1
@@ -186,32 +183,3 @@ data:
       type: GAUGE
       labels:
         quantile: "0.$4"
-  zookeeper-metrics-config.yml: |
-    lowercaseOutputName: true
-    rules: 
-    - pattern: "org.apache.ZooKeeperService<name0=ReplicatedServer_id(\\d+)><>(\\w+)"
-      name: "zookeeper_$2"
-      type: GAUGE
-    - pattern: "org.apache.ZooKeeperService<name0=ReplicatedServer_id(\\d+), name1=replica.(\\d+)><>(\\w+)"
-      name: "zookeeper_$3"
-      type: GAUGE
-      labels:
-        replicaId: "$2"
-    - pattern: "org.apache.ZooKeeperService<name0=ReplicatedServer_id(\\d+), name1=replica.(\\d+), name2=(\\w+)><>(Packets\\w+)"
-      name: "zookeeper_$4"
-      type: COUNTER
-      labels:
-        replicaId: "$2"
-        memberType: "$3"
-    - pattern: "org.apache.ZooKeeperService<name0=ReplicatedServer_id(\\d+), name1=replica.(\\d+), name2=(\\w+)><>(\\w+)"
-      name: "zookeeper_$4"
-      type: GAUGE
-      labels:
-        replicaId: "$2"
-        memberType: "$3"
-    - pattern: "org.apache.ZooKeeperService<name0=ReplicatedServer_id(\\d+), name1=replica.(\\d+), name2=(\\w+), name3=(\\w+)><>(\\w+)"
-      name: "zookeeper_$4_$5"
-      type: GAUGE
-      labels:
-        replicaId: "$2"
-        memberType: "$3"

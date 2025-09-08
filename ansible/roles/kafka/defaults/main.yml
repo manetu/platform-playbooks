@@ -1,6 +1,6 @@
-strimzi_version: 0.45.0
+strimzi_version: 0.47.0
 
-kafka_version: 3.8.0
+kafka_version: 4.0.0
 kafka_replicas: 3
 kafka_namespace: manetu-kafka
 kafka_storage_class: "{{ default_storage_class | default('default') }}"
@@ -50,7 +50,6 @@ kafka_tolerations: "{{ default_tolerations | default([]) }}"
   #   value: experimental
   #   effect: NoSchedule
 
-
 prometheus_monitor_labels: {}
 kafka_monitor_labels:
   app: strimzi
@@ -68,50 +67,6 @@ zookeeper_metrics_config:
     configMapKeyRef:
       name: kafka-metrics
       key: zookeeper-metrics-config.yml
-
-zookeeper_replicas: 3
-zookeeper_storage_class: "{{ default_storage_class | default('default') }}"
-zookeeper_storage_size: 10Gi
-zookeeper_resources: {}
-#  requests:
-#    memory: 8Gi
-#    cpu: "2"
-#  limits:
-#    memory: 8Gi
-#    cpu: "2"
-
-zookeeper_affinity:
-  podAntiAffinity:
-    preferredDuringSchedulingIgnoredDuringExecution:
-    - weight: 100
-      podAffinityTerm:
-        labelSelector:
-          matchLabels:
-            app.kubernetes.io/managed-by: strimzi-cluster-operator
-            app.kubernetes.io/instance: kafka
-            app.kubernetes.io/name: zookeeper
-            app.kubernetes.io/part-of: strimzi-kafka
-        topologyKey: kubernetes.io/hostname
-
-zookeeper_topology_spread_constraints:
-  - maxSkew: 1
-    topologyKey: topology.kubernetes.io/zone
-    whenUnsatisfiable: ScheduleAnyway
-    labelSelector:
-      matchLabels:
-        app.kubernetes.io/managed-by: strimzi-cluster-operator
-        app.kubernetes.io/instance: kafka
-        app.kubernetes.io/name: zookeeper
-        app.kubernetes.io/part-of: strimzi-kafka
-
-
-zookeeper_nodeSelector: "{{ default_nodeSelector | default({}) }}"
-zookeeper_tolerations: "{{ default_tolerations | default([]) }}"
-  # - key: dedicated
-  #   operator: Equal
-  #   value: experimental
-  #   effect: NoSchedule
-
 
 storage_enabled: true
 monitoring_enabled: false
