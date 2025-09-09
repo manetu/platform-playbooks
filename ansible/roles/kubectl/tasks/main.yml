@@ -5,11 +5,9 @@
     mode: '0755'
 
 - name: Copy KUBECONFIG
-  copy:
-    remote_src: true
-    src: /etc/rancher/k3s/k3s.yaml
-    dest: ~/.kube/config
-    mode: '0600'
+  shell: |
+    sudo kubectl config view --raw > ~/.kube/config
+    chmod 600  ~/.kube/config
 
 - name: Install PIP
   become: true

@@ -30,5 +30,4 @@ curl -sfL https://get.k3s.io | sh -s - {{ k3s_role }} \
    --flannel-iface={{ k3s_cluster_iface }} \
 {% endif -%}
    --cluster-cidr={{ k3s_cluster_cidr }} \
-   --node-name=$(hostname -f) \
-   --write-kubeconfig-mode=644
+   --node-name=$(hostname -f)
