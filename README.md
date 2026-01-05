@@ -4,11 +4,27 @@ This repository contains automation tools for managing the lifecycle of a Manetu
 
 ## Prerequisites
 
+### Core Tools
+
 * [python](https://www.python.org/): Tested with v3.12
-* [ansible](https://www.ansible.com/): Tested with v2.16.0
-* [kubnernetes.core](https://galaxy.ansible.com/ui/repo/published/kubernetes/core/): Tested with v2.4.0
+* [ansible](https://www.ansible.com/): Tested with v2.18.x (ansible-core 2.18.6)
+* [helm](https://helm.sh/): Tested with v3.x (Helm v4 is not yet qualified)
 * [pwgen](https://linux.die.net/man/1/pwgen): Tested with v2.08
 * [make](https://www.gnu.org/software/make/manual/make.html): Tested with GNU Make v4.4.1
+
+### Ansible Galaxy Collections
+
+The following Ansible Galaxy collections are required:
+
+* [kubernetes.core](https://galaxy.ansible.com/ui/repo/published/kubernetes/core/): Tested with v5.3.0
+
+> **Warning:** kubernetes.core v6.x has known compatibility issues with these playbooks. Please use v5.x.
+
+Install the required collection:
+
+```shell
+ansible-galaxy collection install kubernetes.core:==5.3.0
+```
 
 ## Setup
 

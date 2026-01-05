@@ -6,8 +6,30 @@ This document outlines how to use the playbooks to deploy to [Amazon Elastic Com
 
 ## Prerequisites
 
-You will require the following:
+In addition to the [general prerequisites](../README.md#prerequisites), EC2 deployments require:
 
+### Ansible Galaxy Collections for AWS
+
+The following additional Ansible Galaxy collections are required for EC2 deployments:
+
+* [amazon.aws](https://galaxy.ansible.com/ui/repo/published/amazon/aws/): Tested with v9.5.0
+* [community.aws](https://galaxy.ansible.com/ui/repo/published/community/aws/): Tested with v9.3.0
+
+Install the required collections:
+
+```shell
+ansible-galaxy collection install amazon.aws:==9.5.0 community.aws:==9.3.0
+```
+
+### Python Dependencies
+
+The AWS collections require the following Python packages on your Configuration Host:
+
+```shell
+pip install boto3 botocore
+```
+
+### Additional Requirements
 - aws cli access to a region (see {{ aws_region }} below)
 - An accessible SSH key pair
    - You must ensure that you register the public key in the region noted above (see {{ aws_key_name }}).

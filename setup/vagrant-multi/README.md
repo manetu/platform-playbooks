@@ -4,14 +4,16 @@ For development, we include a [Vagrantfile](../../Vagrantfile) and related [inve
 
 ## Requirements
 
+In addition to the [general prerequisites](../../README.md#prerequisites):
+
 Install vagrant-disksize plugin:
 ``` shell
 vagrant plugin install vagrant-disksize
 ```
 
-Install ansible kubernetes.core
+Install ansible kubernetes.core (v5.x required, v6.x is not supported):
 ```shell
-ansible-galaxy collection install kubernetes.core
+ansible-galaxy collection install kubernetes.core:==5.3.0
 ```
 
 ## Usage

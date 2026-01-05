@@ -2,6 +2,31 @@
 
 This document outlines how to use the playbooks to deploy to [Amazon Elastic Kubernetes Service](https://aws.amazon.com/pm/eks).  These playbooks will set up an entire environment, including VPC, subnets, internet gateways, Route53 DNS, EKS, and EC2 instances, and all of the infrastructure, third-party, and Manetu components within.
 
+## Prerequisites
+
+In addition to the [general prerequisites](../README.md#prerequisites), EKS deployments require:
+
+### Ansible Galaxy Collections for AWS
+
+The following additional Ansible Galaxy collections are required for EKS deployments:
+
+* [amazon.aws](https://galaxy.ansible.com/ui/repo/published/amazon/aws/): Tested with v9.5.0
+* [community.aws](https://galaxy.ansible.com/ui/repo/published/community/aws/): Tested with v9.3.0
+
+Install the required collections:
+
+```shell
+ansible-galaxy collection install amazon.aws:==9.5.0 community.aws:==9.3.0
+```
+
+### Python Dependencies
+
+The AWS collections require the following Python packages on your Configuration Host:
+
+```shell
+pip install boto3 botocore
+```
+
 ## Defining an Inventory
 
 Example
