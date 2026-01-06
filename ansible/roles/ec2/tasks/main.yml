@@ -81,7 +81,7 @@
     instance_type: "{{ aws_instance_type }}"
     image_id: "{{ aws_image_id }}"
     iam_instance_profile: "{{ iam_instance_profile | default('') }}"
-    tags: "{{ aws_tags | from_yaml }}"
+    tags: "{{ aws_tags }}"
     network:
       assign_public_ip: true
       delete_on_termination: true

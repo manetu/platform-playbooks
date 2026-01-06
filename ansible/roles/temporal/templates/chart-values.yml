@@ -15,7 +15,7 @@ server:
     serviceMonitor:
       enabled: true
       interval: 10s
-      additionalLabels: {{ prometheus_monitor_labels | from_yaml }}
+      additionalLabels: {{ prometheus_monitor_labels }}
 {% endif %}
   replicaCount: {{ temporal_server_replicas }}
   config:

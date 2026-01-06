@@ -3,13 +3,13 @@
   tasks:
     - set_fact:
         manetu_namespace: "{{ manetu_namespace | default('manetu-platform') }}"
-        s3_enabled: false
-        monitoring_enabled: false
-        alerts_enabled: false
-        tracing_enabled: false
-        storage_enabled: false
-        default_storage_class: local-path
-        vault_devmode: true
+        s3_enabled: "{{ s3_enabled | default(false) }}"
+        monitoring_enabled: "{{ monitoring_enabled | default(false) }}"
+        alerts_enabled: "{{ alerts_enabled | default(false) }}"
+        tracing_enabled: "{{ tracing_enabled | default(false) }}"
+        storage_enabled: "{{ storage_enabled | default(false) }}"
+        default_storage_class: "{{ default_storage_class | default('local-path') }}"
+        vault_devmode: "{{ vault_devmode | default(true) }}"
 
 - name: "Deploy k8s infrastructure"
   hosts: config_host

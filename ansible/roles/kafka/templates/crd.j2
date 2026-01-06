@@ -6,7 +6,7 @@ metadata:
     strimzi.io/cluster: kafka
 spec:
   replicas: {{ kafka_replicas }}
-  resources: {{ kafka_resources | from_yaml }}
+  resources: {{ kafka_resources }}
   roles:
     - controller
     - broker
@@ -44,10 +44,10 @@ spec:
     version: "{{ kafka_version }}"
     template:
       pod:
-        affinity: {{ kafka_affinity | from_yaml }}
-        nodeSelector: {{ kafka_nodeSelector | from_yaml }}
-        tolerations: {{ kafka_tolerations | from_yaml }}
-        topologySpreadConstraints: {{ kafka_topology_spread_constraints | from_yaml }}
+        affinity: {{ kafka_affinity }}
+        nodeSelector: {{ kafka_nodeSelector }}
+        tolerations: {{ kafka_tolerations }}
+        topologySpreadConstraints: {{ kafka_topology_spread_constraints }}
     listeners:
       - name: plain
         port: 9092

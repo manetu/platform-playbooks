@@ -20,4 +20,4 @@
     chart_version: "{{ manetu_platform_version }}"
     wait: true
     timeout: "{{ manetu_chart_timeout }}"
-    values: "{{ chart_values | from_yaml | ansible.builtin.combine(manetu_base_chart_values, manetu_chart_values, recursive=true) }}"
+    values: "{{ chart_values | ansible.builtin.combine(manetu_base_chart_values, manetu_chart_values, recursive=true) }}"

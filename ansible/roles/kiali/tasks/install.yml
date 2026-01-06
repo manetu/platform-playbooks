@@ -24,7 +24,7 @@
               enabled: true
               override_yaml:
                 metadata:
-                  annotations: "{{ mgmt_ingress_annotations | from_yaml }}"
+                  annotations: "{{ mgmt_ingress_annotations }}"
           server:
             web_fqdn: "{{ kiali_dns }}"
             web_schema: https

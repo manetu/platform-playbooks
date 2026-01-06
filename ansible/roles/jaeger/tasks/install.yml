@@ -30,7 +30,7 @@
         ingress:
           enabled: true
           ingressClassName: "{{ mgmt_ingress_class_name }}"
-          annotations: "{{ mgmt_ingress_annotations | from_yaml }}"
+          annotations: "{{ mgmt_ingress_annotations }}"
           hosts:
             - "{{ jaeger_dns }}"
       storage:

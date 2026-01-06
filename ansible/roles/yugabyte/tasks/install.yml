@@ -51,7 +51,7 @@
         duration: "{{ yugabyte_tls_duration }}"
         commonName: yugabyte-ca-cert
         secretName: yugabyte-ca-secret
-        usage:
+        usages:
           - "cert sign"
         issuerRef:
           name: selfsigned-issuer
@@ -79,14 +79,14 @@
     release_namespace: "{{ yugabyte_namespace }}"
     wait: true
     values:
-      nodeSelector: "{{ yugabyte_nodeSelector | from_yaml }}"
+      nodeSelector: "{{ yugabyte_nodeSelector }}"
       master:
-        affinity: "{{ yugabyte_master_affinity | from_yaml }}"
-        tolerations: "{{ yugabyte_master_tolerations | from_yaml }}"
+        affinity: "{{ yugabyte_master_affinity }}"
+        tolerations: "{{ yugabyte_master_tolerations }}"
         memoryLimitHardPercentage: 100
       tserver:
-        affinity: "{{ yugabyte_tserver_affinity | from_yaml }}"
-        tolerations: "{{ yugabyte_tserver_tolerations | from_yaml }}"
+        affinity: "{{ yugabyte_tserver_affinity }}"
+        tolerations: "{{ yugabyte_tserver_tolerations }}"
         memoryLimitHardPercentage: 100
       replicas:
         master: "{{ yugabyte_master_replicas }}"
@@ -102,7 +102,7 @@
           size: "{{ yugabyte_tserver_storage_size }}"
           storageClass: "{{ yugabyte_tserver_storage_class }}"
       enableLoadBalancer: "{{ yugabyte_loadbalancer }}"
-      resource: "{{ yugabyte_resources | from_yaml }}"
+      resource: "{{ yugabyte_resources }}"
       oldNamingStyle: false
       tls:
         enabled: "{{ yugabyte_tls_enabled }}"
@@ -123,7 +123,7 @@
       serviceMonitor:
         enabled: "{{ monitoring_enabled }}"
         interval: 10s
-        extraLabels: "{{ prometheus_monitor_labels | from_yaml }}"
+        extraLabels: "{{ prometheus_monitor_labels }}"
 
 - name: Wait for yb-masters
   kubernetes.core.k8s_info:
@@ -133,7 +133,7 @@
     field_selectors:
       - status.phase=Running
     wait: true
-  loop: "{{ range(0, yugabyte_master_replicas) }}"
+  loop: "{{ range(0, yugabyte_master_replicas) | list }}"
 
 - name: Copy YCQL script to cluster
   when: yugabyte_cql_auth_enabled

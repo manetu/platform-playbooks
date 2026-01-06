@@ -62,7 +62,7 @@
         duration: "{{ minio_tls_duration }}"
         commonName: minio-ca-cert
         secretName: minio-ca-secret
-        usage:
+        usages:
           - "cert sign"
         issuerRef:
           name: selfsigned-issuer
@@ -101,7 +101,7 @@
           - "*.{{ minio_namespace }}"
           - "minio"
         secretName: minio-certificate
-        usage:
+        usages:
           - "server auth"
           - "client auth"
         issuerRef:

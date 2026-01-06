@@ -3,9 +3,9 @@
   tasks:
     - set_fact:
         manetu_namespace: "{{ manetu_namespace | default('manetu-platform') }}"
-        monitoring_enabled: false
-        alerts_enabled: false
-        yugabyte_loadbalancer: true
+        monitoring_enabled: "{{ monitoring_enabled | default(false) }}"
+        alerts_enabled: "{{ alerts_enabled | default(false) }}"
+        yugabyte_loadbalancer: "{{ yugabyte_loadbalancer | default(true) }}"
 
 - name: Create EKS environment
   gather_facts: false
@@ -31,7 +31,7 @@
         wait: yes
         wait_sleep: 10
         wait_timeout: 360
-      loop: "{{ range(0, yugabyte_tserver_replicas) }}"
+      loop: "{{ range(0, yugabyte_tserver_replicas) | list }}"
 
 - name: Configure YB DNS
   hosts: config_host

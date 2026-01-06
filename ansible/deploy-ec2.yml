@@ -19,27 +19,19 @@
   tasks:
     - set_fact:
         manetu_namespace: "{{ manetu_namespace | default('manetu-platform') }}"
-        k3s_cluster_enabled: false
-        s3_enabled: false
-        logging_enabled: false
-        vault_enabled: false
-        lb_type: servicelb
-        storage_type: local
-        default_storage_class: local-path
-        traefik_enabled: false
+        k3s_cluster_enabled: "{{ k3s_cluster_enabled | default(false) }}"
+        s3_enabled: "{{ s3_enabled | default(false) }}"
+        logging_enabled: "{{ logging_enabled | default(false) }}"
+        vault_enabled: "{{ vault_enabled | default(false) }}"
+        lb_type: "{{ lb_type | default('servicelb') }}"
+        storage_type: "{{ storage_type | default('local') }}"
+        default_storage_class: "{{ default_storage_class | default('local-path') }}"
+        traefik_enabled: "{{ traefik_enabled | default(false) }}"
         #temporal_dev_mode: true
         #temporal_tls_enabled: false
-        manetu_rollbar_enabled: false
-        manetu_gateway_tls: true
-        manetu_chart_values:
-          gw:
-            resources: {}
-          cp:
-            resources: {}
-          ep:
-            resources: {}
-          sp:
-            resources: {}
+        manetu_rollbar_enabled: "{{ manetu_rollbar_enabled | default(false) }}"
+        manetu_gateway_tls: "{{ manetu_gateway_tls | default(true) }}"
+        manetu_chart_values: "{{ manetu_chart_values | default({'gw': {'resources': {}}, 'cp': {'resources': {}}, 'ep': {'resources': {}}, 'sp': {'resources': {}}}) }}"
 
 - name: "Deploy k3s"
   import_playbook: deploy-k3s.yml

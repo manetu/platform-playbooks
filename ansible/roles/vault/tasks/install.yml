@@ -28,7 +28,7 @@
 
 - name: Wait for Vault
   shell: kubectl -n {{ vault_namespace }} wait --timeout 300s --for=jsonpath='{.status.phase}'=Running pod {{ 'vault-' + item|string }}
-  loop: "{{ range(0, vault_replicas) }}"
+  loop: "{{ range(0, vault_replicas) | list }}"
 
 - name: Get CA certificate
   when: not vault_devmode

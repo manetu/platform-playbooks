@@ -36,4 +36,4 @@ mcp-artifact-service:
 
 prometheus:
   enabled: {{ monitoring_enabled }}
-  extraLabels: {{ prometheus_monitor_labels | from_yaml }}
+  extraLabels: {{ prometheus_monitor_labels }}

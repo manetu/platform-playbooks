@@ -18,5 +18,5 @@
       metadata:
         name: manetu-regcred
       type: kubernetes.io/dockerconfigjson
-      data:
-        .dockerconfigjson:  "{{ lookup('template', 'dockerconfig.json') | to_json | b64encode }}"
+      stringData:
+        .dockerconfigjson:  "{{ lookup('template', 'dockerconfig.json') }}"

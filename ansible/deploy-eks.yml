@@ -3,8 +3,7 @@
   tasks:
     - set_fact:
         manetu_namespace: "{{ manetu_namespace | default('manetu-platform') }}"
-        istio_gateway_annotations:
-          "service.beta.kubernetes.io/aws-load-balancer-type": "nlb"
+        istio_gateway_annotations: "{{ istio_gateway_annotations | default({'service.beta.kubernetes.io/aws-load-balancer-type': 'nlb'}) }}"
 
 - name: Create EKS environment
   gather_facts: false

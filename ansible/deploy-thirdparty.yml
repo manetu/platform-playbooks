@@ -18,7 +18,7 @@
         wait: yes
         wait_sleep: 10
         wait_timeout: 360
-      loop: "{{ range(0, kafka_replicas) }}"
+      loop: "{{ range(0, kafka_replicas) | list }}"
     - name: "Wait for Yugabyte pods"
       kubernetes.core.k8s_info:
         namespace: "{{ yugabyte_namespace }}"
@@ -29,7 +29,7 @@
         wait: yes
         wait_sleep: 10
         wait_timeout: 360
-      loop: "{{ range(0, yugabyte_tserver_replicas) }}"
+      loop: "{{ range(0, yugabyte_tserver_replicas) | list }}"
 
 - name: "Deploy Temporal"
   hosts: config_host

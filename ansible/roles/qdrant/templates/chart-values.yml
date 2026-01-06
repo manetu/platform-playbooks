@@ -6,11 +6,11 @@ apiKey: true
 
 replicaCount: "{{ qdrant_replicas }}"
 
-resource: "{{ qdrant_resources | from_yaml }}"
-affinity: {{ qdrant_affinity | from_yaml }}
-topologySpreadConstraints: {{ qdrant_topology_spread_constraints | from_yaml }}
-nodeSelector: {{ qdrant_nodeSelector | from_yaml }}
-tolerations: {{ qdrant_tolerations | from_yaml }}
+resource: "{{ qdrant_resources }}"
+affinity: {{ qdrant_affinity }}
+topologySpreadConstraints: {{ qdrant_topology_spread_constraints }}
+nodeSelector: {{ qdrant_nodeSelector }}
+tolerations: {{ qdrant_tolerations }}
 
 additionalVolumes:
   - name: cert

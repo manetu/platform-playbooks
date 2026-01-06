@@ -7,7 +7,7 @@
       metadata:
         name: cluster-operator-metrics
         namespace: "{{ kafka_namespace }}"
-        labels: "{{ kafka_monitor_labels | ansible.builtin.combine(prometheus_monitor_labels, recursive=true) | from_yaml }}"
+        labels: "{{ kafka_monitor_labels | ansible.builtin.combine(prometheus_monitor_labels, recursive=true) }}"
       spec:
         selector:
           matchLabels:
@@ -28,7 +28,7 @@
       metadata:
         name: entity-operator-metrics
         namespace: "{{ kafka_namespace }}"
-        labels: "{{ kafka_monitor_labels | ansible.builtin.combine(prometheus_monitor_labels, recursive=true) | from_yaml }}"
+        labels: "{{ kafka_monitor_labels | ansible.builtin.combine(prometheus_monitor_labels, recursive=true) }}"
       spec:
         selector:
           matchLabels:
@@ -49,7 +49,7 @@
       metadata:
         namespace: "{{ kafka_namespace }}"
         name: kafka-resources-metrics
-        labels: "{{ kafka_monitor_labels | ansible.builtin.combine(prometheus_monitor_labels, recursive=true) | from_yaml }}"
+        labels: "{{ kafka_monitor_labels | ansible.builtin.combine(prometheus_monitor_labels, recursive=true) }}"
       spec:
         selector:
           matchExpressions:

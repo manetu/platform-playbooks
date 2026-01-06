@@ -38,7 +38,7 @@
             sampling: "{{ istio_tracing_sampling }}"
       global:
         proxy:
-          resources: "{{ istio_proxy_resources | from_yaml }}"
+          resources: "{{ istio_proxy_resources }}"
     wait: true
 
 - name: Register IngressClass
@@ -62,7 +62,7 @@
     release_namespace: istio-system
     values:
       service:
-        annotations: "{{ istio_gateway_annotations | from_yaml }}"
+        annotations: "{{ istio_gateway_annotations }}"
         type: "{{ istio_gateway_service_type }}"
     wait: true
 
@@ -76,7 +76,7 @@
       metadata:
         name: istio-ingressgateway
         namespace: istio-system
-        labels: "{{ prometheus_monitor_labels | from_yaml }}"
+        labels: "{{ prometheus_monitor_labels }}"
       spec:
         selector:
           matchLabels:
@@ -98,7 +98,7 @@
       metadata:
         name: istiod
         namespace: istio-system
-        labels: "{{ prometheus_monitor_labels | from_yaml }}"
+        labels: "{{ prometheus_monitor_labels }}"
       spec:
         selector:
           matchLabels:
@@ -120,7 +120,7 @@
       metadata:
         name: envoy-stats-monitor
         namespace: istio-system
-        labels: "{{ prometheus_monitor_labels | from_yaml }}"
+        labels: "{{ prometheus_monitor_labels }}"
       spec:
         selector:
           matchExpressions:
@@ -170,7 +170,7 @@
       metadata:
         name: prometheus-oper-istio-dataplane
         namespace: istio-system
-        labels: "{{ prometheus_monitor_labels | from_yaml }}"
+        labels: "{{ prometheus_monitor_labels }}"
       spec:
         selector:
           matchExpressions:
@@ -205,7 +205,7 @@
       metadata:
         name: prometheus-oper-istio-controlplane
         namespace: istio-system
-        labels: "{{ prometheus_monitor_labels | from_yaml }}"
+        labels: "{{ prometheus_monitor_labels }}"
       spec:
         jobLabel: istio
         selector:

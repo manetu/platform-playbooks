@@ -1,4 +1,4 @@
-istio_version: 1.25.0
+istio_version: 1.28.0
 istio_install: true
 istio_ingress_enabled: true
 istio_gateway_annotations: {}

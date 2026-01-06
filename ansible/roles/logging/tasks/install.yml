@@ -61,7 +61,7 @@
       ingress:
         enabled: true
         ingressClassName: "{{ mgmt_ingress_class_name }}"
-        annotations: "{{ mgmt_ingress_annotations | from_yaml }}"
+        annotations: "{{ mgmt_ingress_annotations }}"
         paths:
           write:
             - /api/prom/push
@@ -103,7 +103,7 @@
     wait: yes
     wait_sleep: 10
     wait_timeout: 480
-  loop: "{{ range(0, loki_pod_replicas) | product(('loki-backend', 'loki-write')) }}"
+  loop: "{{ range(0, loki_pod_replicas) | product(('loki-backend', 'loki-write')) | list }}"
 
 - name: Install Promtail using Helm
   kubernetes.core.helm:
