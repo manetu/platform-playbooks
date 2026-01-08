@@ -1,2 +1,2 @@
-metallb_version: 0.14.9
+metallb_version: 0.15.3
 lb_type: "metallb"

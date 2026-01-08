@@ -1,4 +1,4 @@
-vault_version: 0.28.1
+vault_version: 0.31.0
 vault_enabled: false
 vault_namespace: manetu-hashicorp
 vault_replicas: 3

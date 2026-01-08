@@ -223,9 +223,8 @@
             datasource: Loki
         yugabyte:
           yugabte-db:
-            gnetId: 12620
-            revision: 2
-            datasource: Prometheus
+            json: |
+              {{ lookup('file', 'yugabyte.json') | string }}
         longhorn:
           longhorn-db:
             gnetId: 13032
@@ -247,23 +246,23 @@
         istio:
           istio-control-plane-db:
             gnetId: 7645
-            revision: 183
+            revision: 284
             datasource: Prometheus
           istio-mesh-db:
             gnetId: 7639
-            revision: 183
+            revision: 284
             datasource: Prometheus
           istio-performance-db:
             gnetId: 11829
-            revision: 183
+            revision: 284
             datasource: Prometheus
           istio-service-db:
             gnetId: 7636
-            revision: 183
+            revision: 284
             datasource: Prometheus
           istio-workload-db:
             gnetId: 7630
-            revision: 183
+            revision: 284
             datasource: Prometheus
         temporal:
           server:
@@ -328,6 +327,7 @@
             - "{{ prometheus_dns }}"
           paths:
             - /
+          pathType: Prefix
         prometheusSpec:
           replicas: "{{ prometheus_replicas }}"
           podMonitorSelectorNilUsesHelmValues: false
@@ -366,3 +366,4 @@
             - "{{ alertmanager_dns }}"
           paths:
             - /
+          pathType: Prefix

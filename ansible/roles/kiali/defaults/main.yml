@@ -1,8 +1,12 @@
-kiali_operator_version: 1.89.0
+kiali_operator_version: 2.20.0
 kiali_dns: kiali.{{ mgmt_dns_suffix }}
 prometheus_datasource_url: http://prometheus-kube-prometheus-prometheus.monitoring:9090
-jaeger_internal_url: http://jaeger-query.istio-system.svc.cluster.local:16685/jaeger
-jaeger_external_url: https://jaeger.{{ mgmt_dns_suffix }}/jaeger
+# Jaeger v2 (chart 4.x) - use jaeger-query service for gRPC access
+jaeger_internal_url: http://jaeger-query.istio-system.svc.cluster.local:16685
+jaeger_external_url: https://jaeger.{{ mgmt_dns_suffix }}
+# Grafana service URL for Kiali integration
+grafana_internal_url: http://grafana.monitoring.svc.cluster.local
+grafana_external_url: https://grafana.{{ mgmt_dns_suffix }}
 
 mgmt_ingress_class_name: traefik
 mgmt_ingress_annotations:

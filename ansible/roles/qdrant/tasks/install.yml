@@ -24,7 +24,7 @@
         duration: "{{ qdrant_tls_duration }}"
         commonName: qdrant-ca-cert
         secretName: qdrant-ca-secret
-        usage:
+        usages:
           - "cert sign"
         issuerRef:
           name: selfsigned-issuer
@@ -66,7 +66,7 @@
           - "*.{{ qdrant_namespace }}.svc.cluster.local"
           - "*.{{ qdrant_namespace }}"
         secretName: qdrant-certificate
-        usage:
+        usages:
           - "server auth"
           - "client auth"
         issuerRef:

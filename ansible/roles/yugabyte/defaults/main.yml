@@ -1,4 +1,4 @@
-yugabyte_version: 2025.1.0
+yugabyte_version: 2025.2.0
 yugabyte_namespace: manetu-yugabyte
 
 yugabyte_master_affinity:

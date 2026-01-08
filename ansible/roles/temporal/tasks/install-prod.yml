@@ -50,7 +50,7 @@
         duration: "{{ temporal_tls_duration }}"
         commonName: temporal-ca-cert
         secretName: temporal-ca-secret
-        usage:
+        usages:
           - "cert sign"
         issuerRef:
           name: selfsigned-issuer
@@ -106,7 +106,7 @@
           - "temporal-elasticsearch-es-internal-http.{{ temporal_namespace }}"
           - "*.temporal-elasticsearch-es-default.{{ temporal_namespace }}.svc"
         secretName: temporal-elasticsearch-certificate
-        usage:
+        usages:
           - "server auth"
         issuerRef:
           name: temporal-ca-issuer
@@ -160,7 +160,7 @@
           - "*.{{ temporal_namespace }}.svc.cluster.local"
           - "*.{{ temporal_namespace }}"
         secretName: temporal-internode-certificate
-        usage:
+        usages:
           - "server auth"
           - "client auth"
         issuerRef:
@@ -186,7 +186,7 @@
           - "temporal-frontend.{{ temporal_namespace }}"
           - "temporal-frontend.{{ temporal_namespace }}.svc.cluster.local"
         secretName: temporal-frontend-certificate
-        usage:
+        usages:
           - "server auth"
         issuerRef:
           name: temporal-ca-issuer

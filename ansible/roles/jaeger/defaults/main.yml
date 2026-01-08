@@ -1,4 +1,4 @@
-jaeger_version: 0.73.1
+jaeger_version: 4.3.0
 jaeger_dns: jaeger.{{ mgmt_dns_suffix }}
 
 prometheus_monitor_labels: {}

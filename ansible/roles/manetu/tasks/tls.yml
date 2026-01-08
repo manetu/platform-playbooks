@@ -12,7 +12,7 @@
         duration: "{{ manetu_gateway_tls_ca_duration }}"
         commonName: manetu-ca-cert
         secretName: manetu-ca-secret
-        usage:
+        usages:
           - "cert sign"
         issuerRef:
           name: selfsigned-issuer

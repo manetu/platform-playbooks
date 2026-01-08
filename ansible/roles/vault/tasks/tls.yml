@@ -12,7 +12,7 @@
         duration: "{{ vault_tls_duration }}"
         commonName: vault-ca-cert
         secretName: vault-ca-secret
-        usage:
+        usages:
           - "cert sign"
         issuerRef:
           name: selfsigned-issuer
@@ -52,7 +52,7 @@
         ipAddresses:
           - "127.0.0.1"
         secretName: vault-certificate
-        usage:
+        usages:
           - "server auth"
           - "client auth"
         issuerRef:

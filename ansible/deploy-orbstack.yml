@@ -4,13 +4,14 @@
     - set_fact:
         manetu_namespace: "{{ manetu_namespace | default('manetu-platform') }}"
         manetu_dns: "{{ manetu_dns | default('manetu.k8s.orb.local') }}"
-        manetu_http_redirect: "{{ manetu_http_redirect | default(false) }}"
-        mgmt_dns_suffix: "{{ mgmt_dns_suffix | default('k8s.orb.local') }}"
-        default_storage_class: "{{ default_storage_class | default('local-path') }}"
         monitoring_enabled: "{{ monitoring_enabled | default(true) }}"
-        traefik_enabled: "{{ traefik_enabled | default(false) }}"
-        mgmt_ingress_class_name: "{{ mgmt_ingress_class_name | default('istio') }}"
-        mgmt_ingress_annotations: "{{ mgmt_ingress_annotations | default({'kubernetes.io/ingress.class': 'istio'}) }}"
+        mgmt_dns_suffix: "{{ mgmt_dns_suffix | default('k8s.orb.local') }}"
+        manetu_http_redirect: false
+        default_storage_class: local-path
+        traefik_enabled: false
+        mgmt_ingress_class_name: istio
+        mgmt_ingress_annotations:
+          kubernetes.io/ingress.class: istio
 
 - name: "Deploy k8s infrastructure"
   hosts: config_host
@@ -20,6 +21,8 @@
     - monitoring
     - cert-manager
     - istio
+    - kiali
+    - jaeger
 
 - name: "Deploy Third-party"
   import_playbook: deploy-thirdparty.yml

@@ -31,7 +31,7 @@ aws_storage_default_throughput: "1000"
 aws_storage_premium_iops: "4000"
 
 aws_cloudwatch_enabled: false
-aws_cloudwatch_version: 2.6.0
+aws_cloudwatch_version: 4.7.0
 aws_cloudwatch_namespace: amazon-cloudwatch
 
 aws_additional_admins: {} ## arns added here will gain system:masters level kubectl access

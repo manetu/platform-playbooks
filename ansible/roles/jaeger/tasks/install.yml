@@ -12,35 +12,72 @@
     values:
       provisionDataStore:
         cassandra: false
-      allInOne:
+        elasticsearch: false
+      jaeger:
         enabled: true
-        extraEnv:
-          - name: QUERY_BASE_PATH
-            value: /jaeger
-          - name: COLLECTOR_ZIPKIN_HOST_PORT
-            value: ":9411"
-        podAnnotations:
-          prometheus.io/scrape: "true"
-          prometheus.io/port: "14269"
+        replicas: 1
+        extraEnv: []
         podLabels:
           app: jaeger
-          sidecar.istio.io/inject:  "false"
-        serviceMonitor:
-          enabled: true
+          sidecar.istio.io/inject: "false"
         ingress:
           enabled: true
           ingressClassName: "{{ mgmt_ingress_class_name }}"
           annotations: "{{ mgmt_ingress_annotations }}"
           hosts:
             - "{{ jaeger_dns }}"
+          pathType: Prefix
       storage:
         type: none
-      agent:
-        enabled: false
-      collector:
-        enabled: false
-      query:
-        enabled: false
+      # Jaeger v2 uses OTEL collector config for receivers
+      config:
+        extensions:
+          jaeger_query:
+            storage:
+              traces: primary_store
+          jaeger_storage:
+            backends:
+              primary_store:
+                memory:
+                  max_traces: 100000
+        receivers:
+          otlp:
+            protocols:
+              grpc:
+                endpoint: 0.0.0.0:4317
+              http:
+                endpoint: 0.0.0.0:4318
+          jaeger:
+            protocols:
+              grpc:
+          zipkin:
+          
+- name: Create Jaeger Query Service 
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: jaeger-query
+        namespace: istio-system
+        labels:
+          app: jaeger
+          app.kubernetes.io/name: jaeger
+      spec:
+        type: ClusterIP
+        ports:
+          - name: http-query
+            port: 16686
+            protocol: TCP
+            targetPort: 16686
+          - name: grpc-query
+            port: 16685
+            protocol: TCP
+            targetPort: 16685
+        selector:
+          app.kubernetes.io/name: jaeger
+          app.kubernetes.io/component: all-in-one
 
 - name: Create Jaeger Tracing Service
   kubernetes.core.k8s:
@@ -65,7 +102,8 @@
             protocol: TCP
             targetPort: 16685
         selector:
-          app: jaeger
+          app.kubernetes.io/name: jaeger
+          app.kubernetes.io/component: all-in-one
 
 - name: Create Jaeger Zipkin Service
   kubernetes.core.k8s:
@@ -84,7 +122,8 @@
             targetPort: 9411
             name: http-query
         selector:
-          app: jaeger
+          app.kubernetes.io/name: jaeger
+          app.kubernetes.io/component: all-in-one
 
 - name: Create Jaeger Collector Service
   kubernetes.core.k8s:
@@ -116,7 +155,8 @@
         - port: 4318
           name: http-otel
         selector:
-          app: jaeger
+          app.kubernetes.io/name: jaeger
+          app.kubernetes.io/component: all-in-one
 
 - name: Create OTEL secrets for Manetu
   kubernetes.core.k8s:

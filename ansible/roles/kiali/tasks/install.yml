@@ -40,3 +40,9 @@
               in_cluster_url: '{{ jaeger_internal_url }}'
               use_grpc: true
               url: '{{ jaeger_external_url }}'
+            grafana:
+              auth:
+                type: none
+              enabled: true
+              in_cluster_url: '{{ grafana_internal_url }}'
+              url: '{{ grafana_external_url }}'
