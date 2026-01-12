@@ -7,7 +7,7 @@ This repository contains automation tools for managing the lifecycle of a Manetu
 ### Core Tools
 
 * [python](https://www.python.org/): Tested with v3.12
-* [ansible](https://www.ansible.com/): Tested with v2.18.x (ansible-core 2.18.6)
+* [ansible](https://www.ansible.com/): Tested with v2.20.x (ansible-core 2.20.1)
 * [helm](https://helm.sh/): Tested with v3.x (Helm v4 is not yet qualified)
 * [pwgen](https://linux.die.net/man/1/pwgen): Tested with v2.08
 * [make](https://www.gnu.org/software/make/manual/make.html): Tested with GNU Make v4.4.1
