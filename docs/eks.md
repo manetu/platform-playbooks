@@ -16,7 +16,7 @@ The following additional Ansible Galaxy collections are required for EKS deploym
 Install the required collections:
 
 ```shell
-ansible-galaxy collection install amazon.aws:==9.5.0 community.aws:==9.3.0
+ansible-galaxy collection install amazon.aws:==10.1.2 community.aws:==10.0.0
 ```
 
 ### Python Dependencies

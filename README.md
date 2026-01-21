@@ -16,14 +16,12 @@ This repository contains automation tools for managing the lifecycle of a Manetu
 
 The following Ansible Galaxy collections are required:
 
-* [kubernetes.core](https://galaxy.ansible.com/ui/repo/published/kubernetes/core/): Tested with v5.3.0
-
-> **Warning:** kubernetes.core v6.x has known compatibility issues with these playbooks. Please use v5.x.
+* [kubernetes.core](https://galaxy.ansible.com/ui/repo/published/kubernetes/core/): Tested with v6.2.0
 
 Install the required collection:
 
 ```shell
-ansible-galaxy collection install kubernetes.core:==5.3.0
+ansible-galaxy collection install kubernetes.core:==6.2.0
 ```
 
 ## Setup
