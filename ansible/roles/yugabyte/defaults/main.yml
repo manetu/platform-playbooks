@@ -1,5 +1,6 @@
 yugabyte_version: 2025.1.0
 yugabyte_namespace: manetu-yugabyte
+yugabyte_repo_url: "https://charts.yugabyte.com"
 
 yugabyte_master_affinity:
   podAntiAffinity:

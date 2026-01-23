@@ -1,7 +1,7 @@
 - name: Add Yugabyte chart repo
   kubernetes.core.helm_repository:
     name: yugabytedb
-    repo_url: "https://charts.yugabyte.com"
+    repo_url: "{{ yugabyte_repo_url }}"
 
 - name: Create namespace
   kubernetes.core.k8s:
