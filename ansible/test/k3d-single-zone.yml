@@ -1,0 +1,13 @@
+# k3d config for single-zone Yugabyte testing
+apiVersion: k3d.io/v1alpha5
+kind: Simple
+metadata:
+  name: yb-single
+servers: 1
+agents: 1
+options:
+  k3s:
+    extraArgs:
+      - arg: --disable=traefik
+        nodeFilters:
+          - server:*

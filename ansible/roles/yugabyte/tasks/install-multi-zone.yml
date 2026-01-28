@@ -1,0 +1,183 @@
+# Multi-AZ Yugabyte Installation (Single Namespace)
+# Deploys N Helm releases (one per zone) with zone-specific release names
+# All releases deploy to a single namespace for simpler NetworkPolicy
+
+- name: Validate multi-AZ configuration
+  ansible.builtin.assert:
+    that:
+      - yugabyte_zones | length > 0
+      - yugabyte_zones | map(attribute='name') | list | length == yugabyte_zones | length
+      - yugabyte_zones | map(attribute='zone') | list | length == yugabyte_zones | length
+    fail_msg: "yugabyte_zones must be a non-empty list with 'name' and 'zone' fields for each entry"
+
+- name: Compute total masters
+  ansible.builtin.set_fact:
+    yugabyte_total_masters: "{{ yugabyte_zones | length * yugabyte_zone_master_replicas }}"
+
+- name: Set primary zone release name
+  ansible.builtin.set_fact:
+    yugabyte_primary_release: "yb-{{ yugabyte_zones[0].name }}"
+
+- name: Build master addresses string
+  ansible.builtin.set_fact:
+    yugabyte_master_addresses: >-
+      {%- set masters = [] -%}
+      {%- for zone in yugabyte_zones -%}
+        {%- set release = 'yb-' + zone.name -%}
+        {%- for i in range(yugabyte_zone_master_replicas | int) -%}
+          {%- set _ = masters.append(release + '-yugabyte-yb-master-' + i|string + '.' + release + '-yugabyte-yb-masters.' + yugabyte_namespace + '.svc.cluster.local:7100') -%}
+        {%- endfor -%}
+      {%- endfor -%}
+      {{ masters | join(',') }}
+
+- name: Add Yugabyte chart repo
+  kubernetes.core.helm_repository:
+    name: yugabytedb
+    repo_url: "{{ yugabyte_repo_url }}"
+
+- name: Create namespace
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "{{ yugabyte_namespace }}"
+        labels:
+          access.manetu.io/yugabyte: "true"
+
+- name: Create CA certificate
+  when: yugabyte_tls_enabled
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ yugabyte_namespace }}"
+    definition:
+      apiVersion: cert-manager.io/v1
+      kind: Certificate
+      metadata:
+        name: yugabyte-ca-cert
+      spec:
+        isCA: true
+        duration: "{{ yugabyte_tls_duration }}"
+        commonName: yugabyte-ca-cert
+        secretName: yugabyte-ca-secret
+        usages:
+          - "cert sign"
+        issuerRef:
+          name: selfsigned-issuer
+          kind: ClusterIssuer
+
+- name: Wait for CA secret
+  when: yugabyte_tls_enabled
+  kubernetes.core.k8s_info:
+    kind: Secret
+    namespace: "{{ yugabyte_namespace }}"
+    name: yugabyte-ca-secret
+    wait: true
+    wait_timeout: 120
+
+- name: Create CA issuer
+  when: yugabyte_tls_enabled
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ yugabyte_namespace }}"
+    definition:
+      apiVersion: cert-manager.io/v1
+      kind: Issuer
+      metadata:
+        name: yugabyte-ca-issuer
+      spec:
+        ca:
+          secretName: yugabyte-ca-secret
+
+- name: Deploy each zone
+  ansible.builtin.include_tasks: install-zone.yml
+  loop: "{{ yugabyte_zones }}"
+  loop_control:
+    loop_var: current_zone
+    index_var: zone_index
+
+- name: Create unified tserver service
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ yugabyte_namespace }}"
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: yugabyte-yb-tservers
+      spec:
+        clusterIP: None
+        selector:
+          app.kubernetes.io/name: yb-tserver
+        ports:
+          - name: tcp-yql-port
+            port: 9042
+            protocol: TCP
+          - name: tcp-ysql-port
+            port: 5433
+            protocol: TCP
+          - name: tcp-rpc-port
+            port: 9100
+            protocol: TCP
+
+- name: Wait for all masters across all zones
+  kubernetes.core.k8s_info:
+    kind: Pod
+    namespace: "{{ yugabyte_namespace }}"
+    name: "yb-{{ zone.name }}-yugabyte-yb-master-0"
+    field_selectors:
+      - status.phase=Running
+    wait: true
+    wait_timeout: 300
+  loop: "{{ yugabyte_zones }}"
+  loop_control:
+    loop_var: zone
+
+- name: Wait for tservers in primary zone
+  kubernetes.core.k8s_info:
+    kind: Pod
+    namespace: "{{ yugabyte_namespace }}"
+    name: "{{ yugabyte_primary_release }}-yugabyte-yb-tserver-0"
+    field_selectors:
+      - status.phase=Running
+    wait: true
+    wait_timeout: 300
+
+- name: Set passwords
+  ansible.builtin.include_tasks: set-passwords.yml
+  vars:
+    _yugabyte_namespace: "{{ yugabyte_namespace }}"
+    _yugabyte_pod_prefix: "{{ yugabyte_primary_release }}-yugabyte-yb"
+    _yugabyte_tserver_service: "yugabyte-yb-tservers"
+
+- name: Build placement info string
+  ansible.builtin.set_fact:
+    yugabyte_placement_info: >-
+      {%- set placements = [] -%}
+      {%- for zone in yugabyte_zones -%}
+        {%- set _ = placements.append(yugabyte_placement_cloud + '.' + yugabyte_placement_region + '.' + zone.zone + ':' + (yugabyte_zone_tserver_replicas | string)) -%}
+      {%- endfor -%}
+      {{ placements | join(',') }}
+
+- name: Configure replica placement
+  kubernetes.core.k8s_exec:
+    namespace: "{{ yugabyte_namespace }}"
+    pod: "{{ yugabyte_primary_release }}-yugabyte-yb-master-0"
+    container: yb-master
+    command: >-
+      /home/yugabyte/bin/yb-admin
+      --master_addresses {{ yugabyte_master_addresses }}
+      -certs_dir_name /opt/certs/yugabyte
+      modify_placement_info
+      {{ yugabyte_placement_info }}
+      {{ yugabyte_zones | length }}
+  register: result
+  retries: 6
+  delay: 10
+  until: result.rc == 0
+
+- name: Create Manetu configuration
+  ansible.builtin.include_tasks: create-manetu-config.yml
+  vars:
+    _yugabyte_namespace: "{{ yugabyte_namespace }}"

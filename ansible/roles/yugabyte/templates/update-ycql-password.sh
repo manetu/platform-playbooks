@@ -5,7 +5,7 @@ export SSL_CERTFILE=/home/yugabyte/cert-manager/ca.crt
 newpassword=$1
 
 function invoke {
-    ycqlsh --ssl yugabyte-yb-tservers -u cassandra -p $1 -e "$2"
+    ycqlsh --ssl {{ _yugabyte_tserver_service | default('yugabyte-yb-tservers') }} -u cassandra -p $1 -e "$2"
 }
 
 function check_connection {

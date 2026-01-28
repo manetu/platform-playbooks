@@ -1,0 +1,35 @@
+# Test profile for multi-zone Yugabyte deployment
+# Minimal resources for local k3d testing with 3 zones
+
+storage_enabled: false
+
+yugabyte_multi_az_enabled: true
+yugabyte_placement_cloud: "k3d"
+yugabyte_placement_region: "local"
+
+yugabyte_zone_master_replicas: 1
+yugabyte_zone_tserver_replicas: 1
+
+yugabyte_zones:
+  - name: zone-a
+    zone: zone-a
+  - name: zone-b
+    zone: zone-b
+  - name: zone-c
+    zone: zone-c
+
+yugabyte_resources:
+  master:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  tserver:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 1
+      memory: 1Gi

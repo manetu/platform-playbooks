@@ -63,3 +63,27 @@ yugabyte_resources:
 monitoring_enabled: false
 alerts_enabled: false
 prometheus_monitor_labels: {}
+
+# Multi-AZ Configuration (default: disabled for backward compatibility)
+yugabyte_multi_az_enabled: false
+
+# Zone definitions - list of zone configurations
+# Only used when yugabyte_multi_az_enabled is true
+yugabyte_zones: []
+# Example:
+#   - name: zone-a           # Used in namespace suffix (required)
+#     zone: us-east-1a       # Actual AZ name for placement gflags (required)
+#     node_selector: {}      # Optional: override default zone selector
+#     tserver_replicas: 1    # Optional: override default tservers for this zone
+
+# Placement info for multi-AZ (used in gflags)
+yugabyte_placement_cloud: "kubernetes"
+yugabyte_placement_region: "default"
+
+# Per-zone replica counts (for multi-AZ mode) - can be overridden per zone
+yugabyte_zone_master_replicas: 1     # Masters per zone (typically 1)
+yugabyte_zone_tserver_replicas: 1    # Default tservers per zone (can scale)
+
+# Default node selector uses standard k8s topology label
+# Zone value is substituted from each zone's "zone" field
+yugabyte_zone_node_selector_key: "topology.kubernetes.io/zone"

@@ -1,0 +1,24 @@
+# k3d config for multi-zone Yugabyte testing
+# Creates 3 agent nodes, each labeled with a different zone
+apiVersion: k3d.io/v1alpha5
+kind: Simple
+metadata:
+  name: yb-multi
+servers: 1
+agents: 3
+options:
+  k3s:
+    extraArgs:
+      - arg: --disable=traefik
+        nodeFilters:
+          - server:*
+    nodeLabels:
+      - label: topology.kubernetes.io/zone=zone-a
+        nodeFilters:
+          - agent:0
+      - label: topology.kubernetes.io/zone=zone-b
+        nodeFilters:
+          - agent:1
+      - label: topology.kubernetes.io/zone=zone-c
+        nodeFilters:
+          - agent:2

@@ -1,4 +1,15 @@
-- include_tasks: install.yml
+- name: Set yugabyte_hosts
+  ansible.builtin.set_fact:
+    yugabyte_hosts: "yugabyte-yb-tservers.{{ yugabyte_namespace }}.svc.cluster.local"
 
-- include_tasks: monitoring.yml
+- name: Include single-zone installation
+  when: not yugabyte_multi_az_enabled
+  ansible.builtin.include_tasks: install-single-zone.yml
+
+- name: Include multi-zone installation
+  when: yugabyte_multi_az_enabled
+  ansible.builtin.include_tasks: install-multi-zone.yml
+
+- name: Include monitoring tasks
   when: monitoring_enabled
+  ansible.builtin.include_tasks: monitoring.yml

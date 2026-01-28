@@ -1,0 +1,45 @@
+# Create Yugabyte configuration for Manetu consumers
+# Required variables:
+#   _yugabyte_namespace: namespace where Yugabyte is deployed (for fetching client cert)
+#   yugabyte_hosts: comma-separated list of tserver hosts (set by main.yml)
+
+- name: Get CA certificate
+  when: yugabyte_tls_enabled
+  kubernetes.core.k8s_info:
+    kind: Secret
+    namespace: "{{ _yugabyte_namespace }}"
+    name: yugabyte-client-tls
+    wait: true
+  register: client_cert
+
+- name: Create Yugabyte secrets for Manetu
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ manetu_namespace }}"
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: yugabyte-secrets
+      type: Opaque
+      data:
+        YUGABYTE_TLS_CERT: "{{ client_cert.resources[0].data['ca.crt'] | default('') }}"
+        YUGABYTE_USERNAME: "{{ yugabyte_cql_auth_enabled | ternary(('cassandra' | b64encode), '') }}"
+        YUGABYTE_PASSWORD: "{{ yugabyte_cql_auth_enabled | ternary((yugabyte_password | b64encode), '') }}"
+        YSQL_USERNAME: "{{ 'yugabyte' | b64encode }}"
+        YSQL_PASSWORD: "{{ yugabyte_password | b64encode }}"
+
+- name: Create Yugabyte configuration for Manetu
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ manetu_namespace }}"
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: yugabyte-config
+      data:
+        YUGABYTE_HOSTS: "{{ yugabyte_hosts }}"
+        YUGABYTE_PORT: "9042"
+        YUGABYTE_TLS_ENABLED: "{{ yugabyte_tls_enabled | string | lower | quote }}"
+        YSQL_PORT: "5433"

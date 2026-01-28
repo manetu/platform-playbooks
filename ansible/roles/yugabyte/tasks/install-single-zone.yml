@@ -135,85 +135,13 @@
     wait: true
   loop: "{{ range(0, yugabyte_master_replicas) | list }}"
 
-- name: Copy YCQL script to cluster
-  when: yugabyte_cql_auth_enabled
-  kubernetes.core.k8s_cp:
-    namespace: "{{ yugabyte_namespace }}"
-    pod:  yugabyte-yb-master-0
-    container: yb-master
-    content: "{{ lookup('template', 'update-ycql-password.sh') }}"
-    remote_path: /tmp/update-ycql-password.sh
+- name: Set passwords
+  ansible.builtin.include_tasks: set-passwords.yml
+  vars:
+    _yugabyte_namespace: "{{ yugabyte_namespace }}"
+    _yugabyte_pod_prefix: "yugabyte-yb"
 
-- name: Set YCQL password
-  when: yugabyte_cql_auth_enabled
-  kubernetes.core.k8s_exec:
-    namespace: "{{ yugabyte_namespace }}"
-    pod: yugabyte-yb-master-0
-    container: yb-master
-    command: sh /tmp/update-ycql-password.sh {{ yugabyte_password }}
-  register: result
-  failed_when: result.rc != 0 and result.rc != 2
-  retries: 18
-  delay: 5
-  until: result is not failed
-
-- name: Copy YSQL script to cluster
-  kubernetes.core.k8s_cp:
-    namespace: "{{ yugabyte_namespace }}"
-    pod:  yugabyte-yb-tserver-0
-    container: yb-tserver
-    content: "{{ lookup('template', 'update-ysql-password.sh') }}"
-    remote_path: /tmp/update-ysql-password.sh
-
-- name: Set YSQL password
-  kubernetes.core.k8s_exec:
-    namespace: "{{ yugabyte_namespace }}"
-    pod:  yugabyte-yb-tserver-0
-    container: yb-tserver
-    command: sh /tmp/update-ysql-password.sh {{ yugabyte_password }}
-  register: result
-  failed_when: result.rc != 0 and result.rc != 2
-  retries: 18
-  delay: 5
-  until: result is not failed
-
-- name: Get CA certificate
-  when: yugabyte_tls_enabled
-  kubernetes.core.k8s_info:
-    kind: Secret
-    namespace: "{{ yugabyte_namespace }}"
-    name: yugabyte-client-tls
-    wait: true
-  register: client_cert
-
-- name: Create Yugabyte secrets for Manetu
-  kubernetes.core.k8s:
-    state: present
-    namespace: "{{ manetu_namespace }}"
-    definition:
-      apiVersion: v1
-      kind: Secret
-      metadata:
-        name: yugabyte-secrets
-      type: Opaque
-      data:
-        YUGABYTE_TLS_CERT: "{{ client_cert.resources[0].data['ca.crt'] | default('') }}"
-        YUGABYTE_USERNAME: "{{ yugabyte_cql_auth_enabled | ternary(('cassandra' | b64encode), '') }}"
-        YUGABYTE_PASSWORD: "{{ yugabyte_cql_auth_enabled | ternary((yugabyte_password | b64encode), '') }}"
-        YSQL_USERNAME: "{{'yugabyte' | b64encode }}"
-        YSQL_PASSWORD: "{{ yugabyte_password | b64encode }}"
-
-- name: Create Yugabyte configuration for Manetu
-  kubernetes.core.k8s:
-    state: present
-    namespace: "{{ manetu_namespace }}"
-    definition:
-      apiVersion: v1
-      kind: ConfigMap
-      metadata:
-        name: yugabyte-config
-      data:
-        YUGABYTE_HOSTS: "{{ ('yugabyte-yb-tservers.' + yugabyte_namespace + '.svc.cluster.local') }}"
-        YUGABYTE_PORT: "9042"
-        YUGABYTE_TLS_ENABLED: "{{ yugabyte_tls_enabled | string | lower | quote }}"
-        YSQL_PORT: "5433"
+- name: Create Manetu configuration
+  ansible.builtin.include_tasks: create-manetu-config.yml
+  vars:
+    _yugabyte_namespace: "{{ yugabyte_namespace }}"

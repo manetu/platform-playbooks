@@ -1,0 +1,80 @@
+# Per-zone Yugabyte Helm deployment (Single Namespace)
+# Called from install-multi-zone.yml in a loop
+# Uses zone-specific release names to avoid collisions in single namespace
+
+- name: Set zone release name
+  ansible.builtin.set_fact:
+    zone_release_name: "yb-{{ current_zone.name }}"
+
+- name: Set zone node selector
+  ansible.builtin.set_fact:
+    zone_node_selector: "{{ current_zone.node_selector | default({yugabyte_zone_node_selector_key: current_zone.zone}) }}"
+
+- name: Set zone tserver replicas
+  ansible.builtin.set_fact:
+    zone_tserver_replicas: "{{ current_zone.tserver_replicas | default(yugabyte_zone_tserver_replicas) }}"
+
+- name: Install Yugabyte in zone {{ current_zone.name }}
+  kubernetes.core.helm:
+    name: "{{ zone_release_name }}"
+    chart_ref: yugabytedb/yugabyte
+    chart_version: "{{ yugabyte_version }}"
+    release_namespace: "{{ yugabyte_namespace }}"
+    wait: true
+    values:
+      isMultiAz: true
+      AZ: "{{ current_zone.zone }}"
+      masterAddresses: "{{ yugabyte_master_addresses }}"
+      nodeSelector: "{{ zone_node_selector }}"
+      master:
+        affinity: "{{ yugabyte_master_affinity }}"
+        tolerations: "{{ yugabyte_master_tolerations }}"
+        memoryLimitHardPercentage: 100
+      tserver:
+        affinity: "{{ yugabyte_tserver_affinity }}"
+        tolerations: "{{ yugabyte_tserver_tolerations }}"
+        memoryLimitHardPercentage: 100
+      replicas:
+        master: "{{ yugabyte_zone_master_replicas }}"
+        tserver: "{{ zone_tserver_replicas }}"
+        totalMasters: "{{ yugabyte_total_masters }}"
+      storage:
+        ephemeral: "{{ not storage_enabled | default('false') }}"
+        master:
+          count: 1
+          size: "{{ yugabyte_master_storage_size }}"
+          storageClass: "{{ yugabyte_master_storage_class }}"
+        tserver:
+          count: 1
+          size: "{{ yugabyte_tserver_storage_size }}"
+          storageClass: "{{ yugabyte_tserver_storage_class }}"
+      enableLoadBalancer: "{{ yugabyte_loadbalancer }}"
+      resource: "{{ yugabyte_resources }}"
+      oldNamingStyle: false
+      tls:
+        enabled: "{{ yugabyte_tls_enabled }}"
+        nodeToNode: "{{ yugabyte_tls_enabled }}"
+        clientToServer: "{{ yugabyte_tls_enabled }}"
+        insecure: false
+        certManager:
+          enabled: "{{ yugabyte_tls_enabled }}"
+          bootstrapSelfsigned: false
+          issuer: yugabyte-ca-issuer
+          certificates:
+            duration: "{{ yugabyte_tls_duration }}"
+      gflags:
+        master:
+          placement_cloud: "{{ yugabyte_placement_cloud }}"
+          placement_region: "{{ yugabyte_placement_region }}"
+          placement_zone: "{{ current_zone.zone }}"
+        tserver:
+          placement_cloud: "{{ yugabyte_placement_cloud }}"
+          placement_region: "{{ yugabyte_placement_region }}"
+          placement_zone: "{{ current_zone.zone }}"
+          use_cassandra_authentication: "{{ yugabyte_cql_auth_enabled }}"
+          ysql_enable_auth: true
+          ysql_pg_conf_csv: password_encryption=scram-sha-256
+      serviceMonitor:
+        enabled: "{{ monitoring_enabled }}"
+        interval: 10s
+        extraLabels: "{{ prometheus_monitor_labels }}"

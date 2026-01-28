@@ -247,7 +247,7 @@ Manetu recommends a standardized hardware form factor consisting of an [amd64](h
 
 #### Network
 
-Manetu is designed to operate across [Availability Zones](https://en.wikipedia.org/wiki/Availability_zone) but will operate best when inter-az network traffic maintains a latency target below 150us under load.
+Manetu is designed to operate across [Availability Zones](https://en.wikipedia.org/wiki/Availability_zone) but will operate best when inter-az network traffic maintains a latency target below 150us under load. See [Yugabyte Multi-AZ](./docs/yugabyte-multi-az.md) for configuring zone-distributed database deployments.
 
 #### Storage
 

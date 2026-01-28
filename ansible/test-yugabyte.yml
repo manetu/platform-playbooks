@@ -1,0 +1,43 @@
+# Minimal playbook for testing Yugabyte role in isolation
+# Usage: ansible-playbook test-yugabyte.yml -e @profiles/test-yugabyte-single.yml
+#    or: ansible-playbook test-yugabyte.yml -e @profiles/test-yugabyte-multi-az.yml
+
+- name: "Test Yugabyte Deployment"
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    manetu_namespace: manetu-platform
+    yugabyte_password: testpassword123
+
+  pre_tasks:
+    - name: Create Manetu namespace (minimal for testing)
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: "{{ manetu_namespace }}"
+            labels:
+              access.manetu.io/yugabyte: "true"
+
+  roles:
+    - cert-manager
+    - yugabyte
+
+  post_tasks:
+    - name: Display yugabyte_hosts value
+      ansible.builtin.debug:
+        msg: "yugabyte_hosts = {{ yugabyte_hosts }}"
+
+    - name: Verify Yugabyte ConfigMap created
+      kubernetes.core.k8s_info:
+        kind: ConfigMap
+        namespace: "{{ manetu_namespace }}"
+        name: yugabyte-config
+      register: yb_config
+
+    - name: Show ConfigMap data
+      ansible.builtin.debug:
+        msg: "{{ yb_config.resources[0].data }}"

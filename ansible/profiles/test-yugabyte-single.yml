@@ -1,0 +1,23 @@
+# Test profile for single-zone Yugabyte deployment
+# Minimal resources for local k3d testing
+
+storage_enabled: false
+
+yugabyte_multi_az_enabled: false
+yugabyte_master_replicas: 1
+yugabyte_tserver_replicas: 1
+yugabyte_resources:
+  master:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  tserver:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 1
+      memory: 1Gi
