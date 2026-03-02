@@ -1,5 +1,21 @@
 protect-kernel-defaults: true
+disable-helm-controller: true
+disable-cloud-controller: true
+token: {{ k3s_token }}
+cluster-cidr: {{ k3s_cluster_cidr }}
+node-name: {{ hostname_cmd.stdout }}
+disable:
+  - traefik
+{% if not servicelb_enabled %}
+  - servicelb
+{% endif %}
+{% if not local_storage_enabled %}
+  - local-storage
+{% endif %}
+
 {% if k3s_role == "server" %}
+# server configuration
+cluster-init: true
 secrets-encryption: true
 kube-apiserver-arg:
   - 'audit-log-path=/var/lib/rancher/k3s/server/logs/audit.log'
@@ -12,7 +28,25 @@ kube-apiserver-arg:
 kube-controller-manager-arg:
   - 'terminated-pod-gc-threshold=10'
   - 'use-service-account-credentials=true'
+{% else %}
+# agent configuration
+server: https://{{ k3s_primary_host }}:6443
 {% endif %}
+
+{% if k3s_cluster_enabled %}
+flannel-backend: wireguard-native
+node-ip: {{ ansible_ssh_host }} 
+{% endif %}
+
+{% if k3s_external_ip %}
+node-ip: {{ k3s_external_ip }} \
+node-external-ip: {{ k3s_external_ip }} \
+{% endif %}
+
+{% if k3s_cluster_iface %}
+flannel-iface: {{ k3s_cluster_iface }} \
+{% endif %}
+   
 kubelet-arg:
   - 'streaming-connection-idle-timeout=5m'
   - 'make-iptables-util-chains=true'

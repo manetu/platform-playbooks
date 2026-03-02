@@ -23,7 +23,7 @@
       register: ec2
 
     - name: Delete EC2 instance
-      when: ec2.instances | default([]) | length
+      when: (ec2.instances | default([]) | length) > 0
       delegate_to: localhost
       amazon.aws.ec2_instance:
         region: "{{ aws_region }}"

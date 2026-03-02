@@ -1,3 +1,8 @@
+- name: Get hostname
+  shell:
+    cmd: hostname -f
+  register: hostname_cmd
+  
 - name: Create configuration directory
   become: true
   ansible.builtin.file:
@@ -37,3 +42,4 @@
 - name: Install K3s
   become: true
   shell: "{{ lookup('template', 'install.sh') }}"
+  
