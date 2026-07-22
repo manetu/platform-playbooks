@@ -139,6 +139,8 @@
     wait: true
     values:
       namespace: "{{ minio_namespace }}"
+      image:
+        tag: "{{ minio_image_tag }}"
       replicas: "{{ minio_replicas }}"
       mode: "{{ minio_mode }}"
       existingSecret: minio-admin-creds

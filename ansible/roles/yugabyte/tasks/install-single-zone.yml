@@ -112,7 +112,11 @@
         certManager:
           enabled: "{{ yugabyte_tls_enabled }}"
           bootstrapSelfsigned: false
-          issuer: yugabyte-ca-issuer
+          useCustomIssuer: true
+          customIssuer:
+            kind: Issuer
+            name: yugabyte-ca-issuer
+            group: cert-manager.io
           certificates:
             duration: "{{yugabyte_tls_duration}}"
       gflags:

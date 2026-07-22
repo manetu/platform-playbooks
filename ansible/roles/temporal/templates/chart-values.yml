@@ -186,6 +186,8 @@ schema:
 
 web:
   enabled: true
+  image:
+    tag: {{ temporal_ui_version }}
   affinity: {{ temporal_affinity }}
   nodeSelector: {{ temporal_nodeSelector }}
   tolerations: {{ temporal_tolerations }}

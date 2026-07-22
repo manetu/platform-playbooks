@@ -1,5 +1,6 @@
 minio_enabled: true
 minio_version: 5.4.0
+minio_image_tag: RELEASE.2025-09-07T16-13-09Z
 minio_namespace: manetu-minio
 minio_replicas: 3
 minio_mode: distributed

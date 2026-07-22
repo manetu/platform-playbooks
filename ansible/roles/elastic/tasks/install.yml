@@ -51,6 +51,7 @@
                storageClassName: "{{ elasticsearch_storage_class }}"
 
 - name: Configure ElasticSearch Ingress
+  when: traefik_enabled | default(true)
   kubernetes.core.k8s:
     namespace: "{{ elasticsearch_namespace }}"
     state: present
@@ -86,6 +87,7 @@
           name: "{{ elasticsearch_name }}"
 
 - name: Configure Kibana Ingress
+  when: traefik_enabled | default(true)
   kubernetes.core.k8s:
     namespace: "{{ elasticsearch_namespace }}"
     state: present

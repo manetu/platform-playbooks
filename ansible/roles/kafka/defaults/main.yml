@@ -1,6 +1,6 @@
-strimzi_version: 0.49.1
+strimzi_version: 0.51.0
 
-kafka_version: 4.0.0
+kafka_version: 4.2.0
 kafka_replicas: 3
 kafka_namespace: manetu-kafka
 kafka_storage_class: "{{ default_storage_class | default('default') }}"
