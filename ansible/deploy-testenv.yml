@@ -7,7 +7,8 @@
         monitoring_enabled: "{{ monitoring_enabled | default(false) }}"
         alerts_enabled: "{{ alerts_enabled | default(false) }}"
         tracing_enabled: "{{ tracing_enabled | default(false) }}"
-        storage_enabled: "{{ storage_enabled | default(false) }}"
+        # persistent by default: yugabyte 2025.2.x certManager-init needs a shared /mnt/disk0 (its node certs vanish under ephemeral storage)
+        storage_enabled: "{{ storage_enabled | default(true) }}"
         default_storage_class: "{{ default_storage_class | default('local-path') }}"
         vault_devmode: "{{ vault_devmode | default(true) }}"
 
