@@ -140,7 +140,12 @@
     values:
       namespace: "{{ minio_namespace }}"
       image:
+        repository: "{{ minio_image_repo }}"
         tag: "{{ minio_image_tag }}"
+      mcImage:
+        repository: "{{ minio_mc_image_repo }}"
+        tag: "{{ minio_mc_image_tag }}"
+      pullPolicy: IfNotPresent
       replicas: "{{ minio_replicas }}"
       mode: "{{ minio_mode }}"
       existingSecret: minio-admin-creds
